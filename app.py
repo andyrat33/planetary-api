@@ -186,27 +186,33 @@ def planet_details(planet_id: int):
 @jwt_required
 def add_planet():
     if request.is_json:
-        planet_name = request.json["planet_name"]
-    else:
-        planet_name = request.form["planet_name"]
-
-    test = Planet.query.filter_by(planet_name=planet_name).first()
-    if test:
-        return jsonify(message="There is already a planet by that name"), 409
-    else:
-        if request.is_json:
+        try:
+            planet_name = request.json["planet_name"]
             planet_type = request.json["planet_type"]
             home_star = request.json["home_star"]
             mass = float(request.json["mass"])
             radius = float(request.json["radius"])
             distance = float(request.json["distance"])
-        else:
+        except Exception as e:
+            return jsonify(message="Missing Parameter", errno=str(e)), 400
+    else:
+        try:
+            planet_name = request.form["planet_name"]
             planet_type = request.form["planet_type"]
             home_star = request.form["home_star"]
             mass = float(request.form["mass"])
             radius = float(request.form["radius"])
             distance = float(request.form["distance"])
+        except Exception as e:
+            return jsonify(message="Missing Parameter", errno=str(e)), 400
 
+    if not planet_name:
+            return jsonify(message="missing planet name"), 400
+
+    test = Planet.query.filter_by(planet_name=planet_name).first()
+    if test:
+        return jsonify(message="There is already a planet by that name"), 409
+    else:
         new_planet = Planet(
             planet_name=planet_name,
             planet_type=planet_type,
