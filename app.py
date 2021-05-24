@@ -230,15 +230,38 @@ def add_planet():
 @app.route("/update_planet", methods=["PUT"])
 @jwt_required
 def update_planet():
-    planet_id = int(request.form["planet_id"])
+
+    if request.is_json:
+        try:
+            planet_id = request.json["planet_id"]
+            planet_name = request.json["planet_name"]
+            planet_type = request.json["planet_type"]
+            home_star = request.json["home_star"]
+            mass = float(request.json["mass"])
+            radius = float(request.json["radius"])
+            distance = float(request.json["distance"])
+        except Exception as e:
+            return jsonify(message="Missing Parameter", errno=str(e)), 400
+    else:
+        try:
+            planet_id = request.form["planet_id"]
+            planet_name = request.form["planet_name"]
+            planet_type = request.form["planet_type"]
+            home_star = request.form["home_star"]
+            mass = float(request.form["mass"])
+            radius = float(request.form["radius"])
+            distance = float(request.form["distance"])
+        except Exception as e:
+            return jsonify(message="Missing Parameter", errno=str(e)), 400
+
     planet = Planet.query.filter_by(planet_id=planet_id).first()
     if planet:
-        planet.planet_name = request.form["planet_name"]
-        planet.planet_type = request.form["planet_type"]
-        planet.home_star = request.form["home_star"]
-        planet.mass = float(request.form["mass"])
-        planet.radius = float(request.form["radius"])
-        planet.distance = float(request.form["distance"])
+        planet.planet_name = planet_name
+        planet.planet_type = planet_type
+        planet.home_star = home_star
+        planet.mass = mass
+        planet.radius = radius
+        planet.distance = distance
         db.session.commit()
         return jsonify(message="You updated a planet"), 202
     else:
