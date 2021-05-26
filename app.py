@@ -84,12 +84,7 @@ def db_seed():
 
 @app.route("/")
 def hello_world():
-    return "Hello World!"
-
-
-@app.route("/super_simple")
-def super_simple():
-    return jsonify(message="Hello from the Planetary API."), 200
+    return "Planetary-API!"
 
 
 @app.route("/not_found")
@@ -97,29 +92,11 @@ def not_found():
     return jsonify(message="That resource was not found"), 404
 
 
-@app.route("/parameters")
-def parameters():
-    name = request.args.get("name")
-    age = int(request.args.get("age"))
-    if age < 18:
-        return jsonify(message="Sorry " + name + ", you are not old enough."), 401
-    else:
-        return jsonify(message="Welcome " + name + ", you are old enough!")
-
-
-@app.route("/url_variables/<string:name>/<int:age>")
-def url_variables(name: str, age: int):
-    if age < 18:
-        return jsonify(message="Sorry " + name + ", you are not old enough."), 401
-    else:
-        return jsonify(message="Welcome " + name + ", you are old enough!")
-
-
 @app.route("/planets", methods=["GET"])
 def planets():
     planets_list = Planet.query.all()
     result = planets_schema.dump(planets_list)
-    return jsonify(result.data)
+    return jsonify(result.data), 201
 
 
 @app.route("/register", methods=["POST"])
@@ -186,25 +163,18 @@ def planet_details(planet_id: int):
 @jwt_required
 def add_planet():
     if request.is_json:
-        try:
-            planet_name = request.json["planet_name"]
-            planet_type = request.json["planet_type"]
-            home_star = request.json["home_star"]
-            mass = float(request.json["mass"])
-            radius = float(request.json["radius"])
-            distance = float(request.json["distance"])
-        except Exception as e:
-            return jsonify(message="Missing Parameter", errno=str(e)), 400
+        requestCommand = request.json
     else:
-        try:
-            planet_name = request.form["planet_name"]
-            planet_type = request.form["planet_type"]
-            home_star = request.form["home_star"]
-            mass = float(request.form["mass"])
-            radius = float(request.form["radius"])
-            distance = float(request.form["distance"])
-        except Exception as e:
-            return jsonify(message="Missing Parameter", errno=str(e)), 400
+        requestCommand = request.form
+    try:
+        planet_name = requestCommand["planet_name"]
+        planet_type = requestCommand["planet_type"]
+        home_star = requestCommand["home_star"]
+        mass = float(requestCommand["mass"])
+        radius = float(requestCommand["radius"])
+        distance = float(requestCommand["distance"])
+    except Exception as e:
+        return jsonify(message="Missing Parameter", errno=str(e)), 400
 
     if not planet_name:
             return jsonify(message="missing planet name"), 400
@@ -230,29 +200,22 @@ def add_planet():
 @app.route("/update_planet", methods=["PUT"])
 @jwt_required
 def update_planet():
-
     if request.is_json:
-        try:
-            planet_id = request.json["planet_id"]
-            planet_name = request.json["planet_name"]
-            planet_type = request.json["planet_type"]
-            home_star = request.json["home_star"]
-            mass = float(request.json["mass"])
-            radius = float(request.json["radius"])
-            distance = float(request.json["distance"])
-        except Exception as e:
-            return jsonify(message="Missing Parameter", errno=str(e)), 400
+        requestCommand = request.json
     else:
-        try:
-            planet_id = request.form["planet_id"]
-            planet_name = request.form["planet_name"]
-            planet_type = request.form["planet_type"]
-            home_star = request.form["home_star"]
-            mass = float(request.form["mass"])
-            radius = float(request.form["radius"])
-            distance = float(request.form["distance"])
-        except Exception as e:
-            return jsonify(message="Missing Parameter", errno=str(e)), 400
+        requestCommand = request.form
+
+    try:
+        planet_id = requestCommand["planet_id"]
+        planet_name = requestCommand["planet_name"]
+        planet_type = requestCommand["planet_type"]
+        home_star = requestCommand["home_star"]
+        mass = float(requestCommand["mass"])
+        radius = float(requestCommand["radius"])
+        distance = float(requestCommand["distance"])
+    except Exception as e:
+        return jsonify(message="Missing Parameter", errno=str(e)), 400
+
 
     planet = Planet.query.filter_by(planet_id=planet_id).first()
     if planet:
