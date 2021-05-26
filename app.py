@@ -96,7 +96,7 @@ def not_found():
 def planets():
     planets_list = Planet.query.all()
     result = planets_schema.dump(planets_list)
-    return jsonify(result.data), 201
+    return jsonify(result.data), 200
 
 
 @app.route("/register", methods=["POST"])
