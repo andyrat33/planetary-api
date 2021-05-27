@@ -1,15 +1,16 @@
 pipeline {
+
+  stages {
   agent {
     dockerfile {
       filename 'Dockerfile'
     }
 
   }
-  stages {
     stage('Build') {
       steps {
         sh '''echo "Building..."
-echo "Docker.."'''
+        python3 -m flask run --host=0.0.0.0'''
       }
     }
 
