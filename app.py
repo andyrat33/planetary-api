@@ -6,6 +6,7 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
 
+DOES_NOT_EXIST = "That planet does not exist"
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -156,28 +157,28 @@ def planet_details(planet_id: int):
         result = planet_schema.dump(planet)
         return jsonify(result.data)
     else:
-        return jsonify(message="That planet does not exist"), 404
+        return jsonify(message=DOES_NOT_EXIST), 404
 
 
 @app.route("/add_planet", methods=["POST"])
 @jwt_required
 def add_planet():
     if request.is_json:
-        requestCommand = request.json
+        request_command = request.json
     else:
-        requestCommand = request.form
+        request_command = request.form
     try:
-        planet_name = requestCommand["planet_name"]
-        planet_type = requestCommand["planet_type"]
-        home_star = requestCommand["home_star"]
-        mass = float(requestCommand["mass"])
-        radius = float(requestCommand["radius"])
-        distance = float(requestCommand["distance"])
+        planet_name = request_command["planet_name"]
+        planet_type = request_command["planet_type"]
+        home_star = request_command["home_star"]
+        mass = float(request_command["mass"])
+        radius = float(request_command["radius"])
+        distance = float(request_command["distance"])
     except Exception as e:
         return jsonify(message="Missing Parameter", errno=str(e)), 400
 
     if not planet_name:
-            return jsonify(message="missing planet name"), 400
+        return jsonify(message="missing planet name"), 400
 
     test = Planet.query.filter_by(planet_name=planet_name).first()
     if test:
@@ -201,21 +202,20 @@ def add_planet():
 @jwt_required
 def update_planet():
     if request.is_json:
-        requestCommand = request.json
+        request_command = request.json
     else:
-        requestCommand = request.form
+        request_command = request.form
 
     try:
-        planet_id = requestCommand["planet_id"]
-        planet_name = requestCommand["planet_name"]
-        planet_type = requestCommand["planet_type"]
-        home_star = requestCommand["home_star"]
-        mass = float(requestCommand["mass"])
-        radius = float(requestCommand["radius"])
-        distance = float(requestCommand["distance"])
+        planet_id = request_command["planet_id"]
+        planet_name = request_command["planet_name"]
+        planet_type = request_command["planet_type"]
+        home_star = request_command["home_star"]
+        mass = float(request_command["mass"])
+        radius = float(request_command["radius"])
+        distance = float(request_command["distance"])
     except Exception as e:
         return jsonify(message="Missing Parameter", errno=str(e)), 400
-
 
     planet = Planet.query.filter_by(planet_id=planet_id).first()
     if planet:
