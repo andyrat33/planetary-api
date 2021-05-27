@@ -3,6 +3,7 @@ pipeline {
     dockerfile {
       filename 'Dockerfile'
         }
+        }
     stages {
         stage {
             steps {
@@ -10,7 +11,7 @@ pipeline {
             python3 -m flask run --host=0.0.0.0'''
             }
         }
-      }
+      
 
   }
 }
