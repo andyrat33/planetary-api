@@ -8,7 +8,9 @@ pipeline {
         stage('Build') {
             steps {
             sh '''echo "Building..."
-            python3 -m flask run --host=0.0.0.0 '''
+            python3 -m flask run --host=0.0.0.0
+            flask create_db
+            flask seed_db'''
             }
           }
        }
