@@ -10,7 +10,7 @@ pipeline {
             sh '''echo "Building..."
             flask db_create
             flask db_seed
-            python3 -m flask run --host=0.0.0.0
+            python3 -m flask run --host=0.0.0.0 &
            '''
             }
           }
