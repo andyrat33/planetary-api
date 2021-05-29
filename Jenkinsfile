@@ -19,12 +19,12 @@ pipeline {
         agent any
             steps {
                  sh '''echo "Testing..."
-                 newman  run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json -r junit,html --reporter-junit-export var/reports/newman/junit/newman.xml --reporter-html-export var/reports/newman/html/index.html
+                 newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json -r junit,html --reporter-junit-export var/reports/newman/junit/newman.xml --reporter-html-export var/reports/newman/html/index.html
 
            '''
                  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'var/reports/newman/html', reportFiles: 'index.html', reportName: 'Newman API Test', reportTitles: ''])
 
             }
-
+        }
        }
 }
