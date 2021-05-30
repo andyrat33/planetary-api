@@ -22,6 +22,7 @@ pipeline {
     stage('Run') {
         steps {
             sh '''echo "Run"
+            printenv
             '''
             }
         }
