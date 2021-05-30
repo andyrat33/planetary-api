@@ -24,6 +24,8 @@ pipeline {
         steps {
             sh '''echo "Run"
             printenv
+            docker build --tag planetary-api .
+            docker run --rm -d -p 5000:5000 --name planetary-api planetary-api
             '''
             }
         }
