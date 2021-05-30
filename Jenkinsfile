@@ -5,7 +5,6 @@ pipeline {
      agent {
       dockerfile {
         filename 'Dockerfile'
-        label 'planetary-api'
         }
       }
       environment {
