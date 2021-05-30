@@ -21,11 +21,17 @@ pipeline {
          }
        }
     stage('Run') {
+    environment {
+        MAIL_USERNAME = credentials('MAIL_USERNAME')
+        MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+        }
         steps {
             sh '''echo "Run"
             printenv
             docker build --tag planetary-api .
             docker run --rm -d -p 5000:5000 --name planetary-api planetary-api
+            docker exec -ti planetary-api flask db_create
+            docker exec -ti planetary-api flask db_seed
             '''
             }
         }
@@ -33,6 +39,7 @@ pipeline {
       agent any
       steps {
         sh '''echo "Testing"
+        curl -XGET http://localhost:5000/
         '''
       }
     }
