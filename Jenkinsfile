@@ -5,6 +5,7 @@ pipeline {
      agent {
       dockerfile {
         filename 'Dockerfile'
+        args '-p 0.0.0.0:5000:5000 -d --rm'
         }
       }
       environment {
