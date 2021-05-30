@@ -30,8 +30,8 @@ pipeline {
             printenv
             docker build --tag planetary-api .
             docker run --rm -d -p 5000:5000 --name planetary-api planetary-api
-            docker exec -ti planetary-api flask db_create
-            docker exec -ti planetary-api flask db_seed
+            docker exec planetary-api flask db_create
+            docker exec planetary-api flask db_seed
             '''
             }
         }
