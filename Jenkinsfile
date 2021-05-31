@@ -65,8 +65,8 @@ pipeline {
   }
   post {
         always {
-            
-            junit 'report.xml'
+            junit '**/report.xml'
+            archiveArtifacts artifacts: '**/report.html', fingerprint: true
             sh '''echo "Stopping Container"
             docker stop planetary-api
             '''
