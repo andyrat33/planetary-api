@@ -47,11 +47,11 @@ pipeline {
     stage('Postman Tests') {
       agent any
       steps {
-        sh '''echo "Postman Testing"
+        sh '''echo "Postman Testing"'''
         nodejs(nodeJSInstallationName: 'NodeJS') {
         sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html --reporter-junit-export "report.xml" --reporter-html-export "report.html"'
         }
-        
+
       }
     }
      stage('Shutdown') {
