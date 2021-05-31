@@ -63,5 +63,14 @@ pipeline {
       }
     }
   }
+  post {
+        always {
+            archiveArtifacts 'report.xml', fingerprint: true
+            junit 'report.xml'
+            sh '''echo "Stopping Container"
+            docker stop planetary-api
+            '''
+        }
+    }
 }
 
