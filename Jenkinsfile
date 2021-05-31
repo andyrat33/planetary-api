@@ -60,7 +60,7 @@ pipeline {
       agent any
       steps {
         sh '''echo "Stopping Container"
-        docker stop planetary-api
+        docker stop planetary-api || exit 0
         '''
       }
     }
@@ -68,7 +68,7 @@ pipeline {
   post {
         always {
             sh '''echo "Stopping Container"
-            docker stop planetary-api
+            docker stop planetary-api || exit 0
             '''
         }
     }
