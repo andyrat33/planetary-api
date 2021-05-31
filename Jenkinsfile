@@ -50,7 +50,7 @@ pipeline {
         sh '''echo "Postman Testing"'''
         nodejs(nodeJSInstallationName: 'NodeJS') {
         sh 'npm install -g newman-reporter-htmlextra'
-        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit --reporter-junit-export "report.xml" -r htmlextra'
+        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export "report.xml"'
         }
         junit '**/report.xml'
         archiveArtifacts artifacts: 'newman/**/*planetary-api-*.html', fingerprint: true
