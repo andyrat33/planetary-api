@@ -65,5 +65,12 @@ pipeline {
       }
     }
   }
+  post {
+        always {
+            sh '''echo "Stopping Container"
+            docker stop planetary-api
+            '''
+        }
+    }
 }
 
