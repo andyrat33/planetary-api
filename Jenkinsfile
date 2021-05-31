@@ -5,7 +5,7 @@ pipeline {
      agent {
       dockerfile {
         filename 'Dockerfile'
-        args '-d -p 5000:5000 --name planetary-api'
+        args '--rm -d -p 5000:5000 --name planetary-api'
         additionalBuildArgs  '--tag planetary-api'
         }
       }
@@ -15,7 +15,7 @@ pipeline {
         }
 
       steps {
-        sh '''echo "Building..."
+        sh '''echo "Test DB Creation after Building..."
         flask db_create
         flask db_seed
            '''
@@ -38,8 +38,9 @@ pipeline {
     stage('Smoke Test') {
       agent any
       steps {
-        sh '''echo "Testing"
+        sh '''echo "Smoke Tests"
         curl -XGET http://localhost:5000/planet_details/1
+        curl -X GET --location "http://localhost:5000/planet_details/2"
         '''
       }
     }
