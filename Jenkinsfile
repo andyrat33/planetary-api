@@ -51,7 +51,7 @@ pipeline {
         curl -XGET http://localhost:5000/planet_details/3 | json_pp
         mkdir newman'''
         nodejs(nodeJSInstallationName: 'NodeJS') {
-        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html --reporter-junit-export "newmman/report.xml" --reporter-html-export "newman/report.html"'
+        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html --reporter-junit-export "report.xml" --reporter-html-export "report.html"'
         }
         junit "newman/report.xml"
       }
