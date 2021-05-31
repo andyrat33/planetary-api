@@ -5,7 +5,8 @@ pipeline {
      agent {
       dockerfile {
         filename 'Dockerfile'
-        args '--tag planetary-api'
+        args '--rm -d -p 5000:5000 --name planetary-api'
+        additionalBuildArgs  '--tag planetary-api'
         }
       }
       environment {
