@@ -51,7 +51,7 @@ pipeline {
         nodejs(nodeJSInstallationName: 'NodeJS') {
         sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html --reporter-junit-export "report.xml" --reporter-html-export "report.html"'
         }
-        
+        junit '**/report.xml'
       }
     }
      stage('Shutdown') {
@@ -65,7 +65,7 @@ pipeline {
   }
   post {
         always {
-            junit '**/report.xml'
+
             archiveArtifacts artifacts: '**/report.html', fingerprint: true
             sh '''echo "Stopping Container"
             docker stop planetary-api
