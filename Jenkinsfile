@@ -29,17 +29,25 @@ pipeline {
         steps {
             sh '''echo "Run"
             #docker build --tag planetary-api .
-            docker run --env MAIL_USERNAME=${MAIL_USERNAME} --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
+            #docker run --env MAIL_USERNAME=${MAIL_USERNAME} --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
             docker exec planetary-api flask db_create
             docker exec planetary-api flask db_seed
             '''
             }
         }
-    stage('Test') {
+    stage('Smoke Test') {
       agent any
       steps {
         sh '''echo "Testing"
         curl -XGET http://localhost:5000/planet_details/1
+        '''
+      }
+    }
+    stage('Postman Tests') {
+      agent any
+      steps {
+        sh '''echo "Testing"
+        curl -XGET http://localhost:5000/planet_details/2
         '''
       }
     }
