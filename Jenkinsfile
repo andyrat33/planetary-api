@@ -49,7 +49,7 @@ pipeline {
       steps {
         sh '''echo "Postman Testing"'''
         nodejs(nodeJSInstallationName: 'NodeJS') {
-        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html --reporter-junit-export "report.xml" --reporter-html-export "newman/report.html" '
+        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit --reporter-junit-export "report.xml"'
         }
         junit '**/report.xml'
       }
@@ -63,14 +63,5 @@ pipeline {
       }
     }
   }
-  post {
-        always {
-
-            archiveArtifacts artifacts: 'newman/**/*report.html', fingerprint: true
-            sh '''echo "Stopping Container"
-            docker stop planetary-api
-            '''
-        }
-    }
 }
 
