@@ -49,9 +49,10 @@ pipeline {
       steps {
         sh '''echo "Postman Testing"'''
         nodejs(nodeJSInstallationName: 'NodeJS') {
-        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit --reporter-junit-export "report.xml"'
+        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit --reporter-junit-export "report.xml" -r htmlextra'
         }
         junit '**/report.xml'
+        archiveArtifacts artifacts: 'newman/**/*planetary-api-*.html', fingerprint: true
       }
     }
      stage('Shutdown') {
