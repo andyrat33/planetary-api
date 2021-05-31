@@ -51,7 +51,7 @@ pipeline {
         curl -XGET http://localhost:5000/planet_details/3 | json_pp
         '''
         nodejs(nodeJSInstallationName: 'NodeJS') {
-        newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json
+        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json'
         }
       }
     }
