@@ -5,7 +5,7 @@ pipeline {
      agent {
       dockerfile {
         filename 'Dockerfile'
-        args '--rm -d -p 5000:5000 --name planetary-api'
+        args '-d -p 5000:5000 --name planetary-api'
         additionalBuildArgs  '--tag planetary-api'
         }
       }
@@ -30,8 +30,8 @@ pipeline {
             sh '''echo "Run"
             #docker build --tag planetary-api .
             docker run --env MAIL_USERNAME=${MAIL_USERNAME} --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
-            docker exec planetary-api flask db_create
-            docker exec planetary-api flask db_seed
+            #docker exec planetary-api flask db_create
+            #docker exec planetary-api flask db_seed
             '''
             }
         }
