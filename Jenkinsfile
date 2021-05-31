@@ -47,13 +47,11 @@ pipeline {
     stage('Postman Tests') {
       agent any
       steps {
-        sh '''echo "Testing"
-        curl -XGET http://localhost:5000/planet_details/3 | json_pp
-        mkdir newman'''
+        sh '''echo "Postman Testing"
         nodejs(nodeJSInstallationName: 'NodeJS') {
         sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html --reporter-junit-export "report.xml" --reporter-html-export "report.html"'
         }
-        junit "report.xml"
+        
       }
     }
      stage('Shutdown') {
@@ -65,5 +63,14 @@ pipeline {
       }
     }
   }
+   post {
+        always {
+            archiveArtifacts artifacts: 'report.html', fingerprint: true
+            junit 'report.xml'
+            sh '''echo "Stopping Container"
+            docker stop planetary-api
+        '''
+        }
+    }
 }
 
