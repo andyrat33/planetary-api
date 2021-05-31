@@ -49,6 +49,7 @@ pipeline {
       steps {
         sh '''echo "Testing"
         curl -XGET http://localhost:5000/planet_details/3 | json_pp
+        newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json
         '''
       }
     }
