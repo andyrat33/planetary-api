@@ -48,7 +48,7 @@ pipeline {
       agent any
       steps {
         sh '''echo "Testing"
-        curl -XGET http://localhost:5000/planet_details/2
+        curl -XGET http://localhost:5000/planet_details/3 | json_pp
         '''
       }
     }
