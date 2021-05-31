@@ -49,7 +49,7 @@ pipeline {
       steps {
         sh '''echo "Postman Testing"'''
         nodejs(nodeJSInstallationName: 'NodeJS') {
-        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html --reporter-junit-export "report.xml" --reporter-htmlextra-export "report.html"'
+        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,html,htmlextra --reporter-junit-export "report.xml" --reporter-htmlextra-export "report.html" '
         }
         junit '**/report.xml'
       }
