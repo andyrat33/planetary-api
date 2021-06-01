@@ -57,6 +57,9 @@ pipeline {
       }
     }
      stage('Create SBOM') {
+      environment {
+        DC_CREDS = credentials('Dependency-Track-Automation')
+      }
       agent any
       steps {
         sh '''echo "SBOM Creation"
@@ -68,14 +71,8 @@ pipeline {
         ls -la bom.xml
         pwd
         '''
-      }
-    }
-    stage('Dependency Track') {
-    environment {
-        DC_CREDS = credentials('Dependency-Track-Automation')
-      }
-      steps {
         dependencyTrackPublisher(artifact: '${WORKSPACE}/bom.xml', synchronous: 'true', autoCreateProjects: 'true', dependencyTrackApiKey: "$DC_CREDS", projectName: 'planetary-api', projectVersion: '1')
+
       }
     }
      stage('Shutdown') {
