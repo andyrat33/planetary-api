@@ -59,11 +59,10 @@ pipeline {
      stage('Create SBOM') {
       agent any
       steps {
-        sh '''echo "Postman Testing"
+        sh '''echo "SBOM Creation"
         VENV=\'venv\'
         python3 -m venv $VENV
         . $VENV/bin/activate
-        pip3 install -r requirements.txt
         pip3 install cyclonedx-bom
         cyclonedx-py -o bom.xml
         '''
