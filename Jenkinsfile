@@ -75,7 +75,7 @@ pipeline {
         DC_CREDS = credentials('Dependency-Track-Automation')
       }
       steps {
-        dependencyTrackPublisher(artifact: 'bom.xml', synchronous: 'true', autoCreateProjects: 'true', dependencyTrackApiKey: "$DC_CREDS", projectName: 'flask_web1', projectVersion: '1')
+        dependencyTrackPublisher(artifact: '${WORKSPACE}/bom.xml', synchronous: 'true', autoCreateProjects: 'true', dependencyTrackApiKey: "$DC_CREDS", projectName: 'planetary-api', projectVersion: '1')
       }
     }
      stage('Shutdown') {
