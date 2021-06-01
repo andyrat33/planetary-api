@@ -64,7 +64,7 @@ pipeline {
         python3 -m venv $VENV
         . $VENV/bin/activate
         pip3 install cyclonedx-bom
-        cyclonedx-py -o bom.xml
+        cyclonedx-py -o ${WORKSPACE}/bom.xml
         ls -la bom.xml
         pwd
         '''
