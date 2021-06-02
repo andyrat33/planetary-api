@@ -57,9 +57,6 @@ pipeline {
       }
     }
      stage('Dependency Track') {
-      environment {
-        DC_CREDS = credentials('Dependency-Track-Automation')
-      }
       agent any
       steps {
         sh '''echo "SBOM Creation"
