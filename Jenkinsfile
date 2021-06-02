@@ -70,7 +70,7 @@ pipeline {
         cyclonedx-py -o ${WORKSPACE}/bom.xml
         echo "Publish Dependency Track"
         '''
-        dependencyTrackPublisher artifact: '${WORKSPACE}/bom.xml', synchronous: true, autoCreateProjects: true, dependencyTrackApiKey: ${DC_CREDS}, projectName: 'planetary-api', projectVersion: '1'
+        dependencyTrackPublisher artifact: '${WORKSPACE}/bom.xml', synchronous: true, autoCreateProjects: true, dependencyTrackApiKey: "${DC_CREDS}", projectName: 'planetary-api', projectVersion: '1'
       }
     }
      stage('Shutdown') {
