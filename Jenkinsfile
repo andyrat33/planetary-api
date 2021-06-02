@@ -72,14 +72,6 @@ pipeline {
         }
       }
     }
-     stage('Shutdown') {
-      agent any
-      steps {
-        sh '''echo "Stopping Container"
-        docker stop planetary-api || exit 0
-        '''
-      }
-    }
   }
   post {
         always {
