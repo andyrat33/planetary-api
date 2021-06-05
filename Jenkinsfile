@@ -52,7 +52,7 @@ pipeline {
         sh 'npm install -g newman-reporter-htmlextra'
         sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export "report.xml" --suppress-exit-code'
         }
-        junit healthScaleFactor: 0.5, keepLongStdio: true, testResults: '**/report.xml'
+        junit healthScaleFactor: 0.1, keepLongStdio: true, testResults: '**/report.xml'
         archiveArtifacts artifacts: 'newman/**/*planetary-api-*.html', fingerprint: true
       }
     }
