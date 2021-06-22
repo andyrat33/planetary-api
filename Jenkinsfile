@@ -76,6 +76,7 @@ pipeline {
         dependencyCheck(odcInstallation: 'dependency-check', additionalArguments: "--scan ${env.WORKSPACE}")
         dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
         }
+        }
       }
     }
   }
