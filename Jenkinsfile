@@ -71,6 +71,12 @@ pipeline {
             dependencyTrackPublisher artifact: '${WORKSPACE}/bom.xml', synchronous: true, autoCreateProjects: true, dependencyTrackApiKey: API_KEY, projectName: 'planetary-api', projectVersion: '1'
         }
       }
+      stage('Dependency Checks') {
+      steps {
+        dependencyCheck(odcInstallation: 'dependency-check', additionalArguments: "--scan ${env.WORKSPACE}")
+        dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
+        }
+      }
     }
   }
   post {
