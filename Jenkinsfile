@@ -22,7 +22,24 @@ pipeline {
       }
     }
 
-    stage('Semgrep_agent') {
+    stage('Run') {
+      parallel {
+        stage('Run') {
+          environment {
+            MAIL_USERNAME = credentials('MAIL_USERNAME')
+            MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+          }
+          steps {
+            sh '''echo "Run"
+            #docker build --tag planetary-api .
+            docker run --env MAIL_USERNAME=${MAIL_USERNAME} --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
+            docker exec planetary-api flask db_create
+            docker exec planetary-api flask db_seed
+            '''
+          }
+        }
+
+        stage('Semgrep_agent') {
       agent {
         docker {
           image 'returntocorp/semgrep-agent:v1'
@@ -43,29 +60,6 @@ pipeline {
         sh 'python -m semgrep_agent --config "p/jwt" --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
       }
     }
-
-    stage('Run') {
-      parallel {
-        stage('Run') {
-          environment {
-            MAIL_USERNAME = credentials('MAIL_USERNAME')
-            MAIL_PASSWORD = credentials('MAIL_PASSWORD')
-          }
-          steps {
-            sh '''echo "Run"
-            #docker build --tag planetary-api .
-            docker run --env MAIL_USERNAME=${MAIL_USERNAME} --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
-            docker exec planetary-api flask db_create
-            docker exec planetary-api flask db_seed
-            '''
-          }
-        }
-
-        stage('SAST') {
-          steps {
-            sh 'echo "SAST"'
-          }
-        }
 
       }
     }
