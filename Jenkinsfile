@@ -2,33 +2,34 @@ pipeline {
   agent any
   stages {
     stage('Build') {
-     agent {
-      dockerfile {
-        filename 'Dockerfile'
-        args '--rm -d -p 5000:5000 --name planetary-api'
-        additionalBuildArgs  '--tag planetary-api'
+      agent {
+        dockerfile {
+          filename 'Dockerfile'
+          args '--rm -d -p 5000:5000 --name planetary-api'
+          additionalBuildArgs '--tag planetary-api'
         }
+
       }
       environment {
         MAIL_USERNAME = credentials('MAIL_USERNAME')
         MAIL_PASSWORD = credentials('MAIL_PASSWORD')
-        }
-
+      }
       steps {
         sh '''echo "Test DB Creation after Building..."
         flask db_create
         flask db_seed
            '''
-         }
-       }
-       stage('Semgrep_agent') {
+      }
+    }
+
+    stage('Semgrep_agent') {
       agent {
         docker {
           image 'returntocorp/semgrep-agent:v1'
           args '-u root'
-          }
         }
 
+      }
       environment {
         SEMGREP_COMMIT = "${env.GIT_COMMIT}"
         SEMGREP_REPO_NAME = env.GIT_URL.replaceFirst(/^https:\/\/github.com\/(.*).git$/, '$1')
@@ -42,20 +43,33 @@ pipeline {
         sh 'python -m semgrep_agent --config "p/jwt" --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
       }
     }
+
     stage('Run') {
-    environment {
-        MAIL_USERNAME = credentials('MAIL_USERNAME')
-        MAIL_PASSWORD = credentials('MAIL_PASSWORD')
-        }
-        steps {
+      parallel {
+        stage('Run') {
+          environment {
+            MAIL_USERNAME = credentials('MAIL_USERNAME')
+            MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+          }
+          steps {
             sh '''echo "Run"
             #docker build --tag planetary-api .
             docker run --env MAIL_USERNAME=${MAIL_USERNAME} --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
             docker exec planetary-api flask db_create
             docker exec planetary-api flask db_seed
             '''
-            }
+          }
         }
+
+        stage('SAST') {
+          steps {
+            sh 'echo "SAST"'
+          }
+        }
+
+      }
+    }
+
     stage('Smoke Test') {
       agent any
       steps {
@@ -65,19 +79,22 @@ pipeline {
         '''
       }
     }
+
     stage('Postman Tests') {
       agent any
       steps {
-        sh '''echo "Postman Testing"'''
-        nodejs(nodeJSInstallationName: 'NodeJS') {
-        sh 'npm install -g newman-reporter-htmlextra'
-        sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export "report.xml" --suppress-exit-code'
+        sh 'echo "Postman Testing"'
+        nodejs('NodeJS') {
+          sh 'npm install -g newman-reporter-htmlextra'
+          sh 'newman run planetary-api.postman_collection.json -e Planetary-API-Environment.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export "report.xml" --suppress-exit-code'
         }
-        junit healthScaleFactor: 0.9, keepLongStdio: true, testResults: '**/report.xml'
-        archiveArtifacts artifacts: 'newman/**/*planetary-api-*.html', fingerprint: true
+
+        junit(healthScaleFactor: 0.9, keepLongStdio: true, testResults: '**/report.xml')
+        archiveArtifacts(artifacts: 'newman/**/*planetary-api-*.html', fingerprint: true)
       }
     }
-     stage('Dependency Track') {
+
+    stage('Dependency Track') {
       agent any
       steps {
         sh '''echo "SBOM Creation"
@@ -88,24 +105,27 @@ pipeline {
         cyclonedx-py -o ${WORKSPACE}/bom.xml
         echo "Publish Dependency Track"
         '''
-        withCredentials([string(credentialsId: 'Dependency-Track-Automation', variable: 'API_KEY')]) {
-            dependencyTrackPublisher artifact: '${WORKSPACE}/bom.xml', synchronous: true, autoCreateProjects: true, dependencyTrackApiKey: API_KEY, projectName: 'planetary-api', projectVersion: '1'
+        withCredentials(bindings: [string(credentialsId: 'Dependency-Track-Automation', variable: 'API_KEY')]) {
+          dependencyTrackPublisher(artifact: '${WORKSPACE}/bom.xml', synchronous: true, autoCreateProjects: true, dependencyTrackApiKey: API_KEY, projectName: 'planetary-api', projectVersion: '1')
         }
+
       }
-      }
-      stage('Dependency Checks') {
+    }
+
+    stage('Dependency Checks') {
       steps {
         dependencyCheck(odcInstallation: 'dependency-check', additionalArguments: "--scan ${env.WORKSPACE}")
         dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
-        }
       }
+    }
+
   }
   post {
-        always {
-            sh '''echo "Stopping Container"
+    always {
+      sh '''echo "Stopping Container"
             docker stop planetary-api || exit 0
             '''
-        }
     }
-}
 
+  }
+}
