@@ -39,7 +39,7 @@ pipeline {
           }
         }
 
-        stage('Semgrep_agent') {
+        stage('SAST Semgrep_agent') {
       agent {
         docker {
           image 'returntocorp/semgrep-agent:v1'
