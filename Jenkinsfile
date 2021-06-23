@@ -39,7 +39,7 @@ pipeline {
         SEMGREP_BRANCH = "${GIT_BRANCH}"
       }
       steps {
-        sh 'python -m semgrep_agent --config "p/r2c-ci" --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
+        sh 'python -m semgrep_agent --config "p/jwt" --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
       }
     }
     stage('Run') {
