@@ -88,6 +88,11 @@ def hello_world():
     return "Planetary-API!"
 
 
+@app.route("/planetary")
+def planetary():
+    return "Planetary-API!"
+
+
 @app.route("/not_found")
 def not_found():
     return jsonify(message="That resource was not found"), 404
@@ -111,7 +116,10 @@ def register():
         last_name = request.form["last_name"]
         password = request.form["password"]
         user = User(
-            first_name=first_name, last_name=last_name, email=email, password=password
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
         )
         db.session.add(user)
         db.session.commit()
@@ -195,7 +203,10 @@ def add_planet():
 
         db.session.add(new_planet)
         db.session.commit()
-        return jsonify(message="You added a planet", id=new_planet.planet_id), 201
+        return (
+            jsonify(message="You added a planet", id=new_planet.planet_id),
+            201,
+        )
 
 
 @app.route("/update_planet", methods=["PUT"])
