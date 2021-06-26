@@ -239,7 +239,7 @@ def update_planet():
         db.session.commit()
         return jsonify(message="You updated a planet"), 202
     else:
-        return jsonify(message="That planet does not exist"), 404
+        return jsonify(message=DOES_NOT_EXIST), 404
 
 
 @app.route("/remove_planet/<int:planet_id>", methods=["DELETE"])
@@ -251,7 +251,7 @@ def remove_planet(planet_id: int):
         db.session.commit()
         return jsonify(message="You deleted a planet"), 202
     else:
-        return jsonify(message="That planet does not exist"), 404
+        return jsonify(message=DOES_NOT_EXIST), 404
 
 
 # database models
