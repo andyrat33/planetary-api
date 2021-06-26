@@ -68,8 +68,8 @@ pipeline {
       agent any
       steps {
         sh '''echo "Smoke Tests"
-        curl -XGET http://localhost:5000/planet_details/1 | jq .
-        curl -X GET --location "http://localhost:5000/planet_details/2" | jq .
+        curl -s -XGET http://localhost:5000/planet_details/1 | jq .
+        curl -s -X GET --location "http://localhost:5000/planet_details/2" | jq .
         '''
       }
     }
