@@ -134,6 +134,7 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
+    """insecure login. SQLi"""
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
