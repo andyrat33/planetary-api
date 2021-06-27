@@ -141,6 +141,10 @@ def login_insecure():
         email = request.form["email"]
         password = request.form["password"]
 
+    app.logger.info(
+        "SELECT * from users WHERE "
+        "email={id} AND password={passw}".format(id=email, passw=password)
+    )
     test = insecure_cursor.execute(
         "SELECT * from users WHERE email={id} AND password={passw}".format(
             id=email, passw=password
@@ -148,8 +152,10 @@ def login_insecure():
     )
     if test:
         access_token = create_access_token(identity=email)
+        app.logger.info("%s logged in successfully", email)
         return jsonify(message="Login succeeded!", access_token=access_token)
     else:
+        app.logger.info("%s failed to log in", email)
         return jsonify(message="Bad email or password"), 401
 
 
