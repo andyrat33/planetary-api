@@ -128,6 +128,7 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
+    """SQLAlchemy safe login"""
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
