@@ -144,10 +144,10 @@ def login():
 
     app.logger.info(
         "SELECT * from users WHERE "
-        "email={id} AND password={passw}".format(id=email, passw=password)
+        "email='{id}' AND password='{passw}'".format(id=email, passw=password)
     )
     test = insecure_cursor.execute(
-        "SELECT * from users WHERE email={id} AND password={passw}".format(
+        "SELECT * from users WHERE email='{id}' AND password='{passw}'".format(
             id=email, passw=password
         )
     )
