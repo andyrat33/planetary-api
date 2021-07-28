@@ -55,7 +55,7 @@ pipeline {
             SEMGREP_APP_TOKEN = credentials('SEMGREP_APP_TOKEN')
             SEMGREP_DEPLOYMENT_ID = credentials('SEMGREP_DEPLOYMENT_ID')
             SEMGREP_BRANCH = "${GIT_BRANCH}"
-            SEMGREP_RULES = '"p/security-audit p/secrets"'
+            SEMGREP_RULES = 'p/security-audit p/secrets'
           }
           steps {
             sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
