@@ -1,3 +1,5 @@
 fileignoreconfig:
+- filename: planetary-api-trivy-scn.json
+  checksum: e6536dc0f6455d66c8a132dcb2a87dccaf7599dec152716bf4c244e5ad273cb3
 - filename: app.py
-  checksum: d082bb45620be539dc8f9f05901618428fbff2342e4f480d8ec8975a495114cb
+  checksum: 8168bb3dd4c9bf9bde40eb301e6d68e51dc49422ce0930e963a368e981a055cc
