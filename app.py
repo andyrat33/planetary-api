@@ -1,3 +1,4 @@
+import subprocess
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float
@@ -119,6 +120,13 @@ def planets():
     planets_list = Planet.query.all()
     result = planets_schema.dump(planets_list)
     return jsonify(result.data), 200
+
+
+@app.route("/dbsize/<string:dbfile>", methods=["GET"])
+def dbsize(dbfile: str):
+    cmd = "du " + dbfile
+    result = subprocess.check_output(cmd, shell=True)
+    return result, 200
 
 
 @app.route("/register", methods=["POST"])
