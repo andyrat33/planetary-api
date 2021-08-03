@@ -74,19 +74,9 @@ def db_seed():
         distance=92.96e6,
     )
 
-    betelgeuse = Planet(
-        planet_name="Betelgeuse",
-        planet_type="Class C",
-        home_star="Fule",
-        mass=50.972e24,
-        radius=93959,
-        distance=9992.96e6,
-    )
-
     db.session.add(mercury)
     db.session.add(venus)
     db.session.add(earth)
-    db.session.add(betelgeuse)
 
     test_user = User(
         first_name="William",
