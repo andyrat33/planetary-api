@@ -1,3 +1,9 @@
 fileignoreconfig:
+- filename: Planetary-API-Environment.postman_environment.json
+  checksum: 19e2d45e6988b0090c909015dd7debbf2d38205ba57637e5534778f0ff62e560
+- filename: Jenkinsfile
+  checksum: f329e7c6e03ea9a1ddc2e087daadc43221a875f849b2eac9d00cd14996e8f3fb
 - filename: app.py
-  checksum: 717bfcb2e47c467077f92b3d9f29ff6e30a41dfe780d977afacbe4818a6b6867
+  checksum: 1c63edf85059fb9d0be9d4c1113205bd043c2adedac4eb7d0fca99c8f276d488
+- filename: planetary-api.postman_collection.json
+  checksum: 45a82d08a1b90f3eed783760013001e1cc189eac359ed36452ca3f9eac14cbc6
