@@ -152,6 +152,7 @@ def login():
             id=email, passw=password
         )
     )
+    insecure_cursor.close()
     if test:
         access_token = create_access_token(identity=email)
         app.logger.info("%s logged in successfully", email)
