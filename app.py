@@ -6,6 +6,7 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
 import sqlite3
+import subprocess
 
 DOES_NOT_EXIST = "That planet does not exist"
 
@@ -134,7 +135,7 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
-    """SQLAlchemy safe login"""
+    """insecure login. SQLi"""
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
@@ -142,11 +143,21 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-    test = User.query.filter_by(email=email, password=password).first()
+    app.logger.info(
+        "SELECT * from users WHERE "
+        "email='{id}' AND password='{passw}'".format(id=email, passw=password)
+    )
+    test = insecure_cursor.execute(
+        "SELECT * from users WHERE email='{id}' AND password='{passw}'".format(
+            id=email, passw=password
+        )
+    )
     if test:
         access_token = create_access_token(identity=email)
+        app.logger.info("%s logged in successfully", email)
         return jsonify(message="Login succeeded!", access_token=access_token)
     else:
+        app.logger.info("%s failed to log in", email)
         return jsonify(message="Bad email or password"), 401
 
 
@@ -259,6 +270,13 @@ def remove_planet(planet_id: int):
         return jsonify(message="You deleted a planet"), 202
     else:
         return jsonify(message=DOES_NOT_EXIST), 404
+
+
+@app.route("/dbsize/<string:dbfile>", methods=["GET"])
+def dbsize(dbfile: str):
+    cmd = "du " + dbfile
+    result = subprocess.check_output(cmd, shell=True)
+    return result, 200
 
 
 # database models
