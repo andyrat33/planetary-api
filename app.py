@@ -27,11 +27,6 @@ ma = Marshmallow(app)
 jwt = JWTManager(app)
 mail = Mail(app)
 
-# insecure DB access example
-db_insecure = os.path.join(basedir, "planets.db")
-conn = sqlite3.connect(db_insecure)
-insecure_cursor = conn.cursor()
-
 
 @app.cli.command("db_create")
 def db_create():
@@ -135,6 +130,10 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
+    # insecure DB access example
+    db_insecure = os.path.join(basedir, "planets.db")
+    conn = sqlite3.connect(db_insecure)
+    insecure_cursor = conn.cursor()
     """insecure login. SQLi"""
     if request.is_json:
         email = request.json["email"]

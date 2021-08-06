@@ -15,6 +15,9 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"access_token\", jsonData.access_token);",
+									"",
 									"pm.test(\"Status code is 401\", function () {",
 									"    pm.response.to.have.status(401);",
 									"});",
@@ -36,7 +39,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"' or 1=1;--\",\n    \"password\": \"\"\n}",
+							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"' or 1=1;--\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -144,7 +147,7 @@
 								},
 								{
 									"key": "planet_name",
-									"value": "Jupiter0121233376",
+									"value": "Jupiter00005",
 									"type": "text"
 								},
 								{
