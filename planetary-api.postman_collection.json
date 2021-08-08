@@ -18,7 +18,7 @@
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"access_token\", jsonData.access_token);",
 									"",
-									"pm.test(\"Status code is 401\", function () {",
+									"pm.test(\"Status code is 401 - SQL Injection\", function () {",
 									"    pm.response.to.have.status(401);",
 									"});",
 									"",
@@ -122,6 +122,15 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -147,7 +156,7 @@
 								},
 								{
 									"key": "planet_name",
-									"value": "Jupiter00005",
+									"value": "{{$randomFirstName}}",
 									"type": "text"
 								},
 								{
@@ -216,7 +225,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"planet_name\":\"Mudless106851\",\n    \"planet_type\":\"Class D\",\n    \"home_star\":\"Sol\",\n    \"mass\":\"2.258e23\",\n    \"radius\":\"1516\",\n    \"distance\":\"35.98e6\"\n}\n",
+							"raw": "{\n    \"planet_name\":\"{{$randomFirstName}}\",\n    \"planet_type\":\"Class D\",\n    \"home_star\":\"Sol\",\n    \"mass\":\"2.258e23\",\n    \"radius\":\"1516\",\n    \"distance\":\"35.98e6\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -246,6 +255,15 @@
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"planet_name\", jsonData.planet_name);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -540,6 +558,108 @@
 							"port": "5000",
 							"path": [
 								"add_planet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Failure Incorrect Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"access_token\", jsonData.access_token);",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Login failed incorrect email or password\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"wrongpass\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}/login",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Failure Incorrect Username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"access_token\", jsonData.access_token);",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Login failed incorrect email or password\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{$randomFirstName}}@test.com\",\n    \"password\": \"P@ssw0rd\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}/login",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"login"
 							]
 						}
 					},
