@@ -130,11 +130,11 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
+    """insecure login. SQLi"""
     # insecure DB access example
     db_insecure = os.path.join(basedir, "planets.db")
     conn = sqlite3.connect(db_insecure)
     insecure_cursor = conn.cursor()
-    """insecure login. SQLi"""
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
@@ -150,7 +150,7 @@ def login():
         "SELECT * from users WHERE email='{id}' AND password='{passw}'".format(
             id=email, passw=password
         )
-    )
+    ).fetchone()
     insecure_cursor.close()
     if test:
         access_token = create_access_token(identity=email)
