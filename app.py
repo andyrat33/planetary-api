@@ -5,8 +5,6 @@ import os
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
-
-# import sqlite3
 import subprocess
 
 DOES_NOT_EXIST = "That planet does not exist"
@@ -132,10 +130,6 @@ def register():
 @app.route("/login", methods=["POST"])
 def login():
     """insecure login. SQLi"""
-    # # insecure DB access example
-    # db_insecure = os.path.join(basedir, "planets.db")
-    # conn = sqlite3.connect(db_insecure)
-    # insecure_cursor = conn.cursor()
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
@@ -147,18 +141,10 @@ def login():
             "SELECT * from users WHERE email='{id}' "
             "AND password='{passw}'".format(id=email, passw=password)
         ).first()
-        # print(test1.first())
     app.logger.info(
         "SELECT * from users WHERE "
         "email='{id}' AND password='{passw}'".format(id=email, passw=password)
     )
-    # test = insecure_cursor.execute(
-    #     "SELECT * from users WHERE email='{id}'
-    #     AND password='{passw}'".format(
-    #         id=email, passw=password
-    #     )
-    # ).fetchone()
-    # insecure_cursor.close()
     if test:
         access_token = create_access_token(identity=email)
         app.logger.info("%s logged in successfully", email)
