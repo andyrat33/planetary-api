@@ -1,3 +1,4 @@
+import subprocess
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float
@@ -5,7 +6,6 @@ import os
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
-import sqlite3
 
 DOES_NOT_EXIST = "That planet does not exist"
 
@@ -25,11 +25,6 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 jwt = JWTManager(app)
 mail = Mail(app)
-
-# insecure DB access example
-db_insecure = os.path.join(basedir, "planets.db")
-conn = sqlite3.connect(db_insecure)
-insecure_cursor = conn.cursor()
 
 
 @app.cli.command("db_create")
@@ -259,6 +254,16 @@ def remove_planet(planet_id: int):
         return jsonify(message="You deleted a planet"), 202
     else:
         return jsonify(message=DOES_NOT_EXIST), 404
+
+
+@app.route("/dbsize/<string:dbfile>", methods=["GET"])
+def dbsize(dbfile: str):
+    try:
+        result = subprocess.check_output(["du", dbfile], shell=False)
+    except subprocess.CalledProcessError:
+        result = {"message": "Error"}
+        return jsonify(result), 500
+    return result, 200
 
 
 # database models
