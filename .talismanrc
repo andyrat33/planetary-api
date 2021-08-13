@@ -1,3 +1,5 @@
 fileignoreconfig:
 - filename: app.py
-  checksum: 35895594e7bb2743da840172435cbbc2a0eefdb1b67730e15d3ecad535470617
+  checksum: 6ec73869dab29de2d0787c58b321177f80ef6fda41f3296fe6c9702eb8c82f5c
+- filename: planetary-api.postman_collection.json
+  checksum: cef0d921e6a447871e11315c75abb7f15a8f4a2313fcf68e9585689bb222d598
