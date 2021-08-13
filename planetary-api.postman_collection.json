@@ -709,7 +709,7 @@
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
-									"pm.test(\"Error\", function () {",
+									"pm.test(\"Error - CMD Injection Failed\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.message).to.eql(\"Error\");",
 									"});"
