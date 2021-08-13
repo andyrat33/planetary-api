@@ -262,7 +262,7 @@ def dbsize(dbfile: str):
         result = subprocess.check_output(["du", dbfile], shell=False)
     except subprocess.CalledProcessError:
         result = {"message": "Error"}
-        return jsonify(result), 500
+        return jsonify(result), 400
     return result, 200
 
 
