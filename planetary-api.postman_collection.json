@@ -18,11 +18,11 @@
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"access_token\", jsonData.access_token);",
 									"",
-									"pm.test(\"Status code is 401 - SQL Injection\", function () {",
+									"pm.test(\"Status code is 401 - SQL Injection Failed\", function () {",
 									"    pm.response.to.have.status(401);",
 									"});",
 									"",
-									"pm.test(\"Bad email or password\", function () {",
+									"pm.test(\"Bad email or password - SQLi Failed\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
 									"});"
