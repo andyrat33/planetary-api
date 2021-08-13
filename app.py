@@ -267,8 +267,11 @@ def remove_planet(planet_id: int):
 
 @app.route("/dbsize/<string:dbfile>", methods=["GET"])
 def dbsize(dbfile: str):
-    cmd = "du " + dbfile
-    result = subprocess.check_output(cmd, shell=True)
+    try:
+        result = subprocess.check_output("du " + dbfile, shell=True)
+    except subprocess.CalledProcessError:
+        result = {"message": "Error"}
+        return jsonify(result), 400
     return result, 200
 
 

@@ -22,7 +22,7 @@
 									"    pm.response.to.have.status(401);",
 									"});",
 									"",
-									"pm.test(\"Bad email or password\", function () {",
+									"pm.test(\"Bad email or password - SQLi\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
 									"});"
@@ -360,6 +360,39 @@
 					"response": []
 				},
 				{
+					"name": "dbsize",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}/dbsize/planets.db",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"dbsize",
+								"planets.db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete Planet",
 					"event": [
 						{
@@ -660,6 +693,43 @@
 							],
 							"path": [
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dbsize cmd injection",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 - CMD Injection\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error - CMD Injection\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql(\"Error\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}/dbsize/planets.db;ls",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"dbsize",
+								"planets.db;ls"
 							]
 						}
 					},
