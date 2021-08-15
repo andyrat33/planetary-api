@@ -143,7 +143,9 @@ def login():
         ).first()
     app.logger.info(
         "SELECT * from users WHERE "
-        "email='{id}' AND password='{passw}'".format(id=email, passw=password)
+        "email='{id}' AND password length='{passw}'".format(
+            id=email, passw=len(password)
+        )
     )
     if test:
         access_token = create_access_token(identity=email)
