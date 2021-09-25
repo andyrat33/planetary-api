@@ -128,6 +128,26 @@ def register():
         return jsonify(message="User created successfully."), 201
 
 
+# @app.route("/login", methods=["POST"])
+# def login():
+#     """SQLAlchemy safe login"""
+#     if request.is_json:
+#         email = request.json["email"]
+#         password = request.json["password"]
+#     else:
+#         email = request.form["email"]
+#         password = request.form["password"]
+#
+#     test = User.query.filter_by(email=email, password=password).first()
+#     if test:
+#         access_token = create_access_token(identity=email)
+#         app.logger.info("%s logged in successfully", email)
+#         return jsonify(message="Login succeeded!", access_token=access_token)
+#     else:
+#         app.logger.info("%s failed to log in", email)
+#         return jsonify(message="Bad email or password"), 401
+
+
 @app.route("/login", methods=["POST"])
 def login():
     """insecure login. SQLi"""
@@ -268,8 +288,20 @@ def remove_planet(planet_id: int):
         return jsonify(message=DOES_NOT_EXIST), 404
 
 
+# @app.route("/dbsize/<string:dbfile>", methods=["GET"])
+# def dbsize(dbfile: str):
+#     """Secure version no command injection"""
+#     try:
+#         result = subprocess.check_output(["du", dbfile], shell=False)
+#     except subprocess.CalledProcessError:
+#         result = {"message": "Error"}
+#         return jsonify(result), 400
+#     return result, 200
+
+
 @app.route("/dbsize/<string:dbfile>", methods=["GET"])
 def dbsize(dbfile: str):
+    """insecure command injection"""
     try:
         result = subprocess.check_output("du " + dbfile, shell=True)
     except subprocess.CalledProcessError:
