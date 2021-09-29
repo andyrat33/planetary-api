@@ -18,11 +18,11 @@
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"access_token\", jsonData.access_token);",
 									"",
-									"pm.test(\"Status code is 401 - SQL Injection Failed\", function () {",
+									"pm.test(\"Status code is 401 - SQL Injection\", function () {",
 									"    pm.response.to.have.status(401);",
 									"});",
 									"",
-									"pm.test(\"Bad email or password - SQLi Failed\", function () {",
+									"pm.test(\"Bad email or password - SQLi\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
 									"});"
@@ -40,6 +40,57 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"' or 1=1;--\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}/login",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insecure Login 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"access_token\", jsonData.access_token);",
+									"",
+									"pm.test(\"Status code is 401 - SQL Injection\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Bad email or password - SQLi\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"' or 1=1;--\",\n    \"password\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -705,11 +756,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 400\", function () {",
+									"pm.test(\"Status code is 400 - CMD Injection\", function () {",
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
-									"pm.test(\"Error - CMD Injection Failed\", function () {",
+									"pm.test(\"Error - CMD Injection\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.message).to.eql(\"Error\");",
 									"});"

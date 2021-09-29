@@ -7,6 +7,7 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
 
+
 DOES_NOT_EXIST = "That planet does not exist"
 
 app = Flask(__name__)
@@ -127,17 +128,46 @@ def register():
         return jsonify(message="User created successfully."), 201
 
 
+# @app.route("/login", methods=["POST"])
+# def login():
+#     """SQLAlchemy safe login"""
+#     if request.is_json:
+#         email = request.json["email"]
+#         password = request.json["password"]
+#     else:
+#         email = request.form["email"]
+#         password = request.form["password"]
+#
+#     test = User.query.filter_by(email=email, password=password).first()
+#     if test:
+#         access_token = create_access_token(identity=email)
+#         app.logger.info("%s logged in successfully", email)
+#         return jsonify(message="Login succeeded!", access_token=access_token)
+#     else:
+#         app.logger.info("%s failed to log in", email)
+#         return jsonify(message="Bad email or password"), 401
+
+
 @app.route("/login", methods=["POST"])
 def login():
-    """SQLAlchemy safe login"""
+    """insecure login. SQLi"""
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
     else:
         email = request.form["email"]
         password = request.form["password"]
-
-    test = User.query.filter_by(email=email, password=password).first()
+    with db.engine.connect() as con:
+        test = con.execute(
+            "SELECT * from users WHERE email='{id}' "
+            "AND password='{passw}'".format(id=email, passw=password)
+        ).first()
+    app.logger.info(
+        "SELECT * from users WHERE "
+        "email='{id}' AND password length='{passw}'".format(
+            id=email, passw=len(password)
+        )
+    )
     if test:
         access_token = create_access_token(identity=email)
         app.logger.info("%s logged in successfully", email)
@@ -258,10 +288,22 @@ def remove_planet(planet_id: int):
         return jsonify(message=DOES_NOT_EXIST), 404
 
 
+# @app.route("/dbsize/<string:dbfile>", methods=["GET"])
+# def dbsize(dbfile: str):
+#     """Secure version no command injection"""
+#     try:
+#         result = subprocess.check_output(["du", dbfile], shell=False)
+#     except subprocess.CalledProcessError:
+#         result = {"message": "Error"}
+#         return jsonify(result), 400
+#     return result, 200
+
+
 @app.route("/dbsize/<string:dbfile>", methods=["GET"])
 def dbsize(dbfile: str):
+    """insecure command injection"""
     try:
-        result = subprocess.check_output(["du", dbfile], shell=False)
+        result = subprocess.check_output("du " + dbfile, shell=True)
     except subprocess.CalledProcessError:
         result = {"message": "Error"}
         return jsonify(result), 400
