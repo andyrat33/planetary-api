@@ -69,6 +69,15 @@ def db_seed():
         distance=92.96e6,
     )
 
+    saturn = Planet(
+        planet_name="Saturn",
+        planet_type="Class G",
+        home_star="Sol",
+        mass=99.972e24,
+        radius=39959,
+        distance=932.96e6,
+    )
+
     db.session.add(mercury)
     db.session.add(venus)
     db.session.add(earth)
