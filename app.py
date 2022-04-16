@@ -13,6 +13,13 @@ from onepasswordconnectsdk.client import (
 
 DOES_NOT_EXIST = "That planet does not exist"
 
+# creating client using OP_CONNECT_TOKEN and OP_CONNECT_HOST environment variables
+client = new_client_from_environment()
+mailtrap = client.get_item("Mailtrap.io API Credential", "API-Keys")
+# Get API keys from 1Password Vault
+# MAIL_USERNAME = mailtrap.fields[1].value
+# MAIL_PASSWORD = mailtrap.fields[2].value
+
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
@@ -22,14 +29,12 @@ app.config["JWT_SECRET_KEY"] = "super-secret"  # change this IRL
 app.config["MAIL_SERVER"] = "smtp.mailtrap.io"
 # app.config["MAIL_USERNAME"] = os.environ["MAIL_USERNAME"]
 # app.config["MAIL_PASSWORD"] = os.environ["MAIL_PASSWORD"]
+app.config["MAIL_USERNAME"] = mailtrap.fields[1].value
+app.config["MAIL_PASSWORD"] = mailtrap.fields[2].value
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# creating client using OP_CONNECT_TOKEN and OP_CONNECT_HOST environment variables
-client = new_client_from_environment()
-mailtrap = client.get_item("Mailtrap.io API Credential", "API-Keys")
-# Get API keys from 1Password Vault
-MAIL_USERNAME = mailtrap.fields[1].value
-MAIL_PASSWORD = mailtrap.fields[2].value
+
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
