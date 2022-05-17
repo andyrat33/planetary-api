@@ -6,14 +6,12 @@ import os
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
-from onepasswordconnectsdk.client import (
-    Client,
-    new_client_from_environment
-)
+from onepasswordconnectsdk.client import new_client_from_environment
 
 DOES_NOT_EXIST = "That planet does not exist"
 
-# creating client using OP_CONNECT_TOKEN and OP_CONNECT_HOST environment variables
+# creating client using OP_CONNECT_TOKEN and OP_CONNECT_HOST
+# environment variables
 client = new_client_from_environment()
 mailtrap = client.get_item("Mailtrap SMTP", "API-Keys")
 # Get API keys from 1Password Vault
@@ -25,7 +23,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
 )
 app.config["JWT_SECRET_KEY"] = "super-secret"  # change this IRL
 app.config["MAIL_SERVER"] = "smtp.mailtrap.io"
-app.config['MAIL_PORT'] = 2525
+app.config["MAIL_PORT"] = 2525
 app.config["MAIL_USERNAME"] = mailtrap.fields[1].value
 app.config["MAIL_PASSWORD"] = mailtrap.fields[2].value
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -86,9 +84,20 @@ def db_seed():
         distance=932.96e6,
     )
 
+    clangers = Planet(
+        planet_name="Clangers",
+        planet_type="Class S",
+        home_star="Soup",
+        mass=99.972e24,
+        radius=39959,
+        distance=932.96e6,
+    )
+
     db.session.add(mercury)
     db.session.add(venus)
     db.session.add(earth)
+    db.session.add(saturn)
+    db.session.add(clangers)
 
     test_user = User(
         first_name="William",
@@ -200,7 +209,7 @@ def retrieve_password(email: str):
     if user:
         msg = Message(
             "your planetary API password is " + user.password,
-            sender='admin@planetary-api.com',
+            sender="admin@planetary-api.com",
             recipients=[email],
         )
         mail.send(msg)
