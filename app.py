@@ -93,7 +93,7 @@ def db_seed():
         distance=932.96e6,
     )
 
-    Moon = Planet(
+    moon = Planet(
         planet_name="Moon",
         planet_type="Class K",
         home_star="Cheese",
@@ -107,7 +107,7 @@ def db_seed():
     db.session.add(earth)
     db.session.add(saturn)
     db.session.add(clangers)
-    db.session.add(Moon)
+    db.session.add(moon)
 
     test_user = User(
         first_name="William",
