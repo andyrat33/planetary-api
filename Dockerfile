@@ -1,4 +1,4 @@
-FROM python:3.4-alpine
+FROM python:3.9.16-bullseye
 ADD . /app
 WORKDIR /app
 USER root
