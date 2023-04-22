@@ -1,0 +1,5 @@
+fileignoreconfig:
+- filename: 1password-credentials.json
+  checksum: 785fcd0443b2cc485d4ac4ef36502ae71119112c456a9297b659df74741f1c01
+- filename: docker-compose.yml
+  checksum: c57879d9a24a5c3cd62e0d83ff676b919945948d06fb66c902f475792b157a42
