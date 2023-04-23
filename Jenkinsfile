@@ -70,7 +70,6 @@ pipeline {
             SEMGREP_BRANCH = "${GIT_BRANCH}"
           }
           steps {
-             sh 'echo "Current workspace is ${env.WORKSPACE}"'
              sh 'pip3 install semgrep'
              sh 'semgrep ci'
             //sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
