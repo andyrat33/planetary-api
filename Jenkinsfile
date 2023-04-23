@@ -37,8 +37,9 @@ pipeline {
       parallel {
         stage('Run') {
           environment {
-            MAIL_USERNAME = credentials('MAIL_USERNAME')
-            MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+            OP_CONNECT_HOST = 'http://docker1:8080'
+            OP_CONNECT_TOKEN = credentials('op_mail')
+            OP_CLI_PATH = './'
           }
           steps {
             sh '''echo "Run"
