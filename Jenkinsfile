@@ -17,13 +17,10 @@ pipeline {
           args '--rm -d -p 5000:5000 --name planetary-api'
           additionalBuildArgs '--tag planetary-api'
         }
-
       }
       environment {
         MAIL_USERNAME = credentials('MAIL_USERNAME')
         MAIL_PASSWORD = credentials('MAIL_PASSWORD')
-        OP_CONNECT_HOST = 'http://docker1:8080'
-        OP_CONNECT_TOKEN = credentials('1Password')
       }
       steps {
         sh '''echo "Test DB Creation after Building..."
@@ -39,8 +36,6 @@ pipeline {
           environment {
             MAIL_USERNAME = credentials('MAIL_USERNAME')
             MAIL_PASSWORD = credentials('MAIL_PASSWORD')
-            OP_CONNECT_HOST = 'http://docker1:8080'
-            OP_CONNECT_TOKEN = credentials('1Password')
           }
           steps {
             sh '''echo "Run"
