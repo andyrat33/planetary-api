@@ -2,11 +2,13 @@ pipeline {
   agent any
   stages {
     stage('Install 1Password CLI') {
+       steps {
             sh '''
             curl -sSfLo op.zip https://cache.agilebits.com/dist/1P/op2/pkg/v2.8.0/op_linux_amd64_v2.16.1.zip
             unzip -o op.zip
             rm op.zip
             '''
+            }
         }
     stage('Build') {
       agent {
