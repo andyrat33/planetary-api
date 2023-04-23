@@ -68,7 +68,6 @@ pipeline {
             SEMGREP_APP_TOKEN = credentials('SEMGREP_APP_TOKEN')
             SEMGREP_DEPLOYMENT_ID = credentials('SEMGREP_DEPLOYMENT_ID')
             SEMGREP_BRANCH = "${GIT_BRANCH}"
-            PATH = "${env.PATH:/usr/bin}"
           }
           steps {
              sh 'pip3 install semgrep'
