@@ -1,6 +1,13 @@
 pipeline {
   agent any
   stages {
+    stage('Install 1Password CLI') {
+            sh '''
+            curl -sSfLo op.zip https://cache.agilebits.com/dist/1P/op2/pkg/v2.8.0/op_linux_amd64_v2.16.1.zip
+            unzip -o op.zip
+            rm op.zip
+            '''
+        }
     stage('Build') {
       agent {
         dockerfile {
@@ -10,15 +17,18 @@ pipeline {
         }
 
       }
-      environment {
-        MAIL_USERNAME = credentials('MAIL_USERNAME')
-        MAIL_PASSWORD = credentials('MAIL_PASSWORD')
-      }
+      //environment {
+      //  MAIL_USERNAME = credentials('MAIL_USERNAME')
+      //  MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+      //}
+      withSecrets(config: [connectCredentialId: '1password', connectHost: 'http://docker1:8080', opCLIPath: './'], secrets: [[envVar: 'MAIL_USERNAME', secretRef: 'op://API-Keys/Mailtrap SMTP/username'], [envVar: 'MAIL_PASSWORD', secretRef: 'op://API-Keys/Mailtrap SMTP/password']]) {
+    // some block
       steps {
         sh '''echo "Test DB Creation after Building..."
         flask db_create
         flask db_seed
            '''
+       }
       }
     }
 
