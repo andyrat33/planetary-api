@@ -19,18 +19,15 @@ pipeline {
         }
 
       }
-      //environment {
-      //  MAIL_USERNAME = credentials('MAIL_USERNAME')
-      //  MAIL_PASSWORD = credentials('MAIL_PASSWORD')
-      //}
-      withSecrets(config: [connectCredentialId: '1password', connectHost: 'http://docker1:8080', opCLIPath: './'], secrets: [[envVar: 'MAIL_USERNAME', secretRef: 'op://API-Keys/Mailtrap SMTP/username'], [envVar: 'MAIL_PASSWORD', secretRef: 'op://API-Keys/Mailtrap SMTP/password']]) {
-    // some block
+      environment {
+        MAIL_USERNAME = credentials('MAIL_USERNAME')
+        MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+      }
       steps {
         sh '''echo "Test DB Creation after Building..."
         flask db_create
         flask db_seed
            '''
-       }
       }
     }
 
