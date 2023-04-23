@@ -49,7 +49,6 @@ pipeline {
             docker exec planetary-api flask db_create
             docker exec planetary-api flask db_seed
             '''
-            }
           }
         }
 
