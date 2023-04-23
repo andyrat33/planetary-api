@@ -19,8 +19,11 @@ pipeline {
         }
       }
       environment {
-        MAIL_USERNAME = credentials('MAIL_USERNAME')
-        MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+        OP_CONNECT_HOST = 'http://docker1:8080'
+        OP_CONNECT_TOKEN = credentials('1password')
+        OP_CLI_PATH = './'
+        //MAIL_USERNAME = credentials('MAIL_USERNAME')
+        //MAIL_PASSWORD = credentials('MAIL_PASSWORD')
       }
       steps {
         sh '''echo "Test DB Creation after Building..."
