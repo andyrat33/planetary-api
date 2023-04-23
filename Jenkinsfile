@@ -45,7 +45,7 @@ pipeline {
             sh '''
             echo "Run"
             #docker build --tag planetary-api .
-            docker run --env MAIL_USERNAME=${MAIL_USERNAME} --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
+            docker run --env OP_CONNECT_HOST = 'http://docker1:8080' --env MAIL_PASSWORD=${MAIL_PASSWORD} --rm -d -p 5000:5000 --name planetary-api planetary-api
             docker exec planetary-api flask db_create
             docker exec planetary-api flask db_seed
             '''
