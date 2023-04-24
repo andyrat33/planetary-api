@@ -73,7 +73,7 @@ pipeline {
              //sh 'pip3 install semgrep'
              sh '/usr/local/bin/semgrep --version'
              sh '/usr/local/bin/semgrep ci'
-            sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
+             //sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
           }
         }
 
