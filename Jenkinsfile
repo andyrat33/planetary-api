@@ -71,8 +71,8 @@ pipeline {
           }
           steps {
              //sh 'pip3 install semgrep'
-             sh 'semgrep --version'
-             sh 'semgrep ci'
+             sh '/usr/local/bin/semgrep --version'
+             sh '/usr/local/bin/semgrep ci'
             sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
           }
         }
