@@ -70,9 +70,10 @@ pipeline {
             SEMGREP_BRANCH = "${GIT_BRANCH}"
           }
           steps {
-             sh 'pip install semgrep'
+
              sh 'python --version'
              sh 'semgrep --version'
+             sh 'pip install semgrep'
              sh 'semgrep ci'
              //sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
           }
