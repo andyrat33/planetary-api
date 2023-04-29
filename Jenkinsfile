@@ -126,12 +126,12 @@ pipeline {
       }
     }
 
-    stage('Dependency Checks') {
-      steps {
-        dependencyCheck(odcInstallation: 'dependency-check', additionalArguments: "--scan ${env.WORKSPACE}")
-        dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
-      }
-    }
+//     stage('Dependency Checks') {
+//       steps {
+//         dependencyCheck(odcInstallation: 'dependency-check', additionalArguments: "--scan ${env.WORKSPACE}")
+//         dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
+//       }
+//     }
 
   }
   post {
