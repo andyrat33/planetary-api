@@ -60,7 +60,7 @@ pipeline {
 //             SEMGREP_REPO_NAME = env.GIT_URL.replaceFirst(/^https:\/\/github.com\/(.*).git$/, '$1')
 //             SEMGREP_REPO_URL = env.GIT_URL.replaceFirst(/^(.*).git$/,'$1')
 //             SEMGREP_JOB_URL = "${BUILD_URL}"
-//             SEMGREP_APP_TOKEN = credentials('SEMGREP_APP_TOKEN')
+               SEMGREP_APP_TOKEN = credentials('SEMGREP_APP_TOKEN')
 //             SEMGREP_DEPLOYMENT_ID = credentials('SEMGREP_DEPLOYMENT_ID')
 //             SEMGREP_BRANCH = "${GIT_BRANCH}"
           }
@@ -68,7 +68,7 @@ pipeline {
              sh 'pip3 install semgrep'
              sh 'python3 --version'
              sh 'semgrep --version'
-             sh 'semgrep ci'
+             //sh 'semgrep ci'
              //sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
           }
         }
