@@ -20,7 +20,7 @@ pipeline {
       }
       environment {
         OP_CONNECT_HOST = 'http://docker1:8080'
-        OP_CONNECT_TOKEN = credentials('op_mail')
+        OP_CONNECT_TOKEN = credentials('op_token')
         OP_CLI_PATH = './'
         //MAIL_USERNAME = credentials('MAIL_USERNAME')
         //MAIL_PASSWORD = credentials('MAIL_PASSWORD')
@@ -38,7 +38,7 @@ pipeline {
         stage('Run') {
           environment {
             OP_CONNECT_HOST = 'http://docker1:8080'
-            OP_CONNECT_TOKEN = credentials('op_mail')
+            OP_CONNECT_TOKEN = credentials('op_token')
             OP_CLI_PATH = './'
           }
           steps {
