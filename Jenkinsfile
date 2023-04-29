@@ -89,6 +89,7 @@ pipeline {
         sh '''echo "Smoke Tests"
         curl -s -XGET http://localhost:5000/planet_details/1 | jq .
         curl -s -X GET --location "http://localhost:5000/planet_details/2" | jq .
+        host localhost
         '''
       }
     }
