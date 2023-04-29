@@ -1,4 +1,4 @@
 fileignoreconfig:
-- filename: Jenkinsfile
-  checksum: d1af5b181b3235039a83927eacd56ab0930def8bc02971a166c8f6c9c96664ea
+- filename: Planetary-API-Environment.postman_environment.json
+  checksum: 3faa4d6c8aa3e1881ae28d9657b5bd8a059fb3b51d3de6a425398994f2cc4b1d
 version: ""
