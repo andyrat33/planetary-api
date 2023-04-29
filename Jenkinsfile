@@ -65,8 +65,7 @@ pipeline {
 //             SEMGREP_BRANCH = "${GIT_BRANCH}"
           }
           steps {
-
-             sh 'pip install semgrep'
+             sh 'pip3 install semgrep'
              sh 'python3 --version'
              sh 'semgrep --version'
              sh 'semgrep ci'
