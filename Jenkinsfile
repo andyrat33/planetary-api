@@ -67,7 +67,7 @@ pipeline {
           steps {
 
              sh 'pip install semgrep'
-             sh 'python --version'
+             sh 'python3 --version'
              sh 'semgrep --version'
              sh 'semgrep ci'
              //sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
