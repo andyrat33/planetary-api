@@ -53,13 +53,8 @@ pipeline {
         }
 
         stage('SAST Semgrep_agent') {
-          agent {
-            docker {
-              image 'returntocorp/semgrep-agent:v1'
-              args '-u root'
-            }
+          agent any
 
-          }
           environment {
             SEMGREP_COMMIT = "${env.GIT_COMMIT}"
             SEMGREP_REPO_NAME = env.GIT_URL.replaceFirst(/^https:\/\/github.com\/(.*).git$/, '$1')
