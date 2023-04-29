@@ -116,7 +116,7 @@ pipeline {
         python3 -m venv $VENV
         . $VENV/bin/activate
         pip3 install cyclonedx-bom
-        cyclonedx-py -o ${WORKSPACE}/bom.xml
+        cyclonedx-py -r -o ${WORKSPACE}/bom.xml
         echo "Publish Dependency Track"
         '''
         withCredentials(bindings: [string(credentialsId: 'Dependency-Track-Automation', variable: 'API_KEY')]) {
