@@ -64,13 +64,20 @@ pipeline {
             SEMGREP_DEPLOYMENT_ID = credentials('SEMGREP_DEPLOYMENT_ID')
             SEMGREP_BRANCH = "${GIT_BRANCH}"
           }
+
           steps {
-             sh 'pip3 install semgrep'
-             sh 'python3 --version'
-             sh 'semgrep --version'
-             //sh 'semgrep ci'
-             //sh 'python -m semgrep_agent --publish-token $SEMGREP_APP_TOKEN --publish-deployment $SEMGREP_DEPLOYMENT_ID'
-          }
+            sh '''docker pull returntocorp/semgrep && \
+            docker run \
+            -e SEMGREP_APP_TOKEN=$SEMGREP_APP_TOKEN \
+            -e SEMGREP_REPO_URL=$SEMGREP_REPO_URL \
+            -e SEMGREP_BRANCH=$SEMGREP_BRANCH \
+            -e SEMGREP_REPO_NAME=$SEMGREP_REPO_NAME \
+            -e SEMGREP_BRANCH=$SEMGREP_BRANCH \
+            -e SEMGREP_COMMIT=$SEMGREP_COMMIT \
+            -e SEMGREP_PR_ID=$SEMGREP_PR_ID \
+            -v "$(pwd):$(pwd)" --workdir $(pwd) \
+            returntocorp/semgrep semgrep ci '''
+            }
         }
 
       }
