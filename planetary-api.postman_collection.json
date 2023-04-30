@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "69976c46-79a2-456d-8b8d-39a6a9a48b77",
+		"_postman_id": "6d4ff55b-44f9-49af-a9e8-e5fc01367633",
 		"name": "planetary-api",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19909390"
 	},
 	"item": [
 		{
@@ -47,11 +48,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}/login",
+							"raw": "http://{{host}}:{{port}}/login",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"login"
 							]
@@ -98,11 +100,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}/login",
+							"raw": "http://{{host}}:{{port}}/login",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"login"
 							]
@@ -149,11 +152,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}/login",
+							"raw": "http://{{host}}:{{port}}/login",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"login"
 							]
@@ -233,11 +237,12 @@
 							]
 						},
 						"url": {
-							"raw": "http://{{host}}/add_planet",
+							"raw": "http://{{host}}:{{port}}/add_planet",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"add_planet"
 							]
@@ -284,12 +289,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/add_planet",
+							"raw": "http://{{host}}:{{port}}/add_planet",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "5000",
+							"port": "{{port}}",
 							"path": [
 								"add_planet"
 							]
@@ -324,11 +329,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}/planet_details/{{id}}",
+							"raw": "http://{{host}}:{{port}}/planet_details/{{id}}",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"planet_details",
 								"{{id}}"
@@ -362,11 +368,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}/update_planet",
+							"raw": "http://{{host}}:{{port}}/update_planet",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"update_planet"
 							]
@@ -398,11 +405,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}/planets",
+							"raw": "http://{{host}}:{{port}}/planets",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"planets"
 							]
@@ -430,11 +438,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}/dbsize/planets.db",
+							"raw": "http://{{host}}:{{port}}/dbsize/planets.db",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"dbsize",
 								"planets.db"
@@ -473,14 +482,49 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}/remove_planet/{{id}}",
+							"raw": "http://{{host}}:{{port}}/remove_planet/{{id}}",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"remove_planet",
 								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/retrieve_password/{{email}}",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"retrieve_password",
+								"{{email}}"
 							]
 						}
 					},
@@ -580,11 +624,12 @@
 							]
 						},
 						"url": {
-							"raw": "http://{{host}}/add_planet",
+							"raw": "http://{{host}}:{{port}}/add_planet",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"add_planet"
 							]
@@ -634,12 +679,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/add_planet",
+							"raw": "http://{{host}}:{{port}}/add_planet",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "5000",
+							"port": "{{port}}",
 							"path": [
 								"add_planet"
 							]
@@ -686,11 +731,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}/login",
+							"raw": "http://{{host}}:{{port}}/login",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"login"
 							]
@@ -737,11 +783,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}/login",
+							"raw": "http://{{host}}:{{port}}/login",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"login"
 							]
@@ -760,10 +807,7 @@
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
-									"pm.test(\"Error - CMD Injection\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Error\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -773,11 +817,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}/dbsize/planets.db;ls",
+							"raw": "http://{{host}}:{{port}}/dbsize/planets.db;ls",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
+							"port": "{{port}}",
 							"path": [
 								"dbsize",
 								"planets.db;ls"

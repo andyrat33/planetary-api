@@ -6,9 +6,15 @@ import os
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
-
+from onepasswordconnectsdk.client import new_client_from_environment
 
 DOES_NOT_EXIST = "That planet does not exist"
+
+# creating client using OP_CONNECT_TOKEN and OP_CONNECT_HOST
+# environment variables
+client = new_client_from_environment()
+mailtrap = client.get_item("Mailtrap SMTP", "API-Keys")
+# Get API keys from 1Password Vault
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -17,10 +23,10 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
 )
 app.config["JWT_SECRET_KEY"] = "super-secret"  # change this IRL
 app.config["MAIL_SERVER"] = "smtp.mailtrap.io"
-app.config["MAIL_USERNAME"] = os.environ["MAIL_USERNAME"]
-app.config["MAIL_PASSWORD"] = os.environ["MAIL_PASSWORD"]
+app.config["MAIL_PORT"] = 2525
+app.config["MAIL_USERNAME"] = mailtrap.fields[1].value
+app.config["MAIL_PASSWORD"] = mailtrap.fields[2].value
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -78,9 +84,30 @@ def db_seed():
         distance=932.96e6,
     )
 
+    clangers = Planet(
+        planet_name="Clangers",
+        planet_type="Class S",
+        home_star="Soup",
+        mass=99.972e24,
+        radius=39959,
+        distance=932.96e6,
+    )
+
+    moon = Planet(
+        planet_name="Moon",
+        planet_type="Class K",
+        home_star="Cheese",
+        mass=99.972e24,
+        radius=39959,
+        distance=932.96e6,
+    )
+
     db.session.add(mercury)
     db.session.add(venus)
     db.session.add(earth)
+    db.session.add(saturn)
+    db.session.add(clangers)
+    db.session.add(moon)
 
     test_user = User(
         first_name="William",
@@ -137,46 +164,17 @@ def register():
         return jsonify(message="User created successfully."), 201
 
 
-# @app.route("/login", methods=["POST"])
-# def login():
-#     """SQLAlchemy safe login"""
-#     if request.is_json:
-#         email = request.json["email"]
-#         password = request.json["password"]
-#     else:
-#         email = request.form["email"]
-#         password = request.form["password"]
-#
-#     test = User.query.filter_by(email=email, password=password).first()
-#     if test:
-#         access_token = create_access_token(identity=email)
-#         app.logger.info("%s logged in successfully", email)
-#         return jsonify(message="Login succeeded!", access_token=access_token)
-#     else:
-#         app.logger.info("%s failed to log in", email)
-#         return jsonify(message="Bad email or password"), 401
-
-
 @app.route("/login", methods=["POST"])
 def login():
-    """insecure login. SQLi"""
+    """SQLAlchemy safe login"""
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
     else:
         email = request.form["email"]
         password = request.form["password"]
-    with db.engine.connect() as con:
-        test = con.execute(
-            "SELECT * from users WHERE email='{id}' "
-            "AND password='{passw}'".format(id=email, passw=password)
-        ).first()
-    app.logger.info(
-        "SELECT * from users WHERE "
-        "email='{id}' AND password length='{passw}'".format(
-            id=email, passw=len(password)
-        )
-    )
+
+    test = User.query.filter_by(email=email, password=password).first()
     if test:
         access_token = create_access_token(identity=email)
         app.logger.info("%s logged in successfully", email)
@@ -184,6 +182,35 @@ def login():
     else:
         app.logger.info("%s failed to log in", email)
         return jsonify(message="Bad email or password"), 401
+
+
+# @app.route("/login", methods=["POST"])
+# def login():
+#     """insecure login. SQLi"""
+#     if request.is_json:
+#         email = request.json["email"]
+#         password = request.json["password"]
+#     else:
+#         email = request.form["email"]
+#         password = request.form["password"]
+#     with db.engine.connect() as con:
+#         test = con.execute(
+#             "SELECT * from users WHERE email='{id}' "
+#             "AND password='{passw}'".format(id=email, passw=password)
+#         ).first()
+#     app.logger.info(
+#         "SELECT * from users WHERE "
+#         "email='{id}' AND password length='{passw}'".format(
+#             id=email, passw=len(password)
+#         )
+#     )
+#     if test:
+#         access_token = create_access_token(identity=email)
+#         app.logger.info("%s logged in successfully", email)
+#         return jsonify(message="Login succeeded!", access_token=access_token)
+#     else:
+#         app.logger.info("%s failed to log in", email)
+#         return jsonify(message="Bad email or password"), 401
 
 
 @app.route("/retrieve_password/<string:email>", methods=["GET"])
@@ -297,26 +324,26 @@ def remove_planet(planet_id: int):
         return jsonify(message=DOES_NOT_EXIST), 404
 
 
-# @app.route("/dbsize/<string:dbfile>", methods=["GET"])
-# def dbsize(dbfile: str):
-#     """Secure version no command injection"""
-#     try:
-#         result = subprocess.check_output(["du", dbfile], shell=False)
-#     except subprocess.CalledProcessError:
-#         result = {"message": "Error"}
-#         return jsonify(result), 400
-#     return result, 200
-
-
 @app.route("/dbsize/<string:dbfile>", methods=["GET"])
 def dbsize(dbfile: str):
-    """insecure command injection"""
+    """Secure version no command injection"""
     try:
-        result = subprocess.check_output("du " + dbfile, shell=True)
+        result = subprocess.check_output(["du", dbfile], shell=False)
     except subprocess.CalledProcessError:
         result = {"message": "Error"}
         return jsonify(result), 400
     return result, 200
+
+
+# @app.route("/dbsize/<string:dbfile>", methods=["GET"])
+# def dbsize(dbfile: str):
+#     """insecure command injection"""
+#     try:
+#         result = subprocess.check_output("du " + dbfile, shell=True)
+#     except subprocess.CalledProcessError:
+#         result = {"message": "Error"}
+#         return jsonify(result), 400
+#     return result, 200
 
 
 # database models

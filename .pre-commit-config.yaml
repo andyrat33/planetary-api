@@ -6,7 +6,7 @@ repos:
     - id: end-of-file-fixer
     - id: trailing-whitespace
 -   repo: https://github.com/ambv/black
-    rev: 21.6b0
+    rev: 22.3.0
     hooks:
     - id: black
       language_version: python3.9
@@ -14,3 +14,12 @@ repos:
     rev: 3.9.2
     hooks:
     - id: flake8
+-   repo: local
+    hooks:
+    -   id: talisman-precommit
+        name: talisman
+        entry: bash -c 'if [ -n "${TALISMAN_HOME:-}" ]; then ${TALISMAN_HOME}/talisman_hook_script pre-commit; else echo "TALISMAN does not exist. Consider installing from https://github.com/thoughtworks/talisman . If you already have talisman installed, please ensure TALISMAN_HOME variable is set to where talisman_hook_script resides, for example, TALISMAN_HOME=${HOME}/.talisman/bin"; fi'
+        language: system
+        pass_filenames: false
+        types: [text]
+        verbose: true
