@@ -1,5 +1,5 @@
 FROM python:3.9.16-bullseye
-RUN groupadd -r flask && useradd --no-log-init -r -g flask flask
+RUN groupadd -r flask && useradd --no-log-init -r -g -d /app flask flask
 USER flask
 ADD . /app
 WORKDIR /app
