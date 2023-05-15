@@ -1,6 +1,5 @@
 FROM python:3.9.16-bullseye
-RUN groupadd -r flask && useradd --no-log-init -d /app -r -g  flask flask
-USER flask
+USER root
 ADD . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
