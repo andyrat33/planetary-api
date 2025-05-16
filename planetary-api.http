@@ -1,0 +1,361 @@
+# planetary-api
+
+###
+# group: Basic
+# @name Insecure Login
+POST http://{{host}}/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "' or 1=1;--"
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("access_token", jsonData.access_token);
+    //
+    // pm.test("Status code is 401 - SQL Injection", function () {
+    //     pm.response.to.have.status(401);
+    // });
+    //
+    // pm.test("Bad email or password - SQLi", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("Bad email or password");
+    // });
+%}
+
+###
+# group: Basic
+# @name Insecure Login 2
+POST http://{{host}}/login
+Content-Type: application/json
+
+{
+  "email": "' or 1=1;--",
+  "password": ""
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("access_token", jsonData.access_token);
+    //
+    // pm.test("Status code is 401 - SQL Injection", function () {
+    //     pm.response.to.have.status(401);
+    // });
+    //
+    // pm.test("Bad email or password - SQLi", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("Bad email or password");
+    // });
+%}
+
+###
+# group: Basic
+# @name Login
+POST http://{{host}}/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "P@ssw0rd"
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("access_token", jsonData.access_token);
+    //
+    // pm.test("Status code is 200", function () {
+    //     pm.response.to.have.status(200);
+    // });
+    //
+    // pm.test("Login succeeded!", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("Login succeeded!");
+    // });
+%}
+
+###
+# group: Basic
+# @name Add Planet
+//< {%
+    // TODO: you can add here Pre-request handler
+//%}
+POST http://{{host}}/add_planet
+Authorization: Bearer {{access_token}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="planet_type"
+
+Class S
+--WebAppBoundary
+Content-Disposition: form-data; name="planet_name"
+
+{{$randomFirstName}}
+--WebAppBoundary
+Content-Disposition: form-data; name="radius"
+
+242325212434
+--WebAppBoundary
+Content-Disposition: form-data; name="mass"
+
+23423423454e34
+--WebAppBoundary
+Content-Disposition: form-data; name="distance"
+
+2343134e23
+--WebAppBoundary
+Content-Disposition: form-data; name="home_star"
+
+Sol
+--WebAppBoundary
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("id", jsonData.id);
+%}
+
+###
+# group: Basic
+# @name Add Planet JSON
+POST http://localhost:5000/add_planet
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+    "planet_name":"{{$randomFirstName}}",
+    "planet_type":"Class D",
+    "home_star":"Sol",
+    "mass":"2.258e23",
+    "radius":"1516",
+    "distance":"35.98e6"
+}
+
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("id", jsonData.id);
+    //
+    //
+%}
+
+###
+# group: Basic
+# @name Get Planet Details
+//< {%
+    // TODO: you can add here Pre-request handler
+//%}
+GET http://{{host}}/planet_details/{{id}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("planet_name", jsonData.planet_name);
+%}
+
+###
+# group: Basic
+# @name Update Planet
+PUT http://{{host}}/update_planet
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{   "planet_id":{{id}},
+    "planet_name":"Mercury",
+    "planet_type":"Class A",
+        "home_star":"Sol",
+        "mass":2.258e23,
+        "radius":1516,
+        "distance":35.98e6}
+
+###
+# group: Basic
+# @name Planets
+GET http://{{host}}/planets
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 200", function () {
+    //     pm.response.to.have.status(200);
+    // });
+    //
+    // pm.test("Mercury Planet", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData[0].planet_name).to.eql("Mercury");
+    // });
+%}
+
+###
+# group: Basic
+# @name dbsize
+GET http://{{host}}/dbsize/planets.db
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 200", function () {
+    //     pm.response.to.have.status(200);
+    // });
+    //
+%}
+
+###
+# group: Basic
+# @name Delete Planet
+DELETE http://{{host}}/remove_planet/{{id}}
+Authorization: Bearer {{access_token}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Planet Deleted Success", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("You deleted a planet");
+    // });
+%}
+
+###
+# group: Negative
+# @name Add Planet Missing Name
+POST http://{{host}}/add_planet
+Authorization: Bearer {{access_token}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="planet_type"
+
+12
+--WebAppBoundary
+Content-Disposition: form-data; name="planet_name"
+
+
+--WebAppBoundary
+Content-Disposition: form-data; name="radius"
+
+242325212434
+--WebAppBoundary
+Content-Disposition: form-data; name="mass"
+
+23423423454e34
+--WebAppBoundary
+Content-Disposition: form-data; name="distance"
+
+2343134e23
+--WebAppBoundary
+Content-Disposition: form-data; name="home_star"
+
+Sol
+--WebAppBoundary
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 400", function () {
+    //     pm.response.to.have.status(400);
+    // });
+    //
+    // pm.test("Missing Planet Name", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("missing planet name");
+    // });
+%}
+
+###
+# group: Negative
+# @name Add Planet Planet Name Exists
+POST http://localhost:5000/add_planet
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "planet_name": "Mercury",
+  "planet_type": "Class D",
+  "home_star": "Sol",
+  "mass": "2.258e23",
+  "radius": "1516",
+  "distance": "35.98e6"
+}
+
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 409", function () {
+    //     pm.response.to.have.status(409);
+    // });
+    // pm.test("Planet Already Exists", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("There is already a planet by that name");
+    // });
+%}
+
+###
+# group: Negative
+# @name Login Failure Incorrect Password
+POST http://{{host}}/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "wrongpass"
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("access_token", jsonData.access_token);
+    //
+    // pm.test("Status code is 401", function () {
+    //     pm.response.to.have.status(401);
+    // });
+    //
+    // pm.test("Login failed incorrect email or password", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("Bad email or password");
+    // });
+%}
+
+###
+# group: Negative
+# @name Login Failure Incorrect Username
+POST http://{{host}}/login
+Content-Type: application/json
+
+{
+    "email": "{{$randomFirstName}}@test.com",
+    "password": "P@ssw0rd"
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // var jsonData = pm.response.json();
+    // pm.environment.set("access_token", jsonData.access_token);
+    //
+    // pm.test("Status code is 401", function () {
+    //     pm.response.to.have.status(401);
+    // });
+    //
+    // pm.test("Login failed incorrect email or password", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("Bad email or password");
+    // });
+%}
+
+###
+# group: Negative
+# @name dbsize cmd injection
+GET http://{{host}}/dbsize/planets.db;ls
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 400 - CMD Injection", function () {
+    //     pm.response.to.have.status(400);
+    // });
+    //
+    // pm.test("Error - CMD Injection", function () {
+    //     var jsonData = pm.response.json();
+    //     pm.expect(jsonData.message).to.eql("Error");
+    // });
+%}
