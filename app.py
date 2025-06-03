@@ -301,7 +301,7 @@ def remove_planet(planet_id: int):
 
 @app.route("/dbsize/<string:dbfile>", methods=["GET"])
 def dbsize(dbfile: str):
-    """insecure command injection"""
+    """insecure command injection and XSS"""
     try:
         result = subprocess.check_output("du " + dbfile, shell=True)
     except subprocess.CalledProcessError:
