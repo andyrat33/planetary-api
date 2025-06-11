@@ -80,7 +80,15 @@ def db_seed():
         password="P@ssw0rd",
     )
 
+    test_user2 = User(
+        first_name="Brian",
+        last_name="Herschel",
+        email="test@test.com",
+        password="P@ssw0rd",
+    )
+
     db.session.add(test_user)
+    db.session.add(test_user2)
     db.session.commit()
     print("Database seeded!")
 
