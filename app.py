@@ -83,8 +83,8 @@ def db_seed():
     test_user2 = User(
         first_name="Brian",
         last_name="Herschel",
-        email="test@test.com",
-        password="P@ssw0rd",
+        email="test2@test.com",
+        password="password123",
     )
 
     db.session.add(test_user)
@@ -93,9 +93,80 @@ def db_seed():
     print("Database seeded!")
 
 
-@app.route("/")
-def hello_world():
-    return "Planetary-API!"
+# @app.route("/")
+# def hello_world():
+#     return "Planetary-API!"
+
+
+@app.route("/", methods=["GET"])
+def serve_frontend():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Planetary API</title>
+    </head>
+    <body>
+        <h2>Login</h2>
+        <input type="text" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <h2>Get Planet</h2>
+        <input type="text" id="planet_name" placeholder="Planet Name">
+        <button onclick="getPlanet()">Fetch Planet</button>
+        <pre id="output"></pre>
+        <script>
+            let token = "";
+            function login() {
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+                fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ "email":email,
+                            "password":password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.access_token) {
+                        token = data.access_token;
+                        alert("Login successful");
+                    } else {
+                        alert("Invalid credentials");
+                    }
+                });
+            }
+            function getPlanet() {
+                const planet_name = document.getElementById("planet_name")
+                .value;
+                fetch(`/get_planet/${planet_name}`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("output").textContent =
+                    JSON.stringify(data, null, 2);
+                });
+            }
+        </script>
+    </body>
+    </html>
+    """
+
+
+@app.route("/get_planet/<string:planet_name>", methods=["GET"])
+@jwt_required
+def get_planet(planet_name: str):
+    """Get planet details by name"""
+    if not planet_name:
+        return jsonify(message="Missing planet name"), 400
+
+    planet = Planet.query.filter_by(planet_name=planet_name).first()
+    if planet:
+        result = planet_schema.dump(planet)
+        return jsonify(result.data), 200
+    else:
+        return jsonify(message=DOES_NOT_EXIST), 404
 
 
 @app.route("/planetary")
@@ -162,6 +233,7 @@ def login():
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
+        print(f"email: {email}, password: {password}")
     else:
         email = request.form["email"]
         password = request.form["password"]
