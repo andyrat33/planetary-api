@@ -51,6 +51,15 @@ def db_seed():
         distance=35.98e6,
     )
 
+    mercury = Planet(
+        planet_name="Vulcan",
+        planet_type="Class M",
+        home_star="Sol",
+        mass=2.258e23,
+        radius=1516,
+        distance=35.98e6,
+    )
+
     venus = Planet(
         planet_name="Venus",
         planet_type="Class K",
