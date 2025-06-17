@@ -1,6 +1,6 @@
 [
   {
-    "name": "planet-api-task",
+    "name": "planetary-api",
     "imageUri": "183695703210.dkr.ecr.us-east-1.amazonaws.com/simple-docker-service-129174b85c5b:latest"
   }
 ]
