@@ -60,6 +60,15 @@ def db_seed():
         distance=35.98e6,
     )
 
+    ferenginar = Planet(
+        planet_name="Ferenginar",
+        planet_type="Class M",
+        home_star="Plub",
+        mass=6.258e23,
+        radius=3516,
+        distance=367.98e6,
+    )
+
     venus = Planet(
         planet_name="Venus",
         planet_type="Class K",
@@ -82,6 +91,7 @@ def db_seed():
     db.session.add(vulcan)
     db.session.add(venus)
     db.session.add(earth)
+    db.session.add(ferenginar)
 
     test_user = User(
         first_name="William",
