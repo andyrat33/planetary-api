@@ -86,12 +86,20 @@ def db_seed():
         radius=3959,
         distance=92.96e6,
     )
-
+    romulus = Planet(
+        planet_name="Romulus",
+        planet_type="Class M",
+        home_star="Romulus Star",
+        mass=5.972e24,
+        radius=3959,
+        distance=92.96e6,
+    )
     db.session.add(mercury)
     db.session.add(vulcan)
     db.session.add(venus)
     db.session.add(earth)
     db.session.add(ferenginar)
+    db.session.add(romulus)
 
     test_user = User(
         first_name="William",
