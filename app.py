@@ -51,7 +51,7 @@ def db_seed():
         distance=35.98e6,
     )
 
-    mercury = Planet(
+    vulcan = Planet(
         planet_name="Vulcan",
         planet_type="Class M",
         home_star="Sol",
@@ -79,6 +79,7 @@ def db_seed():
     )
 
     db.session.add(mercury)
+    db.session.add(vulcan)
     db.session.add(venus)
     db.session.add(earth)
 
