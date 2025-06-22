@@ -3,7 +3,7 @@ env:
   variables:
     MyVar: "Hello"
   secrets-manager:
-    DOCKER_HUB_USERNAME: "arn:aws:secretsmanager:us-east-1:183695703210:secret:prod/docker-login-iJ6OPC:DOCKER_HUB_USERNAME"
+    DOCKER_HUB_USERNAME: "arn:aws:secretsmanager:us-east-1:183695703210:secret:prod/docker-login-iJ6OPC:DOCKER_HUB_USERNANE"
     DOCKER_HUB_PASSWORD: "arn:aws:secretsmanager:us-east-1:183695703210:secret:prod/docker-login-iJ6OPC:DOCKER_HUB_PASSWORD"
 phases:
   pre_build:
