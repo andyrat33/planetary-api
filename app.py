@@ -92,7 +92,7 @@ def db_seed():
         planet_type="Class M",
         home_star="Romulus Star",
         mass=5.972e24,
-        radius=333959,
+        radius=3339569,
         distance=92.96e6,
     )
     klingon = Planet(
