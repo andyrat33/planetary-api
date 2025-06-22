@@ -1,6 +1,6 @@
 version: 0.2
 env:
-  shell: bash
+  shell: /bin/bash
   variables:
     MyVar: "Hello"
   secrets-manager:
