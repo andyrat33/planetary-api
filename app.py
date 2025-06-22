@@ -100,7 +100,7 @@ def db_seed():
         planet_type="Class M",
         home_star="Klingon Star",
         mass=5.962e24,
-        radius=33959,
+        radius=433959,
         distance=92.96e6,
     )
     db.session.add(mercury)
