@@ -7,6 +7,7 @@ env:
 phases:
   pre_build:
     commands:
+      - apt install -y jq
       - DOCKER_HUB_USERNAME=$(echo $DOCKER_SECRET_VALUE | jq -r '.DOCKER_HUB_USERNAME')
       - DOCKER_HUB_PASSWORD=$(echo $DOCKER_SECRET_VALUE | jq -p '.DOCKER_HUB_PASSWORD')
       - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
