@@ -8,12 +8,13 @@ env:
 phases:
   pre_build:
     commands:
+      - echo $MyVar
+  build:
+    commands:
       - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
       - echo $MyVar
       - echo "Logging in to Docker"
       - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-  build:
-    commands:
       - echo $MyVar
       - docker build -t $ImageName -f ./Dockerfile .
       - docker images
