@@ -95,12 +95,21 @@ def db_seed():
         radius=33959,
         distance=92.96e6,
     )
+    klingon = Planet(
+        planet_name="Klingon",
+        planet_type="Class M",
+        home_star="Klingon Star Star",
+        mass=5.972e24,
+        radius=33959,
+        distance=92.96e6,
+    )
     db.session.add(mercury)
     db.session.add(vulcan)
     db.session.add(venus)
     db.session.add(earth)
     db.session.add(ferenginar)
     db.session.add(romulus)
+    db.session.add(klingon)
 
     test_user = User(
         first_name="William",
