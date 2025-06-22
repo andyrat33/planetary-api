@@ -8,7 +8,6 @@ env:
 phases:
   pre_build:
     commands:
-      - aws --version
       - DOCKER_HUB_USERNAME=$(echo $DOCKER_SECRET_VALUE | ja -r '.DOCKER_HUB_USERNAME')
       - DOCKER_HUB_PASSWORD=$(echo $DOCKER_SECRET_VALUE | jq -p '.DOCKER_HUB_PASSWORD')
       - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
