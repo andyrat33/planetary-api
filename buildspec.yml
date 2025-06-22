@@ -1,0 +1,27 @@
+version: 0.2
+env:
+  shell: bash
+  variables:
+    MyVar: "Hello"
+  secrets-manager:
+    DOCKER_SECRET_VALUE: "arn:aws:secretsmanager:us-east-1:183695703210:secret:prod/docker-login-iJ6OPC"
+phases:
+  pre_build:
+    commands:
+      - aws --version
+      - DOCKER_HUB_USERNAME=$(echo $DOCKER_SECRET_VALUE | ja -r '.DOCKER_HUB_USERNAME')
+      - DOCKER_HUB_PASSWORD=$(echo $DOCKER_SECRET_VALUE | jq -p '.DOCKER_HUB_PASSWORD')
+      - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+      - echo $MyVar
+      - echo "Logging in to Docker"
+      - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+  build:
+    commands:
+      - echo $MyVar
+      - docker build -t $ImageName -f ./Dockerfile .
+      - docker images
+  post_build:
+    commands:
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 183695703210.dkr.ecr.us-east-1.amazonaws.com
+      - docker tag $ImageName:latest 183695703210.dkr.ecr.us-east-1.amazonaws.com/$ImageName:latest
+      - docker push 183695703210.dkr.ecr.us-east-1.amazonaws.com/$ImageName:latest
