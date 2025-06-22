@@ -11,7 +11,7 @@ phases:
       - echo $MyVar
   build:
     commands:
-      - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+      - echo $DOCKER_HUB_PASSWORD | docker login --username DOCKER_HUB_USERNANE --password-stdin
       - echo $MyVar
       - echo "Logging in to Docker"
       - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
