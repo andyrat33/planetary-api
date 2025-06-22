@@ -9,12 +9,10 @@ phases:
   pre_build:
     commands:
       - echo $MyVar
+      - echo "Logging in to Docker"
+      - echo $DOCKER_HUB_PASSWORD | docker login --username DOCKER_HUB_USERNANE --password-stdin
   build:
     commands:
-      - echo $DOCKER_HUB_PASSWORD | docker login --username DOCKER_HUB_USERNANE --password-stdin
-      - echo $MyVar
-      - echo "Logging in to Docker"
-      - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       - echo $MyVar
       - docker build -t $ImageName -f ./Dockerfile .
       - docker images
