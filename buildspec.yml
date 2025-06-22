@@ -3,8 +3,8 @@ env:
   variables:
     MyVar: "Hello"
   secrets-manager:
-    DOCKER_HUB_USERNAME: "prod/docker-login:DOCKER_HUB_USERNAME"
-    DOCKER_HUB_PASSWORD: "prod/docker-login:DOCKER_HUB_PASSWORD"
+    DOCKER_HUB_USERNAME: "docker-login:DOCKER_HUB_USERNAME"
+    DOCKER_HUB_PASSWORD: "docker-login:DOCKER_HUB_PASSWORD"
 phases:
   pre_build:
     commands:
