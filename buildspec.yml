@@ -3,13 +3,11 @@ env:
   variables:
     MyVar: "Hello"
   secrets-manager:
-    DOCKER_SECRET_VALUE: "arn:aws:secretsmanager:us-east-1:183695703210:secret:prod/docker-login-iJ6OPC"
+    DOCKER_HUB_USERNAME: "arn:aws:secretsmanager:us-east-1:183695703210:secret:prod/docker-login-iJ6OPC:DOCKER_HUB_USERNAME"
+    DOCKER_HUB_PASSWORD: "arn:aws:secretsmanager:us-east-1:123456789012:secret:docker-hub-password:DOCKER_HUB_PASSWORD"
 phases:
   pre_build:
     commands:
-      - apt install -y jq
-      - DOCKER_HUB_USERNAME=$(echo $DOCKER_SECRET_VALUE | jq -r '.DOCKER_HUB_USERNAME')
-      - DOCKER_HUB_PASSWORD=$(echo $DOCKER_SECRET_VALUE | jq -p '.DOCKER_HUB_PASSWORD')
       - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
       - echo $MyVar
       - echo "Logging in to Docker"
