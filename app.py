@@ -101,7 +101,7 @@ def db_seed():
         home_star="Klingon Star",
         mass=5.962e24,
         radius=433959,
-        distance=92.96e6,
+        distance=925.96e6,
     )
     db.session.add(mercury)
     db.session.add(vulcan)
