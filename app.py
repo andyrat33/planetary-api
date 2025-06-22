@@ -20,6 +20,7 @@ app.config["MAIL_SERVER"] = "smtp.mailtrap.io"
 app.config["MAIL_USERNAME"] = os.environ["MAIL_USERNAME"]
 app.config["MAIL_PASSWORD"] = os.environ["MAIL_PASSWORD"]
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# TDDO: store secrets in Amazon Secrets Manager or similar service
 
 
 db = SQLAlchemy(app)
