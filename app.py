@@ -83,7 +83,7 @@ def db_seed():
         planet_name="Earth",
         planet_type="Class M",
         home_star="Sol",
-        mass=5.972e24,
+        mass=5.9729e24,
         radius=3959,
         distance=92.96e6,
     )
