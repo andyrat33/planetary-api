@@ -98,7 +98,7 @@ def db_seed():
     klingon = Planet(
         planet_name="Klingon",
         planet_type="Class M",
-        home_star="Klingon Star Star",
+        home_star="Klingon Star",
         mass=5.972e24,
         radius=33959,
         distance=92.96e6,
