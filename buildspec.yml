@@ -13,7 +13,7 @@ phases:
       - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
   build:
     commands:
-      - echo $MyVar
+      - echo $ImageName
       - docker build -t $ImageName -f ./Dockerfile .
       - docker images
   post_build:
