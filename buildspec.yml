@@ -19,10 +19,14 @@ phases:
       - echo "Build started on $(date)"
       - echo Building the Docker image...
       - echo "Building ${REPOSITORY_URI}:latest"
-      - docker build -t ${REPOSITORY_URI}:latest -f ./Dockerfile .
-      - docker tag ${REPOSITORY_URI}:latest ${REPOSITORY_URI}:latest
+      - docker build -t ${ImageName}:latest -f ./Dockerfile .
+      - docker logout
+      - echo "Docker image built successfully"
+      - docker tag ${ImageName}:latest ${REPOSITORY_URI}:latest
       - docker images
   post_build:
     commands:
+      - echo "Build completed on $(date)"
+      - echo "Pushing the Docker image to ECR..."
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 183695703210.dkr.ecr.us-east-1.amazonaws.com
       - docker push ${REPOSITORY_URI}:latest
