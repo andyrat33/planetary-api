@@ -74,7 +74,7 @@ def db_seed():
         planet_name="Venus",
         planet_type="Class K",
         home_star="Sol",
-        mass=4.867e24,
+        mass=4.8647e24,
         radius=3760,
         distance=67.24e6,
     )
