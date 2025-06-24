@@ -26,6 +26,7 @@ phases:
       - docker images
   post_build:
     commands:
+      - echo "ECR repository URI: ${REPOSITORY_URI}"
       - echo "Build completed on $(date)"
       - echo "Pushing the Docker image to ECR...."
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 183695703210.dkr.ecr.us-east-1.amazonaws.com
