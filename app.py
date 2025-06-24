@@ -91,7 +91,7 @@ def db_seed():
         planet_name="Romulus",
         planet_type="Class M",
         home_star="Romulus Star",
-        mass=5.972e24,
+        mass=5.9772e24,
         radius=3339569,
         distance=92.96e6,
     )
