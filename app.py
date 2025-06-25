@@ -152,6 +152,20 @@ def serve_frontend():
         <h2>Get Planet</h2>
         <input type="text" id="planet_name" placeholder="Planet Name">
         <button onclick="getPlanet()">Fetch Planet</button>
+
+        <h2>Add Planet</h2>
+        <input type="text" id="new_planet_name" placeholder="Planet Name">
+        <input type="text" id="new_planet_type" placeholder="Planet Type">
+        <input type="text" id="new_home_star" placeholder="Home Star">
+        <input type="number" id="new_mass" placeholder="Mass">
+        <input type="number" id="new_radius" placeholder="Radius">
+        <input type="number" id="new_distance" placeholder="Distance">
+        <button onclick="addPlanet()">Add Planet</button>
+
+        <h2>Delete Planet</h2>
+        <input type="number" id="delete_planet_id" placeholder="Planet ID">
+        <button onclick="deletePlanet()">Delete Planet</button>
+
         <pre id="output"></pre>
         <script>
             let token = "";
@@ -178,6 +192,43 @@ def serve_frontend():
                 const planet_name = document.getElementById("planet_name")
                 .value;
                 fetch(`/get_planet/${planet_name}`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("output").textContent =
+                    JSON.stringify(data, null, 2);
+                });
+            }
+
+            function addPlanet() {
+                const body = {
+                    planet_name: document.getElementById("new_planet_name").value,
+                    planet_type: document.getElementById("new_planet_type").value,
+                    home_star: document.getElementById("new_home_star").value,
+                    mass: document.getElementById("new_mass").value,
+                    radius: document.getElementById("new_radius").value,
+                    distance: document.getElementById("new_distance").value,
+                };
+                fetch("/add_planet", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("output").textContent =
+                    JSON.stringify(data, null, 2);
+                });
+            }
+
+            function deletePlanet() {
+                const planet_id = document.getElementById("delete_planet_id").value;
+                fetch(`/remove_planet/${planet_id}`, {
+                    method: "DELETE",
                     headers: { "Authorization": `Bearer ${token}` }
                 })
                 .then(response => response.json())
