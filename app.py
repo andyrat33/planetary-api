@@ -47,7 +47,7 @@ def db_seed():
         planet_name="Mercury",
         planet_type="Class D",
         home_star="Sol",
-        mass=2.258e23,
+        mass=2.258e13,
         radius=1516,
         distance=35.98e6,
     )
