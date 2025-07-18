@@ -6,6 +6,7 @@ import os
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
+import logging
 
 
 DOES_NOT_EXIST = "That planet does not exist"
@@ -20,8 +21,9 @@ app.config["MAIL_SERVER"] = "smtp.mailtrap.io"
 app.config["MAIL_USERNAME"] = os.environ["MAIL_USERNAME"]
 app.config["MAIL_PASSWORD"] = os.environ["MAIL_PASSWORD"]
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-# TDDO: store secrets in Amazon Secrets Manager or similar service
 
+app.logger.setLevel(logging.INFO)
+# TDDO: store secrets in Amazon Secrets Manager or similar service
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -250,7 +252,14 @@ def get_planet(planet_name: str):
     if not planet_name:
         return jsonify(message="Missing planet name"), 400
 
-    planet = Planet.query.filter_by(planet_name=planet_name).first()
+    # planet = Planet.query.filter_by(planet_name=planet_name).first()
+    with db.engine.connect() as con:
+        planet = con.execute(
+            "SELECT * from planets WHERE planet_name='{planet_name}'".format(
+                planet_name=planet_name
+            )
+        ).first()
+        app.logger.info(f"Planet: {planet}")
     if planet:
         result = planet_schema.dump(planet)
         return jsonify(result.data), 200
