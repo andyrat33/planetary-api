@@ -122,7 +122,7 @@ def db_seed():
 
     test_user2 = User(
         first_name="Brian",
-        last_name="Herschel",
+        last_name="Cox",
         email="test2@test.com",
         password="password123",
     )
