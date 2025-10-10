@@ -133,9 +133,27 @@ def db_seed():
     print("Database seeded!")
 
 
-# @app.route("/")
-# def hello_world():
-#     return "Planetary-API!"
+# Done: Add a parameterized get request to allow SQLMAP to be used to demonstrate SQLi.
+# This is for educational purposes only, do not use in production.
+# Example: /get_planet_sqlmap?planet_name=Earth' OR '1'='1--
+@app.route("/get_planet_sqlmap", methods=["GET"])
+def get_planet_sqlmap():
+    planet_name = request.args.get("planet_name", "")
+    if not planet_name:
+        return jsonify(message="Missing planet name"), 400
+
+    with db.engine.connect() as con:
+        planet = con.execute(
+            "SELECT * from planets WHERE planet_name='{planet_name}'".format(
+                planet_name=planet_name
+            )
+        ).first()
+        app.logger.info(f"Planet: {planet}")
+    if planet:
+        result = planet_schema.dump(planet)
+        return jsonify(result.data), 200
+    else:
+        return jsonify(message=DOES_NOT_EXIST), 404
 
 
 @app.route("/", methods=["GET"])
