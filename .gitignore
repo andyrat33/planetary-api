@@ -5,3 +5,5 @@
 snyk.json
 planets.db
 /planetary-api-trivy-scn.json
+.vscode/extensions.json
+__pycache__/app.cpython-39.pyc
