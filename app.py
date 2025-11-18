@@ -1,5 +1,5 @@
 import subprocess
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float
 import os
@@ -13,8 +13,11 @@ DOES_NOT_EXIST = "That planet does not exist"
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-    basedir, "planets.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://{}:{}@{}/{}".format(
+    os.environ["DB_USER"],
+    os.environ["DB_PASSWORD"],
+    os.environ["DB_HOST"],
+    os.environ["DB_NAME"],
 )
 app.config["JWT_SECRET_KEY"] = "super-secret"  # change this IRL
 app.config["MAIL_SERVER"] = "smtp.mailtrap.io"
@@ -158,109 +161,16 @@ def get_planet_sqlmap():
 
 @app.route("/", methods=["GET"])
 def serve_frontend():
-    return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Planetary API</title>
-    </head>
-    <body>
-        <h2>Login</h2>
-        <input type="text" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <h2>Get Planet</h2>
-        <input type="text" id="planet_name" placeholder="Planet Name">
-        <button onclick="getPlanet()">Fetch Planet</button>
+    return render_template("index.html")
 
-        <h2>Add Planet</h2>
-        <input type="text" id="new_planet_name" placeholder="Planet Name">
-        <input type="text" id="new_planet_type" placeholder="Planet Type">
-        <input type="text" id="new_home_star" placeholder="Home Star">
-        <input type="number" id="new_mass" placeholder="Mass">
-        <input type="number" id="new_radius" placeholder="Radius">
-        <input type="number" id="new_distance" placeholder="Distance">
-        <button onclick="addPlanet()">Add Planet</button>
 
-        <h2>Delete Planet</h2>
-        <input type="number" id="delete_planet_id" placeholder="Planet ID">
-        <button onclick="deletePlanet()">Delete Planet</button>
+@app.route("/random_planet", methods=["GET"])
+def random_planet():
+    # return a random planet_name
+    import random
 
-        <pre id="output"></pre>
-        <script>
-            let token = "";
-            function login() {
-                const email = document.getElementById("email").value;
-                const password = document.getElementById("password").value;
-                fetch("/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ "email": email,
-                        "password": password })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.access_token) {
-                        token = data.access_token;
-                        alert("Login successful");
-                    } else {
-                        alert("Invalid credentials");
-                    }
-                });
-            }
-            function getPlanet() {
-                const planet_name = document.getElementById("planet_name")
-                .value;
-                fetch(`/get_planet/${planet_name}`, {
-                    headers: { "Authorization": `Bearer ${token}` }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("output").textContent =
-                    JSON.stringify(data, null, 2);
-                });
-            }
-
-            function addPlanet() {
-                const body = {
-                    planet_name: document.getElementById("new_planet_name").value,
-                    planet_type: document.getElementById("new_planet_type").value,
-                    home_star: document.getElementById("new_home_star").value,
-                    mass: document.getElementById("new_mass").value,
-                    radius: document.getElementById("new_radius").value,
-                    distance: document.getElementById("new_distance").value,
-                };
-                fetch("/add_planet", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(body)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("output").textContent =
-                    JSON.stringify(data, null, 2);
-                });
-            }
-
-            function deletePlanet() {
-                const planet_id = document.getElementById("delete_planet_id").value;
-                fetch(`/remove_planet/${planet_id}`, {
-                    method: "DELETE",
-                    headers: { "Authorization": `Bearer ${token}` }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("output").textContent =
-                    JSON.stringify(data, null, 2);
-                });
-            }
-        </script>
-    </body>
-    </html>
-    """
+    result = random.choice(Planet.query.all()).planet_name
+    return jsonify(planet_name=result), 200
 
 
 @app.route("/get_planet/<string:planet_name>", methods=["GET"])
@@ -510,18 +420,18 @@ def dbsize(dbfile: str):
 class User(db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    first_name = Column(String)
-    last_name = Column(String)
-    email = Column(String, unique=True)
-    password = Column(String)
+    first_name = Column(String(50))
+    last_name = Column(String(50))
+    email = Column(String(120), unique=True)
+    password = Column(String(120))
 
 
 class Planet(db.Model):
     __tablename__ = "planets"
     planet_id = Column(Integer, primary_key=True)
-    planet_name = Column(String)
-    planet_type = Column(String)
-    home_star = Column(String)
+    planet_name = Column(String(60))
+    planet_type = Column(String(60))
+    home_star = Column(String(60))
     mass = Column(Float)
     radius = Column(Float)
     distance = Column(Float)
