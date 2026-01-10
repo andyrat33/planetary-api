@@ -7,6 +7,7 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
 import logging
+import json
 
 
 DOES_NOT_EXIST = "That planet does not exist"
@@ -48,73 +49,27 @@ def db_drop():
 
 @app.cli.command("db_seed")
 def db_seed():
-    mercury = Planet(
-        planet_name="Mercury",
-        planet_type="Class D",
-        home_star="Sol",
-        mass=2.258e13,
-        radius=1516,
-        distance=35.98e6,
-    )
+    try:
+        with open("star_trek_planets.json", "r") as f:
+            planets_data = json.load(f)
 
-    vulcan = Planet(
-        planet_name="Vulcan",
-        planet_type="Class M",
-        home_star="Sol",
-        mass=2.258e23,
-        radius=1516,
-        distance=35.98e6,
-    )
+        for planet_data in planets_data:
+            new_planet = Planet(
+                planet_name=planet_data["planet_name"],
+                planet_type=planet_data["planet_type"],
+                home_star=planet_data["home_star"],
+                mass=planet_data["mass"],
+                radius=planet_data["radius"],
+                distance=planet_data["distance"],
+            )
+            db.session.add(new_planet)
 
-    ferenginar = Planet(
-        planet_name="Ferenginar",
-        planet_type="Class M",
-        home_star="Plub",
-        mass=6.258e23,
-        radius=3516,
-        distance=367.98e6,
-    )
-
-    venus = Planet(
-        planet_name="Venus",
-        planet_type="Class K",
-        home_star="Sol",
-        mass=4.86457e24,
-        radius=3760,
-        distance=67.24e6,
-    )
-
-    earth = Planet(
-        planet_name="Earth",
-        planet_type="Class M",
-        home_star="Sol",
-        mass=5.97269e24,
-        radius=3959,
-        distance=92.96e6,
-    )
-    romulus = Planet(
-        planet_name="Romulus",
-        planet_type="Class M",
-        home_star="Romulus Star",
-        mass=5.9772e24,
-        radius=3339569,
-        distance=92.96e6,
-    )
-    klingon = Planet(
-        planet_name="Klingon",
-        planet_type="Class M",
-        home_star="Klingon Star",
-        mass=5.962e24,
-        radius=433959,
-        distance=995.96e6,
-    )
-    db.session.add(mercury)
-    db.session.add(vulcan)
-    db.session.add(venus)
-    db.session.add(earth)
-    db.session.add(ferenginar)
-    db.session.add(romulus)
-    db.session.add(klingon)
+    except FileNotFoundError:
+        print("Error: star_trek_planets.json not found.")
+        return
+    except json.JSONDecodeError:
+        print("Error: Failed to decode JSON from star_trek_planets.json.")
+        return
 
     test_user = User(
         first_name="William",

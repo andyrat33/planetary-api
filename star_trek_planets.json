@@ -1,0 +1,82 @@
+[
+  {
+    "planet_name": "Vulcan",
+    "planet_type": "Class M",
+    "home_star": "40 Eridani A",
+    "mass": 4.86457e24,
+    "radius": 3760,
+    "distance": 150.24e6
+  },
+  {
+    "planet_name": "Qo'noS",
+    "planet_type": "Class M",
+    "home_star": "Kro'nos",
+    "mass": 6.97269e24,
+    "radius": 4959,
+    "distance": 182.96e6
+  },
+  {
+    "planet_name": "Romulus",
+    "planet_type": "Class M",
+    "home_star": "Romulus",
+    "mass": 5.9772e24,
+    "radius": 4395,
+    "distance": 142.96e6
+  },
+  {
+    "planet_name": "Bajor",
+    "planet_type": "Class M",
+    "home_star": "Bajor",
+    "mass": 5.258e23,
+    "radius": 3516,
+    "distance": 135.98e6
+  },
+  {
+    "planet_name": "Betazed",
+    "planet_type": "Class M",
+    "home_star": "Beta Zed",
+    "mass": 5.458e23,
+    "radius": 3616,
+    "distance": 140.98e6
+  },
+  {
+    "planet_name": "Cardassia Prime",
+    "planet_type": "Class M",
+    "home_star": "Cardassia",
+    "mass": 6.158e23,
+    "radius": 4516,
+    "distance": 160.98e6
+  },
+  {
+    "planet_name": "Risa",
+    "planet_type": "Class M",
+    "home_star": "Epsilon Ceti B",
+    "mass": 4.958e23,
+    "radius": 3416,
+    "distance": 120.98e6
+  },
+  {
+    "planet_name": "Andoria",
+    "planet_type": "Class M (Ice Moon)",
+    "home_star": "Procyon",
+    "mass": 3.258e23,
+    "radius": 2516,
+    "distance": 110.98e6
+  },
+  {
+    "planet_name": "Talos IV",
+    "planet_type": "Class M",
+    "home_star": "Talos",
+    "mass": 5.0e24,
+    "radius": 4000,
+    "distance": 145.0e6
+  },
+    {
+    "planet_name": "Wolf 359",
+    "planet_type": "Class K",
+    "home_star": "Wolf",
+    "mass": 2.0e24,
+    "radius": 1000,
+    "distance": 50.0e6
+  }
+]
