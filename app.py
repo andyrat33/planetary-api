@@ -8,6 +8,9 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_mail import Mail, Message
 import logging
 import json
+import requests
+import httpx
+from urllib.parse import urlparse
 
 
 DOES_NOT_EXIST = "That planet does not exist"
@@ -46,49 +49,46 @@ def db_drop():
     db.drop_all()
     print("Database dropped!")
 
+    # python
+    @app.cli.command("db_seed")
+    def db_seed():
+        try:
+            # Load planets
+            with open("star_trek_planets.json", "r") as f:
+                planets_data = json.load(f)
+            for planet_data in planets_data:
+                new_planet = Planet(
+                    planet_name=planet_data["planet_name"],
+                    planet_type=planet_data["planet_type"],
+                    home_star=planet_data["home_star"],
+                    mass=planet_data["mass"],
+                    radius=planet_data["radius"],
+                    distance=planet_data["distance"],
+                )
+                db.session.add(new_planet)
 
-@app.cli.command("db_seed")
-def db_seed():
-    try:
-        with open("star_trek_planets.json", "r") as f:
-            planets_data = json.load(f)
+            # Load users
+            with open("users.json", "r") as f:
+                users_data = json.load(f)
+            for user_data in users_data:
+                new_user = User(
+                    first_name=user_data["first_name"],
+                    last_name=user_data["last_name"],
+                    email=user_data["email"],
+                    password=user_data["password"],
+                )
+                db.session.add(new_user)
 
-        for planet_data in planets_data:
-            new_planet = Planet(
-                planet_name=planet_data["planet_name"],
-                planet_type=planet_data["planet_type"],
-                home_star=planet_data["home_star"],
-                mass=planet_data["mass"],
-                radius=planet_data["radius"],
-                distance=planet_data["distance"],
-            )
-            db.session.add(new_planet)
+            db.session.commit()
+            print("Database seeded!")
 
-    except FileNotFoundError:
-        print("Error: star_trek_planets.json not found.")
-        return
-    except json.JSONDecodeError:
-        print("Error: Failed to decode JSON from star_trek_planets.json.")
-        return
-
-    test_user = User(
-        first_name="William",
-        last_name="Herschel",
-        email="test@test.com",
-        password="P@ssw0rd",
-    )
-
-    test_user2 = User(
-        first_name="Brian",
-        last_name="Cox",
-        email="test2@test.com",
-        password="password123",
-    )
-
-    db.session.add(test_user)
-    db.session.add(test_user2)
-    db.session.commit()
-    print("Database seeded!")
+        except FileNotFoundError as e:
+            print(f"Error: {e}")
+        except json.JSONDecodeError as e:
+            print(f"Error: Failed to decode JSON. {e}")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error: {e}")
 
 
 # Done: Add a parameterized get request to allow SQLMAP to be used to demonstrate SQLi.
@@ -415,6 +415,43 @@ users_schema = UserSchema(many=True)
 
 planet_schema = PlanetSchema()
 planets_schema = PlanetSchema(many=True)
+
+
+@app.route("/fetch")
+def fetch():
+    # ❌ Vulnerable: Directly using user input in a server-side request
+    target_url = request.args.get("url")
+    if not target_url:
+        return "Missing 'url' parameter", 400
+
+    try:
+        # This can be exploited to access internal services
+        resp = requests.get(target_url)
+        return resp.text
+    except requests.RequestException as e:
+        return f"Error fetching URL: {e}", 500
+
+
+@app.route("/fetch/safe")
+def fetch_safe():
+    # ✅ Safe: Validate user input before using it in a server-side request
+    # uses httpx with URL validation
+    target_url = request.args.get("url")
+    if not target_url:
+        return "Missing 'url' parameter", 400
+    try:
+        parsed_url = urlparse(target_url)
+        if parsed_url.scheme not in ("http", "https"):
+            return "Invalid URL scheme", 400
+        if parsed_url.hostname in ("localhost", "example.com") and parsed_url.port in (
+            80,
+            443,
+        ):
+            return "Access to this host is not allowed", 403
+        resp = httpx.get(target_url)
+        return resp.text
+    except httpx.RequestError as e:
+        return f"Error fetching URL: {e}", 500
 
 
 if __name__ == "__main__":

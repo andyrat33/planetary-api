@@ -1,3 +1,4 @@
+requests==2.22.0
 blinker==1.4
 Click==8.0.2
 Flask==1.0.2
@@ -16,3 +17,4 @@ SQLAlchemy==1.2.18
 Werkzeug==0.14.1
 pymysql
 cryptography
+httpx==0.23.0
