@@ -78,5 +78,45 @@
     "mass": 2.0e24,
     "radius": 1000,
     "distance": 50.0e6
+  },
+  {
+    "planet_name": "Ferenginar",
+    "planet_type": "Class M",
+    "home_star": "Alpha Ferengi",
+    "mass": 4.12e24,
+    "radius": 3890,
+    "distance": 158.32e6
+  },
+  {
+    "planet_name": "Trill",
+    "planet_type": "Class M",
+    "home_star": "Trillius Prime",
+    "mass": 5.62e24,
+    "radius": 4120,
+    "distance": 139.45e6
+  },
+  {
+    "planet_name": "Remus",
+    "planet_type": "Class K",
+    "home_star": "Romulus",
+    "mass": 3.85e24,
+    "radius": 3200,
+    "distance": 143.10e6
+  },
+  {
+    "planet_name": "Tellar Prime",
+    "planet_type": "Class M",
+    "home_star": "61 Cygni",
+    "mass": 6.45e24,
+    "radius": 4780,
+    "distance": 165.72e6
+  },
+  {
+    "planet_name": "Denobula",
+    "planet_type": "Class M",
+    "home_star": "Denobula Triaxa",
+    "mass": 5.18e24,
+    "radius": 4050,
+    "distance": 148.60e6
   }
 ]
