@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Planetary API is an educational Flask application that provides a CRUD API for managing Star Trek planetary data. It intentionally includes security vulnerabilities (SQLi, command injection, SSRF) alongside secure implementations for security training purposes.
+Planetary API is an educational Flask application that provides a CRUD API for managing Star Trek planetary data. It intentionally includes security vulnerabilities (SQLi, command injection, SSRF, path traversal) alongside secure implementations for security training purposes.
 
 ## Development Commands
 
@@ -15,11 +15,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Running (Docker Compose — app + MySQL)
+### Running (Docker Compose — app + MySQL + Mailpit)
 ```bash
-docker-compose up
+docker compose up
 ```
-App runs on port 5001 (mapped to container port 5000). MySQL on port 3306.
+- App: http://localhost:5001
+- MySQL: localhost:3306
+- Mailpit UI: http://localhost:8025 (captures emails for testing)
 
 ### Running (Local — uses SQLite)
 ```bash
@@ -68,8 +70,8 @@ No unit test suite. API testing is done via Postman collection (`planetary-api.p
 ### Route Categories
 - **Public:** `/planets`, `/planet_details/<id>`, `/random_planet`, `/login`, `/register`
 - **Protected (JWT):** `/get_planet/<name>`, `/add_planet`, `/update_planet`, `/remove_planet/<id>`
-- **Intentionally vulnerable:** `/get_planet_sqlmap` (SQLi), `/dbsize/<dbfile>` (command injection), `/fetch` (SSRF)
-- **Secure variant:** `/fetch/safe` (URL-validated version of `/fetch`)
+- **Intentionally vulnerable:** `/get_planet_sqlmap` (SQLi), `/dbsize/<dbfile>` (command injection), `/fetch` (SSRF), `/read_log` (path traversal)
+- **Secure variants:** `/fetch/safe` (URL-validated), `/read_log/safe` (path-validated, commented in code)
 
 ### Frontend
 Minimal HTML+JS UI served from `templates/index.html` at `GET /`. Provides login, planet search, add, and delete functionality.
@@ -77,8 +79,9 @@ Minimal HTML+JS UI served from `templates/index.html` at `GET /`. Provides login
 ## Environment Variables
 
 ```
-DB_USER, DB_PASSWORD, DB_HOST, DB_NAME   # Database connection
-MAIL_USERNAME, MAIL_PASSWORD              # Mailtrap email credentials
+DB_USER, DB_PASSWORD, DB_HOST, DB_NAME              # Database connection
+MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS                # Mail server config (defaults to Mailtrap)
+MAIL_USERNAME, MAIL_PASSWORD                        # Mail credentials
 ```
 
 ## CI/CD
