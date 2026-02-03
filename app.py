@@ -454,5 +454,48 @@ def fetch_safe():
         return f"Error fetching URL: {e}", 500
 
 
+# Path Traversal vulnerability - for educational purposes only
+# Example exploit: /read_log?filename=../../../etc/passwd
+@app.route("/read_log")
+def read_log():
+    """Vulnerable to path traversal - allows reading arbitrary files"""
+    filename = request.args.get("filename", "")
+    if not filename:
+        return jsonify(message="Missing 'filename' parameter"), 400
+
+    # ❌ Vulnerable: Directly concatenating user input to file path
+    log_path = os.path.join(basedir, "logs", filename)
+    try:
+        with open(log_path, "r") as f:
+            return f.read(), 200, {"Content-Type": "text/plain"}
+    except FileNotFoundError:
+        return jsonify(message="Log file not found"), 404
+    except Exception as e:
+        return jsonify(message=f"Error reading file: {e}"), 500
+
+
+# @app.route("/read_log/safe")
+# def read_log_safe():
+#     """Secure version - validates path stays within logs directory"""
+#     filename = request.args.get("filename", "")
+#     if not filename:
+#         return jsonify(message="Missing 'filename' parameter"), 400
+#
+#     # ✅ Safe: Resolve the real path and verify it's within the allowed directory
+#     logs_dir = os.path.join(basedir, "logs")
+#     requested_path = os.path.realpath(os.path.join(logs_dir, filename))
+#
+#     if not requested_path.startswith(os.path.realpath(logs_dir)):
+#         return jsonify(message="Access denied - invalid path"), 403
+#
+#     try:
+#         with open(requested_path, "r") as f:
+#             return f.read(), 200, {"Content-Type": "text/plain"}
+#     except FileNotFoundError:
+#         return jsonify(message="Log file not found"), 404
+#     except Exception as e:
+#         return jsonify(message=f"Error reading file: {e}"), 500
+
+
 if __name__ == "__main__":
     app.run()
