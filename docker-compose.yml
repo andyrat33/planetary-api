@@ -8,10 +8,14 @@ services:
       - DB_USER=root
       - DB_PASSWORD=rootpassword
       - DB_NAME=planetary
-      - MAIL_USERNAME=your_mail_username
-      - MAIL_PASSWORD=your_mail_password
+      - MAIL_SERVER=mailpit
+      - MAIL_PORT=1025
+      - MAIL_USE_TLS=false
+      - MAIL_USERNAME=
+      - MAIL_PASSWORD=
     depends_on:
       - db
+      - mailpit
     volumes:
       - .:/app
 
@@ -24,6 +28,12 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
 
 volumes:
   db_data:

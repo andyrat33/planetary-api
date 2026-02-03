@@ -24,9 +24,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://{}:{}@{}/{}".format(
     os.environ["DB_NAME"],
 )
 app.config["JWT_SECRET_KEY"] = "super-secret"  # change this IRL
-app.config["MAIL_SERVER"] = "smtp.mailtrap.io"
-app.config["MAIL_USERNAME"] = os.environ["MAIL_USERNAME"]
-app.config["MAIL_PASSWORD"] = os.environ["MAIL_PASSWORD"]
+app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "smtp.mailtrap.io")
+app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT", 587))
+app.config["MAIL_USE_TLS"] = os.environ.get("MAIL_USE_TLS", "true").lower() == "true"
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME", "")
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD", "")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.logger.setLevel(logging.INFO)
@@ -49,46 +51,46 @@ def db_drop():
     db.drop_all()
     print("Database dropped!")
 
-    # python
-    @app.cli.command("db_seed")
-    def db_seed():
-        try:
-            # Load planets
-            with open("star_trek_planets.json", "r") as f:
-                planets_data = json.load(f)
-            for planet_data in planets_data:
-                new_planet = Planet(
-                    planet_name=planet_data["planet_name"],
-                    planet_type=planet_data["planet_type"],
-                    home_star=planet_data["home_star"],
-                    mass=planet_data["mass"],
-                    radius=planet_data["radius"],
-                    distance=planet_data["distance"],
-                )
-                db.session.add(new_planet)
 
-            # Load users
-            with open("users.json", "r") as f:
-                users_data = json.load(f)
-            for user_data in users_data:
-                new_user = User(
-                    first_name=user_data["first_name"],
-                    last_name=user_data["last_name"],
-                    email=user_data["email"],
-                    password=user_data["password"],
-                )
-                db.session.add(new_user)
+@app.cli.command("db_seed")
+def db_seed():
+    try:
+        # Load planets
+        with open("star_trek_planets.json", "r") as f:
+            planets_data = json.load(f)
+        for planet_data in planets_data:
+            new_planet = Planet(
+                planet_name=planet_data["planet_name"],
+                planet_type=planet_data["planet_type"],
+                home_star=planet_data["home_star"],
+                mass=planet_data["mass"],
+                radius=planet_data["radius"],
+                distance=planet_data["distance"],
+            )
+            db.session.add(new_planet)
 
-            db.session.commit()
-            print("Database seeded!")
+        # Load users
+        with open("users.json", "r") as f:
+            users_data = json.load(f)
+        for user_data in users_data:
+            new_user = User(
+                first_name=user_data["first_name"],
+                last_name=user_data["last_name"],
+                email=user_data["email"],
+                password=user_data["password"],
+            )
+            db.session.add(new_user)
 
-        except FileNotFoundError as e:
-            print(f"Error: {e}")
-        except json.JSONDecodeError as e:
-            print(f"Error: Failed to decode JSON. {e}")
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error: {e}")
+        db.session.commit()
+        print("Database seeded!")
+
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+    except json.JSONDecodeError as e:
+        print(f"Error: Failed to decode JSON. {e}")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error: {e}")
 
 
 # Done: Add a parameterized get request to allow SQLMAP to be used to demonstrate SQLi.
