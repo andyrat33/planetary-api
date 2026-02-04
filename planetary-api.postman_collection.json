@@ -42,7 +42,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"' or 1=1;--\"\n}",
+							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"' or 1=1;#\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -85,7 +85,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"' or 1=1;--\",\n    \"password\": \"\"\n}",
+							"raw": "{\n    \"email\": \"' or 1=1;#\",\n    \"password\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
