@@ -23,7 +23,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://{}:{}@{}/{}".format(
     os.environ["DB_HOST"],
     os.environ["DB_NAME"],
 )
-app.config["JWT_SECRET_KEY"] = "super-secret"  # change this IRL
+app.config[
+    "JWT_SECRET_KEY"
+] = "super-secret"  # VULN: CWE-798 Hardcoded Credentials - change this IRL
 app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "smtp.mailtrap.io")
 app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT", 587))
 app.config["MAIL_USE_TLS"] = os.environ.get("MAIL_USE_TLS", "true").lower() == "true"
@@ -102,6 +104,7 @@ def get_planet_sqlmap():
     if not planet_name:
         return jsonify(message="Missing planet name"), 400
 
+    # VULN: CWE-89 SQL Injection - user input interpolated directly into SQL via .format()
     with db.engine.connect() as con:
         planet = con.execute(
             "SELECT * from planets WHERE planet_name='{planet_name}'".format(
@@ -138,6 +141,7 @@ def get_planet(planet_name: str):
         return jsonify(message="Missing planet name"), 400
 
     # planet = Planet.query.filter_by(planet_name=planet_name).first()
+    # VULN: CWE-89 SQL Injection - user input interpolated directly into SQL via .format()
     with db.engine.connect() as con:
         planet = con.execute(
             "SELECT * from planets WHERE planet_name='{planet_name}'".format(
@@ -169,6 +173,7 @@ def planets():
     return jsonify(result.data), 200
 
 
+# VULN: CWE-352 Missing CSRF Protection - no CSRF token validation on state-changing endpoint
 @app.route("/register", methods=["POST"])
 def register():
     email = request.form["email"]
@@ -179,6 +184,7 @@ def register():
         first_name = request.form["first_name"]
         last_name = request.form["last_name"]
         password = request.form["password"]
+        # VULN: CWE-256 Plaintext Password Storage - password stored without hashing
         user = User(
             first_name=first_name,
             last_name=last_name,
@@ -210,16 +216,20 @@ def register():
 #         return jsonify(message="Bad email or password"), 401
 
 
+# VULN: CWE-307 Missing Rate Limiting - no brute-force protection on login
 @app.route("/login", methods=["POST"])
 def login():
     """insecure login. SQLi"""
     if request.is_json:
         email = request.json["email"]
         password = request.json["password"]
+        # VULN: CWE-209 Information Exposure - credentials printed to stdout
         print(f"email: {email}, password: {password}")
     else:
         email = request.form["email"]
         password = request.form["password"]
+    # VULN: CWE-89 SQL Injection - authentication bypass via .format() string interpolation
+    # Example: email=' OR '1'='1'-- allows login without valid credentials
     with db.engine.connect() as con:
         test = con.execute(
             "SELECT * from users WHERE email='{id}' "
@@ -244,6 +254,8 @@ def login():
 def retrieve_password(email: str):
     user = User.query.filter_by(email=email).first()
     if user:
+        # VULN: CWE-256 Plaintext Password Storage + CWE-319 Cleartext Transmission
+        # Password sent in plaintext via email; should use a reset token instead
         msg = Message(
             "your planetary API password is " + user.password,
             sender="admin@planetary-api.com",
@@ -280,6 +292,7 @@ def add_planet():
         radius = float(request_command["radius"])
         distance = float(request_command["distance"])
     except Exception as e:
+        # VULN: CWE-209 Information Exposure - internal exception details returned to client
         return jsonify(message="Missing Parameter", errno=str(e)), 400
 
     if not planet_name:
@@ -366,6 +379,9 @@ def remove_planet(planet_id: int):
 def dbsize(dbfile: str):
     """insecure command injection and XSS"""
     try:
+        # VULN: CWE-78 OS Command Injection - user input concatenated into shell command
+        # VULN: CWE-79 Reflected XSS - raw output returned without Content-Type header
+        # Example: /dbsize/foo;cat%20/etc/passwd
         result = subprocess.check_output("du " + dbfile, shell=True)
     except subprocess.CalledProcessError:
         result = {"message": "Error"}
@@ -380,6 +396,7 @@ class User(db.Model):
     first_name = Column(String(50))
     last_name = Column(String(50))
     email = Column(String(120), unique=True)
+    # VULN: CWE-256 Plaintext Password Storage - should use a hashed column (e.g. bcrypt)
     password = Column(String(120))
 
 
@@ -396,6 +413,7 @@ class Planet(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
+        # VULN: CWE-200 Sensitive Data Exposure - password field included in serialized output
         fields = ("id", "first_name", "last_name", "email", "password")
 
 
@@ -419,6 +437,8 @@ planet_schema = PlanetSchema()
 planets_schema = PlanetSchema(many=True)
 
 
+# VULN: CWE-918 Server-Side Request Forgery (SSRF) - no URL validation
+# Example: /fetch?url=http://169.254.169.254/latest/meta-data/
 @app.route("/fetch")
 def fetch():
     # ❌ Vulnerable: Directly using user input in a server-side request
@@ -434,9 +454,11 @@ def fetch():
         return f"Error fetching URL: {e}", 500
 
 
+# VULN: CWE-918 Incomplete SSRF Mitigation - blocklist is easily bypassed
+# Bypass via: 127.0.0.1, 0.0.0.0, [::1], DNS rebinding, or non-standard ports
 @app.route("/fetch/safe")
 def fetch_safe():
-    # ✅ Safe: Validate user input before using it in a server-side request
+    # ✅ Partially safe: Validates URL but blocklist is incomplete
     # uses httpx with URL validation
     target_url = request.args.get("url")
     if not target_url:
@@ -456,7 +478,7 @@ def fetch_safe():
         return f"Error fetching URL: {e}", 500
 
 
-# Path Traversal vulnerability - for educational purposes only
+# VULN: CWE-22 Path Traversal - for educational purposes only
 # Example exploit: /read_log?filename=../../../etc/passwd
 @app.route("/read_log")
 def read_log():
@@ -465,7 +487,7 @@ def read_log():
     if not filename:
         return jsonify(message="Missing 'filename' parameter"), 400
 
-    # ❌ Vulnerable: Directly concatenating user input to file path
+    # ❌ Vulnerable: No validation that resolved path stays within logs directory
     log_path = os.path.join(basedir, "logs", filename)
     try:
         with open(log_path, "r") as f:
