@@ -1,0 +1,1902 @@
+{
+ "Resources": {
+  "SecurityOverrideF14F4E09": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "Set to 'true' to bypass security gate failures",
+    "Name": "/planetary-api/pipeline/security-override",
+    "Type": "String",
+    "Value": "false"
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/SecurityOverride/Resource"
+   }
+  },
+  "ArtifactsBucket2AAC5544": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/ArtifactsBucket/Resource"
+   }
+  },
+  "ApprovalTopic1D517B4C": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "Planetary API Pipeline Approval"
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/ApprovalTopic/Resource"
+   }
+  },
+  "CodeBuildRole728CBADE": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codebuild.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/CodeBuildRole/Resource"
+   }
+  },
+  "CodeBuildRoleDefaultPolicy829527DE": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchPutTestCases",
+        "codebuild:CreateReport",
+        "codebuild:CreateReportGroup",
+        "codebuild:UpdateReport",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:CompleteLayerUpload",
+        "ecr:GetAuthorizationToken",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart",
+        "ecs:DescribeServices",
+        "ecs:UpdateService",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:PutObject",
+        "secretsmanager:GetSecretValue",
+        "securityhub:BatchImportFindings",
+        "securityhub:GetFindings",
+        "ssm:GetParameter"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryBuildE71902CB"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryBuildE71902CB"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySecurityGateAF32041F"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySecurityGateAF32041F"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySemgrep9A0E98F6"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySemgrep9A0E98F6"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySmokeTest8DA19E79"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySmokeTest8DA19E79"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySnykBF9EA1E5"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetarySnykBF9EA1E5"
+           }
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "codebuild:BatchPutCodeCoverages",
+        "codebuild:BatchPutTestCases",
+        "codebuild:CreateReport",
+        "codebuild:CreateReportGroup",
+        "codebuild:UpdateReport"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetaryBuildE71902CB"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetarySecurityGateAF32041F"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetarySemgrep9A0E98F6"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetarySmokeTest8DA19E79"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetarySnykBF9EA1E5"
+           },
+           "-*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "ArtifactsBucket2AAC5544",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "ArtifactsBucket2AAC5544",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CodeBuildRoleDefaultPolicy829527DE",
+    "Roles": [
+     {
+      "Ref": "CodeBuildRole728CBADE"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/CodeBuildRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryBuildE71902CB": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetaryBuild",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/build.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryBuild/Resource"
+   }
+  },
+  "PlanetarySemgrep9A0E98F6": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetarySemgrep",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/semgrep.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetarySemgrep/Resource"
+   }
+  },
+  "PlanetarySnykBF9EA1E5": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetarySnyk",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/snyk_sca.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetarySnyk/Resource"
+   }
+  },
+  "PlanetarySecurityGateAF32041F": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetarySecurityGate",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/security_gate.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetarySecurityGate/Resource"
+   }
+  },
+  "PlanetarySmokeTest8DA19E79": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetarySmokeTest",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/smoke_test.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetarySmokeTest/Resource"
+   }
+  },
+  "PlanetaryPipelineRole62A61D31": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codepipeline.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Role/Resource"
+   }
+  },
+  "PlanetaryPipelineRoleDefaultPolicy4EF3B4EC": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "ArtifactsBucket2AAC5544",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "ArtifactsBucket2AAC5544",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineBuildDockerBuildCodePipelineActionRole063FF8BF",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineDeployEcsDeployCodePipelineActionRole43CD64AE",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineManualApprovalSecurityReviewCodePipelineActionRoleD420378C",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityGateCodePipelineActionRoleFA9EB250",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityScanSemgrepSASTCodePipelineActionRole03D2B525",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityScanSnykSCACodePipelineActionRoleDFB25E74",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSmokeTestNewmanSmokeTestCodePipelineActionRole880C9CDC",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSourceGitHubSourceCodePipelineActionRole42CDAF6A",
+          "Arn"
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "codestar-connections:UseConnection",
+       "Effect": "Allow",
+       "Resource": "arn:aws:codeconnections:us-east-1:450372565572:connection/6a48f8fd-f212-407c-99ff-20b201813e1d"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineRoleDefaultPolicy4EF3B4EC",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineRole62A61D31"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Role/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipeline18439020": {
+   "Type": "AWS::CodePipeline::Pipeline",
+   "Properties": {
+    "ArtifactStore": {
+     "Location": {
+      "Ref": "ArtifactsBucket2AAC5544"
+     },
+     "Type": "S3"
+    },
+    "Name": "planetary-api-pipeline",
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "PlanetaryPipelineRole62A61D31",
+      "Arn"
+     ]
+    },
+    "Stages": [
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Source",
+         "Owner": "AWS",
+         "Provider": "CodeStarSourceConnection",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ConnectionArn": "arn:aws:codeconnections:us-east-1:450372565572:connection/6a48f8fd-f212-407c-99ff-20b201813e1d",
+         "FullRepositoryId": "andyrat33/planetary-api",
+         "BranchName": "master"
+        },
+        "Name": "GitHub_Source",
+        "OutputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSourceGitHubSourceCodePipelineActionRole42CDAF6A",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Source"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetaryBuildE71902CB"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "Name": "DockerBuild",
+        "OutputArtifacts": [
+         {
+          "Name": "BuildArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineBuildDockerBuildCodePipelineActionRole063FF8BF",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Build"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetarySemgrep9A0E98F6"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "Name": "Semgrep_SAST",
+        "OutputArtifacts": [
+         {
+          "Name": "SemgrepArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityScanSemgrepSASTCodePipelineActionRole03D2B525",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       },
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetarySnykBF9EA1E5"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "Name": "Snyk_SCA",
+        "OutputArtifacts": [
+         {
+          "Name": "SnykArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityScanSnykSCACodePipelineActionRoleDFB25E74",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "SecurityScan"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetarySecurityGateAF32041F"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "Name": "SecurityGate",
+        "OutputArtifacts": [
+         {
+          "Name": "GateArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityGateCodePipelineActionRoleFA9EB250",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "SecurityGate"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Approval",
+         "Owner": "AWS",
+         "Provider": "Manual",
+         "Version": "1"
+        },
+        "Configuration": {
+         "NotificationArn": {
+          "Ref": "ApprovalTopic1D517B4C"
+         },
+         "CustomData": "Review Security Hub findings before approving deployment. Console: https://us-east-1.console.aws.amazon.com/securityhub/home?region=us-east-1#/findings?search=GeneratorId%3DPREFIX%3Aplanetary-api"
+        },
+        "Name": "SecurityReview",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineManualApprovalSecurityReviewCodePipelineActionRoleD420378C",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "ManualApproval"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetarySmokeTest8DA19E79"
+         },
+         "PrimarySource": "SourceArtifact"
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         },
+         {
+          "Name": "BuildArtifact"
+         }
+        ],
+        "Name": "NewmanSmokeTest",
+        "OutputArtifacts": [
+         {
+          "Name": "SmokeArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSmokeTestNewmanSmokeTestCodePipelineActionRole880C9CDC",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "SmokeTest"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Deploy",
+         "Owner": "AWS",
+         "Provider": "ECS",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ClusterName": {
+          "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+         },
+         "ServiceName": {
+          "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryService256D60FBName4E24F9E2"
+         },
+         "FileName": "imagedefinitions.json"
+        },
+        "InputArtifacts": [
+         {
+          "Name": "BuildArtifact"
+         }
+        ],
+        "Name": "EcsDeploy",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineDeployEcsDeployCodePipelineActionRole43CD64AE",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Deploy"
+     }
+    ]
+   },
+   "DependsOn": [
+    "PlanetaryPipelineRoleDefaultPolicy4EF3B4EC",
+    "PlanetaryPipelineRole62A61D31"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Resource"
+   }
+  },
+  "PlanetaryPipelineSourceGitHubSourceCodePipelineActionRole42CDAF6A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Source/GitHub_Source/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineSourceGitHubSourceCodePipelineActionRoleDefaultPolicy669044A2": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "codestar-connections:UseConnection",
+       "Effect": "Allow",
+       "Resource": "arn:aws:codeconnections:us-east-1:450372565572:connection/6a48f8fd-f212-407c-99ff-20b201813e1d"
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "ArtifactsBucket2AAC5544",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "ArtifactsBucket2AAC5544",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:PutObjectAcl",
+        "s3:PutObjectVersionAcl"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "ArtifactsBucket2AAC5544",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineSourceGitHubSourceCodePipelineActionRoleDefaultPolicy669044A2",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineSourceGitHubSourceCodePipelineActionRole42CDAF6A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Source/GitHub_Source/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineBuildDockerBuildCodePipelineActionRole063FF8BF": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Build/DockerBuild/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineBuildDockerBuildCodePipelineActionRoleDefaultPolicy310DE3D0": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetaryBuildE71902CB",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineBuildDockerBuildCodePipelineActionRoleDefaultPolicy310DE3D0",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineBuildDockerBuildCodePipelineActionRole063FF8BF"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Build/DockerBuild/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineSecurityScanSemgrepSASTCodePipelineActionRole03D2B525": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityScan/Semgrep_SAST/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineSecurityScanSemgrepSASTCodePipelineActionRoleDefaultPolicy4CFBBD2C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetarySemgrep9A0E98F6",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineSecurityScanSemgrepSASTCodePipelineActionRoleDefaultPolicy4CFBBD2C",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineSecurityScanSemgrepSASTCodePipelineActionRole03D2B525"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityScan/Semgrep_SAST/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineSecurityScanSnykSCACodePipelineActionRoleDFB25E74": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityScan/Snyk_SCA/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineSecurityScanSnykSCACodePipelineActionRoleDefaultPolicy58E5077E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetarySnykBF9EA1E5",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineSecurityScanSnykSCACodePipelineActionRoleDefaultPolicy58E5077E",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineSecurityScanSnykSCACodePipelineActionRoleDFB25E74"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityScan/Snyk_SCA/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineSecurityGateCodePipelineActionRoleFA9EB250": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityGate/SecurityGate/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineSecurityGateCodePipelineActionRoleDefaultPolicyBA038E64": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetarySecurityGateAF32041F",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineSecurityGateCodePipelineActionRoleDefaultPolicyBA038E64",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineSecurityGateCodePipelineActionRoleFA9EB250"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityGate/SecurityGate/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineManualApprovalSecurityReviewCodePipelineActionRoleD420378C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/ManualApproval/SecurityReview/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineManualApprovalSecurityReviewCodePipelineActionRoleDefaultPolicyAF98D876": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sns:Publish",
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "ApprovalTopic1D517B4C"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineManualApprovalSecurityReviewCodePipelineActionRoleDefaultPolicyAF98D876",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineManualApprovalSecurityReviewCodePipelineActionRoleD420378C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/ManualApproval/SecurityReview/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineSmokeTestNewmanSmokeTestCodePipelineActionRole880C9CDC": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SmokeTest/NewmanSmokeTest/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineSmokeTestNewmanSmokeTestCodePipelineActionRoleDefaultPolicyD6E60512": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetarySmokeTest8DA19E79",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineSmokeTestNewmanSmokeTestCodePipelineActionRoleDefaultPolicyD6E60512",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineSmokeTestNewmanSmokeTestCodePipelineActionRole880C9CDC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SmokeTest/NewmanSmokeTest/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineDeployEcsDeployCodePipelineActionRole43CD64AE": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Deploy/EcsDeploy/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineDeployEcsDeployCodePipelineActionRoleDefaultPolicy9C18BAA9": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:ListTasks",
+        "ecs:RegisterTaskDefinition",
+        "ecs:TagResource",
+        "ecs:UpdateService"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringEqualsIfExists": {
+         "iam:PassedToService": [
+          "ec2.amazonaws.com",
+          "ecs-tasks.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "ArtifactsBucket2AAC5544",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "ArtifactsBucket2AAC5544",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineDeployEcsDeployCodePipelineActionRoleDefaultPolicy9C18BAA9",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineDeployEcsDeployCodePipelineActionRole43CD64AE"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Deploy/EcsDeploy/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/0WMWw6CMBBF18J/GRFcgS7ARv03tYw6UlrSR4xpundpIfp1z33kttDuGmgq8Xa17Ida0Q3i2Qs5sDm6RufG7C3pBxdWjOjRssNd/0xiroO4D3JAn4uF5lQ7iBczkcxpgcRIzG8nozBnRblRJD/lsVBi0vR4C6R6iJwmVKSRW/NCWe5XXGbT2v+XZbJyStkdg5/CvOcf/zR608G2hbZ6OaLaBu1pRDgt+gU3zKojCwEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ApprovalTopicArn": {
+   "Description": "Run: aws sns subscribe --topic-arn <this> --protocol email --notification-endpoint <your-email>",
+   "Value": {
+    "Ref": "ApprovalTopic1D517B4C"
+   }
+  },
+  "ArtifactsBucketName": {
+   "Value": {
+    "Ref": "ArtifactsBucket2AAC5544"
+   }
+  },
+  "PipelineName": {
+   "Value": {
+    "Ref": "PlanetaryPipeline18439020"
+   }
+  },
+  "PipelineArn": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "arn:aws:codepipeline:us-east-1:450372565572:",
+      {
+       "Ref": "PlanetaryPipeline18439020"
+      }
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

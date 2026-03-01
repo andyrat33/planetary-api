@@ -1,0 +1,38 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    SEMGREP_APP_TOKEN: "planetary-api/semgrep-token:SEMGREP_APP_TOKEN"
+
+phases:
+  install:
+    commands:
+      - pip install semgrep boto3 --quiet
+
+  build:
+    commands:
+      - echo "Running Semgrep SAST scan..."
+      - semgrep scan --config=auto --sarif --output semgrep.sarif || true
+      - echo "Converting SARIF to ASFF..."
+      - python infra/scripts/sarif_to_asff.py semgrep.sarif $CODEBUILD_RESOLVED_SOURCE_VERSION findings.json
+      - echo "Importing findings to AWS Security Hub..."
+      - |
+        FINDING_COUNT=$(python -c "import json; d=json.load(open('findings.json')); print(len(d['Findings']))" 2>/dev/null || echo "0")
+        echo "Findings to import: $FINDING_COUNT"
+        if [ "$FINDING_COUNT" -gt 0 ]; then
+          aws securityhub batch-import-findings --findings file://findings.json
+        else
+          echo "No findings to import."
+        fi
+      - echo "Uploading SARIF report to S3..."
+      - aws s3 cp semgrep.sarif s3://$ARTIFACTS_BUCKET/semgrep/$CODEBUILD_BUILD_ID/semgrep.sarif
+      - aws s3 cp findings.json s3://$ARTIFACTS_BUCKET/semgrep/$CODEBUILD_BUILD_ID/findings.json
+
+  post_build:
+    commands:
+      - echo "Semgrep scan complete."
+
+artifacts:
+  files:
+    - semgrep.sarif
+    - findings.json

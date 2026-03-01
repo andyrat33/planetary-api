@@ -1,0 +1,74 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo "=== Security Gate ==="
+      - |
+        OVERRIDE=$(aws ssm get-parameter \
+          --name /planetary-api/pipeline/security-override \
+          --query Parameter.Value \
+          --output text 2>/dev/null || echo "false")
+        echo "Security override flag: $OVERRIDE"
+
+        # Query Security Hub for HIGH/CRITICAL unresolved findings from this pipeline
+        FINDINGS=$(aws securityhub get-findings \
+          --filters '{
+            "GeneratorId":[
+              {"Value":"planetary-api-semgrep","Comparison":"PREFIX"},
+              {"Value":"planetary-api-snyk","Comparison":"PREFIX"}
+            ],
+            "SeverityLabel":[
+              {"Value":"HIGH","Comparison":"EQUALS"},
+              {"Value":"CRITICAL","Comparison":"EQUALS"}
+            ],
+            "WorkflowStatus":[
+              {"Value":"NEW","Comparison":"EQUALS"}
+            ],
+            "RecordState":[
+              {"Value":"ACTIVE","Comparison":"EQUALS"}
+            ]
+          }' \
+          --query 'length(Findings)' \
+          --output text 2>/dev/null || echo "0")
+
+        echo "Total HIGH/CRITICAL unresolved findings: $FINDINGS"
+
+        # Write summary to file for S3 upload
+        cat > security-gate-report.txt << EOF
+        === Security Gate Report ===
+        Build ID: $CODEBUILD_BUILD_ID
+        Source Version: $CODEBUILD_RESOLVED_SOURCE_VERSION
+        Override Flag: $OVERRIDE
+        HIGH/CRITICAL Findings: $FINDINGS
+        EOF
+
+        aws s3 cp security-gate-report.txt \
+          s3://$ARTIFACTS_BUCKET/security-gate/$CODEBUILD_BUILD_ID/report.txt || true
+
+        if [ "$FINDINGS" -gt "0" ] && [ "$OVERRIDE" = "false" ]; then
+          echo ""
+          echo "================================================================"
+          echo "PIPELINE BLOCKED: $FINDINGS HIGH/CRITICAL security finding(s)."
+          echo "Review findings in AWS Security Hub before proceeding."
+          echo "To override: aws ssm put-parameter --name /planetary-api/pipeline/security-override --value true --overwrite --type String"
+          echo "================================================================"
+          exit 1
+        elif [ "$OVERRIDE" = "true" ]; then
+          echo ""
+          echo "================================================================"
+          echo "WARNING: Security override is ACTIVE. Pipeline continuing despite $FINDINGS finding(s)."
+          echo "Ensure this is intentional and reset override after deployment."
+          echo "================================================================"
+        else
+          echo ""
+          echo "Security gate passed. No HIGH/CRITICAL findings."
+        fi
+
+  post_build:
+    commands:
+      - echo "Security gate evaluation complete."
+
+artifacts:
+  files:
+    - security-gate-report.txt

@@ -1,0 +1,21 @@
+{
+  "version": "50.0.0",
+  "files": {
+    "abcddebf9353ff3ddebb66fa05122df0e56a9b161776a88a2f718532d43b1405": {
+      "displayName": "PlanetaryPipeline Template",
+      "source": {
+        "path": "PlanetaryPipeline.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "450372565572-us-east-1-46a26128": {
+          "bucketName": "cdk-hnb659fds-assets-450372565572-us-east-1",
+          "objectKey": "abcddebf9353ff3ddebb66fa05122df0e56a9b161776a88a2f718532d43b1405.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::450372565572:role/cdk-hnb659fds-file-publishing-role-450372565572-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

@@ -1,0 +1,990 @@
+{
+ "Resources": {
+  "PlanetaryVpc2814F774": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/Resource"
+   }
+  },
+  "PlanetaryVpcPublicSubnet1Subnet419E99F1": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.0.0.0/18",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1/Subnet"
+   }
+  },
+  "PlanetaryVpcPublicSubnet1RouteTableD737BE9C": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1/RouteTable"
+   }
+  },
+  "PlanetaryVpcPublicSubnet1RouteTableAssociation3333B994": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPublicSubnet1RouteTableD737BE9C"
+    },
+    "SubnetId": {
+     "Ref": "PlanetaryVpcPublicSubnet1Subnet419E99F1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "PlanetaryVpcPublicSubnet1DefaultRoute5E4332F0": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "PlanetaryVpcIGW82807DCC"
+    },
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPublicSubnet1RouteTableD737BE9C"
+    }
+   },
+   "DependsOn": [
+    "PlanetaryVpcVPCGWE2B8AB2E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "PlanetaryVpcPublicSubnet1EIP42FD29FE": {
+   "Type": "AWS::EC2::EIP",
+   "Properties": {
+    "Domain": "vpc",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1/EIP"
+   }
+  },
+  "PlanetaryVpcPublicSubnet1NATGatewayA93EF514": {
+   "Type": "AWS::EC2::NatGateway",
+   "Properties": {
+    "AllocationId": {
+     "Fn::GetAtt": [
+      "PlanetaryVpcPublicSubnet1EIP42FD29FE",
+      "AllocationId"
+     ]
+    },
+    "SubnetId": {
+     "Ref": "PlanetaryVpcPublicSubnet1Subnet419E99F1"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1"
+     }
+    ]
+   },
+   "DependsOn": [
+    "PlanetaryVpcPublicSubnet1DefaultRoute5E4332F0",
+    "PlanetaryVpcPublicSubnet1RouteTableAssociation3333B994"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet1/NATGateway"
+   }
+  },
+  "PlanetaryVpcPublicSubnet2Subnet93876FF3": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.0.64.0/18",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet2/Subnet"
+   }
+  },
+  "PlanetaryVpcPublicSubnet2RouteTable0AE38DD7": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet2/RouteTable"
+   }
+  },
+  "PlanetaryVpcPublicSubnet2RouteTableAssociation281552F4": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPublicSubnet2RouteTable0AE38DD7"
+    },
+    "SubnetId": {
+     "Ref": "PlanetaryVpcPublicSubnet2Subnet93876FF3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "PlanetaryVpcPublicSubnet2DefaultRoute8A8EE278": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "PlanetaryVpcIGW82807DCC"
+    },
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPublicSubnet2RouteTable0AE38DD7"
+    }
+   },
+   "DependsOn": [
+    "PlanetaryVpcVPCGWE2B8AB2E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet1SubnetE2514B64": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.0.128.0/18",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet1/Subnet"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet1RouteTable612948D5": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet1/RouteTable"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet1RouteTableAssociation3CDB2BE5": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPrivateSubnet1RouteTable612948D5"
+    },
+    "SubnetId": {
+     "Ref": "PlanetaryVpcPrivateSubnet1SubnetE2514B64"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet1/RouteTableAssociation"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet1DefaultRouteB7F2CE2B": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "PlanetaryVpcPublicSubnet1NATGatewayA93EF514"
+    },
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPrivateSubnet1RouteTable612948D5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet1/DefaultRoute"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet2SubnetB02B119C": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.0.192.0/18",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet2/Subnet"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet2RouteTable161ABA8D": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet2/RouteTable"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet2RouteTableAssociationB63BD821": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPrivateSubnet2RouteTable161ABA8D"
+    },
+    "SubnetId": {
+     "Ref": "PlanetaryVpcPrivateSubnet2SubnetB02B119C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet2/RouteTableAssociation"
+   }
+  },
+  "PlanetaryVpcPrivateSubnet2DefaultRoute290BC4A1": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "PlanetaryVpcPublicSubnet1NATGatewayA93EF514"
+    },
+    "RouteTableId": {
+     "Ref": "PlanetaryVpcPrivateSubnet2RouteTable161ABA8D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/PrivateSubnet2/DefaultRoute"
+   }
+  },
+  "PlanetaryVpcIGW82807DCC": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "PlanetaryEcs/PlanetaryVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/IGW"
+   }
+  },
+  "PlanetaryVpcVPCGWE2B8AB2E": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "PlanetaryVpcIGW82807DCC"
+    },
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryVpc/VPCGW"
+   }
+  },
+  "PlanetaryCluster4F250F96": {
+   "Type": "AWS::ECS::Cluster",
+   "Properties": {
+    "ClusterName": "planetary-api-cluster"
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryCluster/Resource"
+   }
+  },
+  "PlanetaryTaskDefTaskRole478DB264": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryTaskDef/TaskRole/Resource"
+   }
+  },
+  "PlanetaryTaskDef24BDD8E8": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Environment": [
+       {
+        "Name": "MAIL_SERVER",
+        "Value": "localhost"
+       },
+       {
+        "Name": "MAIL_PORT",
+        "Value": "1025"
+       },
+       {
+        "Name": "MAIL_USE_TLS",
+        "Value": "false"
+       }
+      ],
+      "Essential": true,
+      "HealthCheck": {
+       "Command": [
+        "CMD-SHELL",
+        "curl -f http://localhost:5000/ || exit 1"
+       ],
+       "Interval": 30,
+       "Retries": 3,
+       "StartPeriod": 60,
+       "Timeout": 5
+      },
+      "Image": {
+       "Fn::Join": [
+        "",
+        [
+         {
+          "Fn::Select": [
+           4,
+           {
+            "Fn::Split": [
+             ":",
+             {
+              "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+             }
+            ]
+           }
+          ]
+         },
+         ".dkr.ecr.",
+         {
+          "Fn::Select": [
+           3,
+           {
+            "Fn::Split": [
+             ":",
+             {
+              "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+             }
+            ]
+           }
+          ]
+         },
+         ".",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/",
+         {
+          "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+         },
+         ":latest"
+        ]
+       ]
+      },
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "PlanetaryTaskDefplanetaryapiLogGroupD8F39288"
+        },
+        "awslogs-stream-prefix": "planetary-api",
+        "awslogs-region": "us-east-1"
+       }
+      },
+      "Name": "planetary-api",
+      "PortMappings": [
+       {
+        "ContainerPort": 5000,
+        "Protocol": "tcp"
+       }
+      ],
+      "Secrets": [
+       {
+        "Name": "DB_USER",
+        "ValueFrom": "arn:aws:secretsmanager:us-east-1:450372565572:secret:planetary-api/db-credentials:DB_USER::"
+       },
+       {
+        "Name": "DB_PASSWORD",
+        "ValueFrom": "arn:aws:secretsmanager:us-east-1:450372565572:secret:planetary-api/db-credentials:DB_PASSWORD::"
+       },
+       {
+        "Name": "DB_HOST",
+        "ValueFrom": "arn:aws:secretsmanager:us-east-1:450372565572:secret:planetary-api/db-credentials:DB_HOST::"
+       },
+       {
+        "Name": "DB_NAME",
+        "ValueFrom": "arn:aws:secretsmanager:us-east-1:450372565572:secret:planetary-api/db-credentials:DB_NAME::"
+       }
+      ]
+     }
+    ],
+    "Cpu": "512",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "PlanetaryTaskDefExecutionRoleF4D3061E",
+      "Arn"
+     ]
+    },
+    "Family": "PlanetaryEcsPlanetaryTaskDef38BF7A91",
+    "Memory": "1024",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "PlanetaryTaskDefTaskRole478DB264",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryTaskDef/Resource"
+   }
+  },
+  "PlanetaryTaskDefplanetaryapiLogGroupD8F39288": {
+   "Type": "AWS::Logs::LogGroup",
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryTaskDef/planetary-api/LogGroup/Resource"
+   }
+  },
+  "PlanetaryTaskDefExecutionRoleF4D3061E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryTaskDef/ExecutionRole/Resource"
+   }
+  },
+  "PlanetaryTaskDefExecutionRoleDefaultPolicy4027D96C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+       }
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetaryTaskDefplanetaryapiLogGroupD8F39288",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:450372565572:secret:planetary-api/db-credentials-??????"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryTaskDefExecutionRoleDefaultPolicy4027D96C",
+    "Roles": [
+     {
+      "Ref": "PlanetaryTaskDefExecutionRoleF4D3061E"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryServiceLB849C6FE4": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "Properties": {
+    "LoadBalancerAttributes": [
+     {
+      "Key": "deletion_protection.enabled",
+      "Value": "false"
+     }
+    ],
+    "Scheme": "internet-facing",
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "PlanetaryServiceLBSecurityGroupA338020E",
+       "GroupId"
+      ]
+     }
+    ],
+    "Subnets": [
+     {
+      "Ref": "PlanetaryVpcPublicSubnet1Subnet419E99F1"
+     },
+     {
+      "Ref": "PlanetaryVpcPublicSubnet2Subnet93876FF3"
+     }
+    ],
+    "Type": "application"
+   },
+   "DependsOn": [
+    "PlanetaryVpcPublicSubnet1DefaultRoute5E4332F0",
+    "PlanetaryVpcPublicSubnet1RouteTableAssociation3333B994",
+    "PlanetaryVpcPublicSubnet2DefaultRoute8A8EE278",
+    "PlanetaryVpcPublicSubnet2RouteTableAssociation281552F4"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/Resource"
+   }
+  },
+  "PlanetaryServiceLBSecurityGroupA338020E": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatically created Security Group for ELB PlanetaryEcsPlanetaryServiceLBA852A904",
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 80",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/SecurityGroup/Resource"
+   }
+  },
+  "PlanetaryServiceLBSecurityGrouptoPlanetaryEcsPlanetaryServiceSecurityGroup752509AA500099D0D585": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceSecurityGroup6082DF2A",
+      "GroupId"
+     ]
+    },
+    "FromPort": 5000,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceLBSecurityGroupA338020E",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 5000
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/SecurityGroup/to PlanetaryEcsPlanetaryServiceSecurityGroup752509AA:5000"
+   }
+  },
+  "PlanetaryServiceLBPublicListener00060808": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "PlanetaryServiceLBPublicListenerECSGroupBFCDD617"
+      },
+      "Type": "forward"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "PlanetaryServiceLB849C6FE4"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/PublicListener/Resource"
+   }
+  },
+  "PlanetaryServiceLBPublicListenerECSGroupBFCDD617": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "HealthCheckIntervalSeconds": 30,
+    "HealthCheckPath": "/",
+    "Matcher": {
+     "HttpCode": "200"
+    },
+    "Port": 80,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/PublicListener/ECSGroup/Resource"
+   }
+  },
+  "PlanetaryService256D60FB": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": {
+     "Ref": "PlanetaryCluster4F250F96"
+    },
+    "DeploymentConfiguration": {
+     "Alarms": {
+      "AlarmNames": [],
+      "Enable": false,
+      "Rollback": false
+     },
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 50
+    },
+    "DesiredCount": 1,
+    "EnableECSManagedTags": false,
+    "HealthCheckGracePeriodSeconds": 60,
+    "LaunchType": "FARGATE",
+    "LoadBalancers": [
+     {
+      "ContainerName": "planetary-api",
+      "ContainerPort": 5000,
+      "TargetGroupArn": {
+       "Ref": "PlanetaryServiceLBPublicListenerECSGroupBFCDD617"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "DISABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "PlanetaryServiceSecurityGroup6082DF2A",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       {
+        "Ref": "PlanetaryVpcPrivateSubnet1SubnetE2514B64"
+       },
+       {
+        "Ref": "PlanetaryVpcPrivateSubnet2SubnetB02B119C"
+       }
+      ]
+     }
+    },
+    "TaskDefinition": {
+     "Ref": "PlanetaryTaskDef24BDD8E8"
+    }
+   },
+   "DependsOn": [
+    "PlanetaryServiceLBPublicListenerECSGroupBFCDD617",
+    "PlanetaryServiceLBPublicListener00060808",
+    "PlanetaryTaskDefTaskRole478DB264"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/Service/Service"
+   }
+  },
+  "PlanetaryServiceSecurityGroup6082DF2A": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "PlanetaryEcs/PlanetaryService/Service/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "DependsOn": [
+    "PlanetaryTaskDefTaskRole478DB264"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/Service/SecurityGroup/Resource"
+   }
+  },
+  "PlanetaryServiceSecurityGroupfromPlanetaryEcsPlanetaryServiceLBSecurityGroup7B437B5E50007EE4A4B6": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "FromPort": 5000,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceSecurityGroup6082DF2A",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceLBSecurityGroupA338020E",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5000
+   },
+   "DependsOn": [
+    "PlanetaryTaskDefTaskRole478DB264"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/Service/SecurityGroup/from PlanetaryEcsPlanetaryServiceLBSecurityGroup7B437B5E:5000"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31R0W7CMAz8Ft5Dxrr9AGMMIaGtahGvKA2meISkShwQqvrvS1tKKzbtyefruT5fIh69TvhkJC5uLHfHscKMlykJeWSB2pYgI15uCslme72JZyz2mUKZ+kwD1VyPEuMJ1iJT0PM9N3XOSBSERt/FNZgv47p8CloIgou4stjiOcD+x0tNYAPuBK2TWzel4PVwAk0sBekt0nVhjS8aD/8S89yCc7/opW74ioF0vJwp78L2WtXBD2FzUV/lju+wR43dTY+M0SRQgx1wt9kU7Bllm1MLK4bixMvEtOk1NTYh6ebcFlVMmTx4Wpn8flGHG7vbQlAdlePToggTTdorI3ZvQgktYfewHpRwhFIFRdYoUOfn8Nx/T9t236Af6jBko2+aDg++r8Pm8IKd7UFbVSwBZ7xt8/jyVHiqWHylg9FPL/w54tHo2yGOrdeEJ+BJW38AKL+4z7oCAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "PlanetaryServiceLoadBalancerDNS2AE31C04": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryServiceLB849C6FE4",
+     "DNSName"
+    ]
+   }
+  },
+  "PlanetaryServiceServiceURL25D09585": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "PlanetaryServiceLB849C6FE4",
+        "DNSName"
+       ]
+      }
+     ]
+    ]
+   }
+  },
+  "ServiceArn": {
+   "Value": {
+    "Ref": "PlanetaryService256D60FB"
+   }
+  },
+  "ClusterArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryCluster4F250F96",
+     "Arn"
+    ]
+   }
+  },
+  "AlbDnsName": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryServiceLB849C6FE4",
+     "DNSName"
+    ]
+   }
+  },
+  "ExportsOutputRefPlanetaryCluster4F250F965F1C3032": {
+   "Value": {
+    "Ref": "PlanetaryCluster4F250F96"
+   },
+   "Export": {
+    "Name": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+   }
+  },
+  "ExportsOutputFnGetAttPlanetaryService256D60FBName4E24F9E2": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryService256D60FB",
+     "Name"
+    ]
+   },
+   "Export": {
+    "Name": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryService256D60FBName4E24F9E2"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

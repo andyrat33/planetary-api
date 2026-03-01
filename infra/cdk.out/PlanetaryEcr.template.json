@@ -1,0 +1,143 @@
+{
+ "Resources": {
+  "PlanetaryApiRepoDF56E5AD": {
+   "Type": "AWS::ECR::Repository",
+   "Properties": {
+    "ImageScanningConfiguration": {
+     "ScanOnPush": true
+    },
+    "LifecyclePolicy": {
+     "LifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"description\":\"Keep last 10 images\",\"selection\":{\"tagStatus\":\"any\",\"countType\":\"imageCountMoreThan\",\"countNumber\":10},\"action\":{\"type\":\"expire\"}}]}"
+    },
+    "RepositoryName": "planetary-api"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcr/PlanetaryApiRepo/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zPSMzIx0DNQTCwv1k1OydbNyUzSqw4uSUzO1gEKxacmF+lVB6UW5BdnluQXVeo4p+UheLUgrn9pSUFpSa1OQGVJRn6evrGeoZGekWJWcWamblFpXklmbqpeEIQGAMWCY+prAAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcr/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "RepoUri": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      {
+       "Fn::Select": [
+        4,
+        {
+         "Fn::Split": [
+          ":",
+          {
+           "Fn::GetAtt": [
+            "PlanetaryApiRepoDF56E5AD",
+            "Arn"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      ".dkr.ecr.",
+      {
+       "Fn::Select": [
+        3,
+        {
+         "Fn::Split": [
+          ":",
+          {
+           "Fn::GetAtt": [
+            "PlanetaryApiRepoDF56E5AD",
+            "Arn"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "PlanetaryApiRepoDF56E5AD"
+      }
+     ]
+    ]
+   }
+  },
+  "RepoArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryApiRepoDF56E5AD",
+     "Arn"
+    ]
+   }
+  },
+  "ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryApiRepoDF56E5AD",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+   }
+  },
+  "ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC": {
+   "Value": {
+    "Ref": "PlanetaryApiRepoDF56E5AD"
+   },
+   "Export": {
+    "Name": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
