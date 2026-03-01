@@ -133,7 +133,6 @@ def sarif_to_asff(sarif_file: str, source_version: str, output_file: str) -> Non
                         },
                     }
                 ],
-                "WorkflowState": "NEW",
                 "RecordState": "ACTIVE",
             }
 
