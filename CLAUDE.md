@@ -65,6 +65,7 @@ No unit test suite. API testing is done via Postman collection (`planetary-api.p
 ### Database
 - **Docker Compose:** MySQL 5.7 (`mysql+pymysql://`)
 - **Local dev:** SQLite (`planets.db`)
+- **AWS (prod):** RDS MySQL 8.0 (`planetary-api-db.co5qauskgubh.us-east-1.rds.amazonaws.com`)
 - Connection string is built from env vars: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`
 
 ### Route Categories
@@ -86,5 +87,84 @@ MAIL_USERNAME, MAIL_PASSWORD                        # Mail credentials
 
 ## CI/CD
 
-- **buildspec.yml:** AWS CodeBuild pipeline pushing to ECR
-- **GitHub Actions:** Semgrep SAST scanning on PRs and pushes to main/master
+### AWS CDK Pipeline (primary — `infra/`)
+
+The production pipeline is built with AWS CDK (Python) and deployed to account `450372565572`, region `us-east-1`.
+
+**Three CDK stacks:**
+- `PlanetaryEcr` (`infra/stacks/ecr_stack.py`) — ECR repository `planetary-api`
+- `PlanetaryEcs` (`infra/stacks/ecs_stack.py`) — VPC, ECS Fargate cluster + ALB, references RDS MySQL 8.0 credentials from Secrets Manager
+- `PlanetaryPipeline` (`infra/stacks/pipeline_stack.py`) — full 7-stage CodePipeline
+
+**Pipeline stages:**
+1. **Source** — GitHub (`andyrat33/planetary-api`, branch `master`) via CodeStar connection
+2. **Build** — Docker build + ECR push, produces `imagedefinitions.json`
+3. **SecurityScan** — Semgrep SAST + Snyk SCA run in parallel; findings imported to Security Hub in ASFF format
+4. **SecurityGate** — queries Security Hub for HIGH/CRITICAL findings; blocks pipeline unless SSM override is `true`
+5. **ManualApproval** — SNS email notification with Security Hub console link; reviewer approves/rejects
+6. **SmokeTest** — Docker-in-Docker: MySQL + app containers, Newman/Postman tests, results uploaded to S3
+7. **Deploy** — ECS Fargate rolling update via `imagedefinitions.json`
+
+**Buildspecs** (`infra/buildspecs/`):
+- `build.yml` — Docker build + ECR push, Docker Hub login via Secrets Manager
+- `semgrep.yml` — Semgrep SAST → SARIF → ASFF → Security Hub + S3
+- `snyk_sca.yml` — Snyk SCA + CycloneDX SBOM → ASFF → Security Hub + S3
+- `security_gate.yml` — Security Hub query + SSM override check
+- `smoke_test.yml` — Docker-in-Docker Newman tests
+
+**Converter scripts** (`infra/scripts/`):
+- `sarif_to_asff.py` — converts Semgrep SARIF output to ASFF (ERROR→HIGH, WARNING→MEDIUM, NOTE→LOW)
+- `snyk_to_asff.py` — converts Snyk JSON output to ASFF with CVE/CWE/package metadata
+
+**CDK deployment commands:**
+```bash
+cd infra
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# One-time bootstrap (already done for 450372565572/us-east-1)
+AWS_PROFILE=andy_admin cdk bootstrap
+
+# Deploy all stacks
+AWS_PROFILE=andy_admin cdk deploy --all
+
+# Deploy a single stack
+AWS_PROFILE=andy_admin cdk deploy PlanetaryPipeline
+```
+
+**Security override** (to deploy despite Security Hub findings):
+```bash
+# Allow pipeline to proceed
+aws ssm put-parameter --name /planetary-api/pipeline/security-override \
+  --value "true" --overwrite --type String --profile andy_admin
+
+# Reset after deploy
+aws ssm put-parameter --name /planetary-api/pipeline/security-override \
+  --value "false" --overwrite --type String --profile andy_admin
+```
+
+**AWS resource references:**
+- ALB: `Planet-Plane-SNDR7vxPgVHV-1816646008.us-east-1.elb.amazonaws.com`
+- ECR: `450372565572.dkr.ecr.us-east-1.amazonaws.com/planetary-api`
+- ECS cluster: `planetary-api-cluster`
+- RDS: `planetary-api-db.co5qauskgubh.us-east-1.rds.amazonaws.com`
+- Pipeline: `planetary-api-pipeline`
+- Artifacts bucket: `planetarypipeline-artifactsbucket2aac5544-ia3wnxtts7eq`
+- SNS approval topic: `arn:aws:sns:us-east-1:450372565572:PlanetaryPipeline-ApprovalTopic1D517B4C-NqFIB9PFwYya`
+
+**AWS Secrets Manager secrets:**
+- `prod/docker-login-iJ6OPC` — Docker Hub credentials (`DOCKER_HUB_USERNAME`, `DOCKER_HUB_PASSWORD`)
+- `planetary-api/snyk-token` — Snyk auth token (`SNYK_TOKEN`)
+- `planetary-api/semgrep-token` — Semgrep app token (`SEMGREP_APP_TOKEN`)
+- `planetary-api/db-credentials` — RDS credentials (`DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`)
+
+**Known CDK quirks:**
+- Do NOT call `ecr_repo.grant_pull(task_definition.execution_role)` — `execution_role` is null at synth time; CDK handles ECR permissions automatically via `ContainerImage.from_ecr_repository()`
+- Do NOT use `codebuild.Cache.no_cache()` — no cache is the default in CDK v2, that method does not exist
+- `EcsDeployAction` takes either `input` or `image_file`, not both
+- `securityhub.CfnHub` was removed because Security Hub was enabled manually; re-adding it will cause a 409 conflict
+- ASFF `WorkflowState` field is deprecated and rejected by `batch-import-findings` — use nothing (RecordState only)
+- ASFF `Vulnerabilities[].Cwes` expects strings (`"CWE-79"`), not integers
+
+### GitHub Actions
+Semgrep SAST scanning on PRs and pushes to `main`/`master` (`.github/workflows/`).

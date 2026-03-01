@@ -10,7 +10,7 @@ A Flask-based CRUD API for managing Star Trek planetary data, designed as a secu
 - Minimal HTML/JS frontend
 - Docker Compose setup with MySQL and Mailpit (email testing)
 - SQLite support for local development
-- CI/CD pipelines for Jenkins, AWS CodeBuild, and GitHub Actions (Semgrep SAST)
+- AWS CDK security pipeline with Semgrep SAST, Snyk SCA, Security Hub integration, and Newman smoke tests
 
 ## Quick Start
 
@@ -101,7 +101,7 @@ Single-file Flask application (`app.py`) containing all models, schemas, routes,
 - **ORM**: SQLAlchemy (`User` and `Planet` models)
 - **Serialization**: Marshmallow (`UserSchema`, `PlanetSchema`)
 - **Auth**: Flask-JWT-Extended with `@jwt_required` decorator
-- **Database**: MySQL 5.7 (Docker) or SQLite (local)
+- **Database**: MySQL 5.7 (Docker) or SQLite (local) or RDS MySQL 8.0 (AWS)
 - **Email**: Flask-Mail configured for Mailpit in Docker
 
 ## Testing
@@ -132,12 +132,70 @@ pre-commit run --all-files      # Black + flake8 + file fixers
 | `MAIL_USERNAME` | SMTP username |
 | `MAIL_PASSWORD` | SMTP password |
 
-## CI/CD
+## CI/CD — AWS Security Pipeline
 
-- **Jenkinsfile** — Build, seed, smoke test, Postman tests, Semgrep, OWASP Dependency Check
-- **buildspec.yml** — AWS CodeBuild pipeline pushing to ECR
-- **GitHub Actions** — Semgrep SAST scanning on PRs and pushes to main/master
+The production pipeline is built with AWS CDK (Python) in the `infra/` directory and deployed to AWS (`us-east-1`).
+
+### Pipeline Stages
+
+```
+GitHub (master)
+    │
+    ▼
+[1] Source         — CodeStar connection to andyrat33/planetary-api
+[2] Build          — Docker build + push to ECR
+[3] SecurityScan   — Semgrep SAST + Snyk SCA (parallel)
+                     → findings imported to AWS Security Hub (ASFF)
+                     → CycloneDX SBOM uploaded to S3
+[4] SecurityGate   — blocks on HIGH/CRITICAL Security Hub findings
+                     (SSM parameter /planetary-api/pipeline/security-override
+                      can be set to "true" to bypass for intentional vulns)
+[5] ManualApproval — SNS email with Security Hub console link
+[6] SmokeTest      — Newman/Postman tests in Docker-in-Docker; results to S3
+[7] Deploy         — ECS Fargate rolling update
+```
+
+### Infrastructure (CDK Stacks)
+
+| Stack | Resources |
+|-------|-----------|
+| `PlanetaryEcr` | ECR repository |
+| `PlanetaryEcs` | VPC, ECS Fargate cluster, ALB, task definition |
+| `PlanetaryPipeline` | CodePipeline, CodeBuild projects, S3, SNS, SSM, IAM |
+
+RDS MySQL 8.0 (`db.t3.micro`) is provisioned separately in the same VPC.
+
+### Security Hub Integration
+
+All findings from Semgrep and Snyk are converted to ASFF format and imported to AWS Security Hub as a single pane of glass. The `infra/scripts/` directory contains the converters:
+
+- `sarif_to_asff.py` — Semgrep SARIF → ASFF
+- `snyk_to_asff.py` — Snyk JSON → ASFF with CVE/CWE metadata
+
+### CDK Deployment
+
+```bash
+cd infra
+pip install -r requirements.txt
+AWS_PROFILE=andy_admin cdk deploy --all
+```
+
+### Security Override
+
+To deploy despite Security Hub findings (e.g. when testing the intentional vulnerabilities):
+
+```bash
+aws ssm put-parameter --name /planetary-api/pipeline/security-override \
+  --value "true" --overwrite --type String --profile andy_admin
+# Re-run the pipeline, then reset:
+aws ssm put-parameter --name /planetary-api/pipeline/security-override \
+  --value "false" --overwrite --type String --profile andy_admin
+```
+
+### GitHub Actions
+
+Semgrep SAST scanning runs on all PRs and pushes to `main`/`master`.
 
 ## Disclaimer
 
-This application contains **intentional security vulnerabilities** for educational purposes. Do not deploy it in a production environment.
+This application contains **intentional security vulnerabilities** for educational purposes. Do not deploy it in a production environment without the appropriate controls.
