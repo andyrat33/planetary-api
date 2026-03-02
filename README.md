@@ -155,6 +155,7 @@ GitHub (master)
 [6] SmokeTest      — Newman/Postman functional tests (Basic + Negative folders)
                      in Docker-in-Docker; results uploaded to S3
 [7] Deploy         — ECS Fargate rolling update
+[8] Verify         — live health check against ALB; prints URL + commit SHA
 ```
 
 ### Infrastructure (CDK Stacks)

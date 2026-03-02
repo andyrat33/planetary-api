@@ -104,6 +104,7 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 5. **ManualApproval** — SNS email notification with Security Hub console link; reviewer approves/rejects
 6. **SmokeTest** — Docker-in-Docker: MySQL + app containers, Newman/Postman tests, results uploaded to S3
 7. **Deploy** — ECS Fargate rolling update via `imagedefinitions.json`
+8. **Verify** — live health check against the ALB; prints URL and commit SHA in build logs
 
 **Buildspecs** (`infra/buildspecs/`):
 - `build.yml` — Docker build + ECR push, Docker Hub login via Secrets Manager
@@ -112,6 +113,7 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 - `postman_security.yml` — Docker-in-Docker, runs Postman `Security` folder with `--suppress-exit-code`
 - `security_gate.yml` — Security Hub query + SSM override check
 - `smoke_test.yml` — Docker-in-Docker Newman tests (Postman `Basic` + `Negative` folders)
+- `verify.yml` — curl health check against live ALB; prints deployment URL and commit SHA
 
 **Converter scripts** (`infra/scripts/`):
 - `sarif_to_asff.py` — converts Semgrep SARIF output to ASFF (ERROR→HIGH, WARNING→MEDIUM, NOTE→LOW)
