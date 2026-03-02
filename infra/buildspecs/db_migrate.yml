@@ -13,11 +13,13 @@ phases:
         import boto3, os, sys, time
 
         region = os.environ["AWS_DEFAULT_REGION"]
-        cluster = "planetary-api-cluster"
+        cluster = os.environ["ECS_CLUSTER"]
+        family = os.environ["ECS_TASK_FAMILY"]
+        subnets = os.environ["ECS_SUBNET_IDS"].split(",")
+        security_groups = [os.environ["ECS_TASK_SG_ID"]]
 
         # Resolve latest active revision of the task definition family
         ecs = boto3.client("ecs", region_name=region)
-        family = "PlanetaryEcsPlanetaryTaskDef38BF7A91"
         latest_td = ecs.describe_task_definition(taskDefinition=family)["taskDefinition"]["taskDefinitionArn"]
         print(f"Task definition: {latest_td}")
 
@@ -28,8 +30,8 @@ phases:
             launchType="FARGATE",
             networkConfiguration={
                 "awsvpcConfiguration": {
-                    "subnets": ["subnet-0c66537c0861cbf09", "subnet-0b547401946f1b085"],
-                    "securityGroups": ["sg-088cbb9df3be86516"],
+                    "subnets": subnets,
+                    "securityGroups": security_groups,
                     "assignPublicIp": "DISABLED",
                 }
             },

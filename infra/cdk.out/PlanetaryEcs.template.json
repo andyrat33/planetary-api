@@ -880,7 +880,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31R0W7CMAz8Ft5Dxrr9AGMMIaGtahGvKA2meISkShwQqvrvS1tKKzbtyefruT5fIh69TvhkJC5uLHfHscKMlykJeWSB2pYgI15uCslme72JZyz2mUKZ+kwD1VyPEuMJ1iJT0PM9N3XOSBSERt/FNZgv47p8CloIgou4stjiOcD+x0tNYAPuBK2TWzel4PVwAk0sBekt0nVhjS8aD/8S89yCc7/opW74ioF0vJwp78L2WtXBD2FzUV/lju+wR43dTY+M0SRQgx1wt9kU7Bllm1MLK4bixMvEtOk1NTYh6ebcFlVMmTx4Wpn8flGHG7vbQlAdlePToggTTdorI3ZvQgktYfewHpRwhFIFRdYoUOfn8Nx/T9t236Af6jBko2+aDg++r8Pm8IKd7UFbVSwBZ7xt8/jyVHiqWHylg9FPL/w54tHo2yGOrdeEJ+BJW38AKL+4z7oCAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31RwW7CMAz9lt1DtsEuOzLGEBLaqhZxRWkwxSMkVeKAUNV/X9pQqNi0k59fn+vnlyEfjl7504M4uYHc7AcKc15lJOSeBWpdgRzyalVKNtnqVTJhic8VysznGqjhbig1nmApcgU3/saNnTMSBaHRV3EDpvOkKZ+CZoLgJM4ssXgM8PbjuSawAXeC6OTSjSl43R1AE8tAeot0nlnjy9bDv8S0sODcL3quW75mIB2vJsq7sL1RdfBD2EI0V7n9O2xRY3fTPWM0CdRge9xlNgN7RBlzirBmKA68Sk1Mr62JCUm350ZUM2WK4GlhiutFHW7trktBTVSOj8syTLRpL4zYvAkltITN3XpQwhFKFRR5q0BdHMNz/z1t475e39dhyEZfNB3ufV+GzeEFO9u9tq5ZCs54G/P48lR6qllypp3RjyP+/MJHD98OcWC9JjwAT2P9Ab5qYRK6AgAA"
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryEcs/CDKMetadata/Default"
@@ -931,6 +931,28 @@
      "PlanetaryServiceLB849C6FE4",
      "DNSName"
     ]
+   }
+  },
+  "ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryServiceLB849C6FE4",
+     "DNSName"
+    ]
+   },
+   "Export": {
+    "Name": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+   }
+  },
+  "ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryServiceLBSecurityGroupA338020E",
+     "GroupId"
+    ]
+   },
+   "Export": {
+    "Name": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
    }
   },
   "ExportsOutputRefPlanetaryCluster4F250F965F1C3032": {

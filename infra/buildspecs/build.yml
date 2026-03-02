@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   secrets-manager:
-    DOCKER_HUB_USERNAME: "prod/docker-login-iJ6OPC:DOCKER_HUB_USERNAME"
-    DOCKER_HUB_PASSWORD: "prod/docker-login-iJ6OPC:DOCKER_HUB_PASSWORD"
+    DOCKER_HUB_USERNAME: "planetary-api/docker-credentials:DOCKER_HUB_USERNAME"
+    DOCKER_HUB_PASSWORD: "planetary-api/docker-credentials:DOCKER_HUB_PASSWORD"
 
 phases:
   pre_build:

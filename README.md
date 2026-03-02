@@ -12,6 +12,20 @@ A Flask-based CRUD API for managing Star Trek planetary data, designed as a secu
 - SQLite support for local development
 - AWS CDK security pipeline with Semgrep SAST, Snyk SCA, Security Hub integration, and Newman smoke tests
 
+## Quick Setup (AWS deployment)
+
+To deploy the full AWS CDK security pipeline, run the interactive setup script:
+
+```bash
+./setup.sh
+```
+
+It will collect your AWS profile, GitHub details, Docker Hub credentials, and security scanning tokens; create the required Secrets Manager secrets; and generate `infra/config.py`. Then follow the printed deploy instructions (`cdk deploy --all`).
+
+See [infra/config.example.py](infra/config.example.py) for the shape of the generated config file.
+
+---
+
 ## Quick Start
 
 ### Docker Compose (recommended)
@@ -142,7 +156,7 @@ The production pipeline is built with AWS CDK (Python) in the `infra/` directory
 GitHub (master)
     │
     ▼
-[1] Source         — CodeStar connection to andyrat33/planetary-api
+[1] Source         — CodeStar connection to your GitHub repo
 [2] Build          — Docker build + push to ECR
 [3] SecurityScan   — three parallel actions:
                      • Semgrep SAST → ASFF → Security Hub
@@ -181,11 +195,16 @@ All findings from Semgrep and Snyk are converted to ASFF format and imported to 
 
 ### CDK Deployment
 
+Run `./setup.sh` first to generate `infra/config.py`, then:
+
 ```bash
 cd infra
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-AWS_PROFILE=andy_admin cdk deploy --all
+cdk deploy --all --profile <your-aws-profile>
 ```
+
+CDK outputs include the ALB DNS name, SNS approval topic ARN, and S3 artifacts bucket name.
 
 ### Security Override
 
@@ -193,10 +212,10 @@ To deploy despite Security Hub findings (e.g. when testing the intentional vulne
 
 ```bash
 aws ssm put-parameter --name /planetary-api/pipeline/security-override \
-  --value "true" --overwrite --type String --profile andy_admin
+  --value "true" --overwrite --type String --profile <your-aws-profile>
 # Re-run the pipeline, then reset:
 aws ssm put-parameter --name /planetary-api/pipeline/security-override \
-  --value "false" --overwrite --type String --profile andy_admin
+  --value "false" --overwrite --type String --profile <your-aws-profile>
 ```
 
 ### GitHub Actions

@@ -39,6 +39,7 @@ class EcsStack(Stack):
             "PlanetaryTaskDef",
             cpu=512,
             memory_limit_mib=1024,
+            family="planetary-api-task",
         )
 
         # Note: ECR pull permissions are granted automatically by CDK
@@ -105,6 +106,11 @@ class EcsStack(Stack):
         self.alb_sg_id = alb_service.load_balancer.connections.security_groups[
             0
         ].security_group_id
+        self.task_def_family = "planetary-api-task"
+        self.task_sg_id = alb_service.service.connections.security_groups[
+            0
+        ].security_group_id
+        self.private_subnet_ids = [s.subnet_id for s in vpc.private_subnets]
 
         CfnOutput(self, "ServiceArn", value=self.service.service_arn)
         CfnOutput(self, "ClusterArn", value=self.cluster.cluster_arn)

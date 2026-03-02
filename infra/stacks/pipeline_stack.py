@@ -14,20 +14,13 @@ from aws_cdk import (
     CfnOutput,
 )
 from constructs import Construct
-
-
-ACCOUNT = "450372565572"
-REGION = "us-east-1"
-GITHUB_OWNER = "andyrat33"
-GITHUB_REPO = "planetary-api"
-GITHUB_BRANCH = "master"
-# Update this ARN after creating the CodeStar connection via the AWS Console
-CODESTAR_CONNECTION_ARN = (
-    "arn:aws:codeconnections:us-east-1:450372565572"
-    ":connection/6a48f8fd-f212-407c-99ff-20b201813e1d"
-)
-DOCKER_SECRET_ARN = (
-    "arn:aws:secretsmanager:us-east-1:450372565572:secret:prod/docker-login-iJ6OPC"
+from config import (
+    ACCOUNT,
+    REGION,
+    GITHUB_OWNER,
+    GITHUB_REPO,
+    GITHUB_BRANCH,
+    CODESTAR_CONNECTION_ARN,
 )
 
 
@@ -41,6 +34,9 @@ class PipelineStack(Stack):
         ecs_cluster: ecs.Cluster,
         alb_dns_name: str,
         alb_sg_id: str,
+        task_def_family: str,
+        task_sg_id: str,
+        private_subnet_ids: list,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -151,6 +147,16 @@ class PipelineStack(Stack):
                 "AWS_DEFAULT_REGION": codebuild.BuildEnvironmentVariable(value=REGION),
                 "ALB_DNS": codebuild.BuildEnvironmentVariable(value=alb_dns_name),
                 "ALB_SG_ID": codebuild.BuildEnvironmentVariable(value=alb_sg_id),
+                "ECS_CLUSTER": codebuild.BuildEnvironmentVariable(
+                    value=ecs_cluster.cluster_name
+                ),
+                "ECS_TASK_FAMILY": codebuild.BuildEnvironmentVariable(
+                    value=task_def_family
+                ),
+                "ECS_TASK_SG_ID": codebuild.BuildEnvironmentVariable(value=task_sg_id),
+                "ECS_SUBNET_IDS": codebuild.BuildEnvironmentVariable(
+                    value=",".join(private_subnet_ids)
+                ),
             },
         )
 

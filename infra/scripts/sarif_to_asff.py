@@ -33,8 +33,8 @@ def get_env(key: str, default: str = "unknown") -> str:
 
 
 def sarif_to_asff(sarif_file: str, source_version: str, output_file: str) -> None:
-    account_id = get_env("AWS_ACCOUNT_ID", "183695703210")
-    region = get_env("AWS_DEFAULT_REGION", "us-east-1")
+    account_id = get_env("AWS_ACCOUNT_ID", "")
+    region = get_env("AWS_DEFAULT_REGION", "")
     build_id = get_env("CODEBUILD_BUILD_ID", "local-build")
 
     product_arn = (

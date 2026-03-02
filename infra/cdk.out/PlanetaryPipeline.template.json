@@ -80,6 +80,9 @@
         "codebuild:CreateReport",
         "codebuild:CreateReportGroup",
         "codebuild:UpdateReport",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:DescribeSecurityGroups",
+        "ec2:RevokeSecurityGroupIngress",
         "ecr:BatchCheckLayerAvailability",
         "ecr:BatchGetImage",
         "ecr:CompleteLayerUpload",
@@ -89,7 +92,11 @@
         "ecr:PutImage",
         "ecr:UploadLayerPart",
         "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:RunTask",
         "ecs:UpdateService",
+        "iam:PassRole",
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
         "logs:PutLogEvents",
@@ -141,6 +148,75 @@
           [
            "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
            {
+            "Ref": "PlanetaryDbMigrateB3D9F2DD"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryDbMigrateB3D9F2DD"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryLockdown158A73CB"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryLockdown158A73CB"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryPostmanSecurity3FA6E14C"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryPostmanSecurity3FA6E14C"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
             "Ref": "PlanetarySecurityGateAF32041F"
            },
            ":*"
@@ -223,6 +299,29 @@
            "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
            {
             "Ref": "PlanetarySnykBF9EA1E5"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryVerify16F10408"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:450372565572:log-group:/aws/codebuild/",
+           {
+            "Ref": "PlanetaryVerify16F10408"
            }
           ]
          ]
@@ -257,6 +356,42 @@
           [
            "arn:aws:codebuild:us-east-1:450372565572:report-group/",
            {
+            "Ref": "PlanetaryDbMigrateB3D9F2DD"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetaryLockdown158A73CB"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetaryPostmanSecurity3FA6E14C"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
             "Ref": "PlanetarySecurityGateAF32041F"
            },
            "-*"
@@ -294,6 +429,18 @@
            "arn:aws:codebuild:us-east-1:450372565572:report-group/",
            {
             "Ref": "PlanetarySnykBF9EA1E5"
+           },
+           "-*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:codebuild:us-east-1:450372565572:report-group/",
+           {
+            "Ref": "PlanetaryVerify16F10408"
            },
            "-*"
           ]
@@ -427,6 +574,20 @@
        "Name": "AWS_DEFAULT_REGION",
        "Type": "PLAINTEXT",
        "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -525,6 +686,20 @@
        "Name": "AWS_DEFAULT_REGION",
        "Type": "PLAINTEXT",
        "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -623,6 +798,20 @@
        "Name": "AWS_DEFAULT_REGION",
        "Type": "PLAINTEXT",
        "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -644,6 +833,118 @@
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryPipeline/PlanetarySnyk/Resource"
+   }
+  },
+  "PlanetaryPostmanSecurity3FA6E14C": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetaryPostmanSecurity",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/postman_security.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPostmanSecurity/Resource"
    }
   },
   "PlanetarySecurityGateAF32041F": {
@@ -721,6 +1022,20 @@
        "Name": "AWS_DEFAULT_REGION",
        "Type": "PLAINTEXT",
        "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -819,6 +1134,20 @@
        "Name": "AWS_DEFAULT_REGION",
        "Type": "PLAINTEXT",
        "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -840,6 +1169,342 @@
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryPipeline/PlanetarySmokeTest/Resource"
+   }
+  },
+  "PlanetaryDbMigrateB3D9F2DD": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetaryDbMigrate",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/db_migrate.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryDbMigrate/Resource"
+   }
+  },
+  "PlanetaryVerify16F10408": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetaryVerify",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/verify.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryVerify/Resource"
+   }
+  },
+  "PlanetaryLockdown158A73CB": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": "alias/aws/s3",
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "PlanetaryEcr:ExportsOutputFnGetAttPlanetaryApiRepoDF56E5ADArn789C51E6"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "PlanetaryEcr:ExportsOutputRefPlanetaryApiRepoDF56E5AD528D92CC"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "ARTIFACTS_BUCKET",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Ref": "ArtifactsBucket2AAC5544"
+       }
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "450372565572"
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      },
+      {
+       "Name": "ALB_DNS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621"
+       }
+      },
+      {
+       "Name": "ALB_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "PlanetaryLockdown",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CodeBuildRole728CBADE",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "infra/buildspecs/lockdown.yml",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryLockdown/Resource"
    }
   },
   "PlanetaryPipelineRole62A61D31": {
@@ -916,7 +1581,19 @@
         },
         {
          "Fn::GetAtt": [
+          "PlanetaryPipelineDbMigrateFlaskDbCreateCodePipelineActionRole4F3C37BA",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
           "PlanetaryPipelineDeployEcsDeployCodePipelineActionRole43CD64AE",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineLockdownSecurityGroupLockdownCodePipelineActionRoleDD70E995",
           "Arn"
          ]
         },
@@ -929,6 +1606,12 @@
         {
          "Fn::GetAtt": [
           "PlanetaryPipelineSecurityGateCodePipelineActionRoleFA9EB250",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityScanPostmanSecurityCodePipelineActionRole0B799D99",
           "Arn"
          ]
         },
@@ -953,6 +1636,12 @@
         {
          "Fn::GetAtt": [
           "PlanetaryPipelineSourceGitHubSourceCodePipelineActionRole42CDAF6A",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineVerifyHealthCheckCodePipelineActionRole7B52AAF9",
           "Arn"
          ]
         }
@@ -987,6 +1676,7 @@
      "Type": "S3"
     },
     "Name": "planetary-api-pipeline",
+    "PipelineType": "V2",
     "RoleArn": {
      "Fn::GetAtt": [
       "PlanetaryPipelineRole62A61D31",
@@ -1120,6 +1810,41 @@
         "RoleArn": {
          "Fn::GetAtt": [
           "PlanetaryPipelineSecurityScanSnykSCACodePipelineActionRoleDFB25E74",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       },
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetaryPostmanSecurity3FA6E14C"
+         },
+         "PrimarySource": "SourceArtifact"
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         },
+         {
+          "Name": "BuildArtifact"
+         }
+        ],
+        "Name": "Postman_Security",
+        "OutputArtifacts": [
+         {
+          "Name": "PostmanSecurityArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineSecurityScanPostmanSecurityCodePipelineActionRole0B799D99",
           "Arn"
          ]
         },
@@ -1265,6 +1990,123 @@
        }
       ],
       "Name": "Deploy"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetaryDbMigrateB3D9F2DD"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "Name": "FlaskDbCreate",
+        "OutputArtifacts": [
+         {
+          "Name": "DbMigrateArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineDbMigrateFlaskDbCreateCodePipelineActionRole4F3C37BA",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "DbMigrate"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetaryLockdown158A73CB"
+         },
+         "EnvironmentVariables": "[{\"name\":\"ALLOWED_IP\",\"type\":\"PLAINTEXT\",\"value\":\"#{variables.AllowedIp}\"}]"
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "Name": "SecurityGroupLockdown",
+        "OutputArtifacts": [
+         {
+          "Name": "LockdownArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineLockdownSecurityGroupLockdownCodePipelineActionRoleDD70E995",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Lockdown"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "PlanetaryVerify16F10408"
+         },
+         "EnvironmentVariables": "[{\"name\":\"ALLOWED_IP\",\"type\":\"PLAINTEXT\",\"value\":\"#{variables.AllowedIp}\"}]"
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceArtifact"
+         }
+        ],
+        "Name": "HealthCheck",
+        "OutputArtifacts": [
+         {
+          "Name": "VerifyArtifact"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineVerifyHealthCheckCodePipelineActionRole7B52AAF9",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Verify"
+     }
+    ],
+    "Variables": [
+     {
+      "DefaultValue": "none",
+      "Description": "Optional CIDR to restrict ALB inbound access (e.g. 1.2.3.4/32). Set to 'none' (default) to allow unrestricted access.",
+      "Name": "AllowedIp"
      }
     ]
    },
@@ -1557,6 +2399,64 @@
     "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityScan/Snyk_SCA/CodePipelineActionRole/DefaultPolicy/Resource"
    }
   },
+  "PlanetaryPipelineSecurityScanPostmanSecurityCodePipelineActionRole0B799D99": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityScan/Postman_Security/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineSecurityScanPostmanSecurityCodePipelineActionRoleDefaultPolicyB7A04B71": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetaryPostmanSecurity3FA6E14C",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineSecurityScanPostmanSecurityCodePipelineActionRoleDefaultPolicyB7A04B71",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineSecurityScanPostmanSecurityCodePipelineActionRole0B799D99"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/SecurityScan/Postman_Security/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
   "PlanetaryPipelineSecurityGateCodePipelineActionRoleFA9EB250": {
    "Type": "AWS::IAM::Role",
    "Properties": {
@@ -1824,10 +2724,184 @@
     "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Deploy/EcsDeploy/CodePipelineActionRole/DefaultPolicy/Resource"
    }
   },
+  "PlanetaryPipelineDbMigrateFlaskDbCreateCodePipelineActionRole4F3C37BA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/DbMigrate/FlaskDbCreate/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineDbMigrateFlaskDbCreateCodePipelineActionRoleDefaultPolicy41359EA1": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetaryDbMigrateB3D9F2DD",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineDbMigrateFlaskDbCreateCodePipelineActionRoleDefaultPolicy41359EA1",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineDbMigrateFlaskDbCreateCodePipelineActionRole4F3C37BA"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/DbMigrate/FlaskDbCreate/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineLockdownSecurityGroupLockdownCodePipelineActionRoleDD70E995": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Lockdown/SecurityGroupLockdown/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineLockdownSecurityGroupLockdownCodePipelineActionRoleDefaultPolicy54539022": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetaryLockdown158A73CB",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineLockdownSecurityGroupLockdownCodePipelineActionRoleDefaultPolicy54539022",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineLockdownSecurityGroupLockdownCodePipelineActionRoleDD70E995"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Lockdown/SecurityGroupLockdown/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryPipelineVerifyHealthCheckCodePipelineActionRole7B52AAF9": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "PlanetaryPipelineRole62A61D31",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Verify/HealthCheck/CodePipelineActionRole/Resource"
+   }
+  },
+  "PlanetaryPipelineVerifyHealthCheckCodePipelineActionRoleDefaultPolicy846F9C8F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "PlanetaryVerify16F10408",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlanetaryPipelineVerifyHealthCheckCodePipelineActionRoleDefaultPolicy846F9C8F",
+    "Roles": [
+     {
+      "Ref": "PlanetaryPipelineVerifyHealthCheckCodePipelineActionRole7B52AAF9"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryPipeline/PlanetaryPipeline/Verify/HealthCheck/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/0WMWw6CMBBF18J/GRFcgS7ARv03tYw6UlrSR4xpundpIfp1z33kttDuGmgq8Xa17Ida0Q3i2Qs5sDm6RufG7C3pBxdWjOjRssNd/0xiroO4D3JAn4uF5lQ7iBczkcxpgcRIzG8nozBnRblRJD/lsVBi0vR4C6R6iJwmVKSRW/NCWe5XXGbT2v+XZbJyStkdg5/CvOcf/zR608G2hbZ6OaLaBu1pRDgt+gU3zKojCwEAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/0WMyQ7CIBRFv8U9fQ5141Y/QKLuDaVPfZZCwxDTEP7dQhtd3XOH3B3s6gNsVuLjKtl2laIG4tUL2bEpukfn+uwt6ScXVvTo0bLTQ/9MYq6GeAyyQ5+LmaZUO4g3M5DMaYHESExvF6MwZ0W5USTH8lgoMWlabAKpFiKnARVp5Na8UZb7BefZsPT/ZZksnFJ25+CHMO356F9Gr2vY7qFevR1RZYP21CNcZv0CtK85JgsBAAA="
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryPipeline/CDKMetadata/Default"
