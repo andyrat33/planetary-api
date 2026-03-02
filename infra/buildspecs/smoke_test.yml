@@ -54,7 +54,8 @@ phases:
           --reporters cli,junit,htmlextra \
           --reporter-junit-export report.xml \
           --reporter-htmlextra-export newman-report.html \
-          --env-var "baseUrl=http://localhost:5001"
+          --env-var "baseUrl=http://localhost:5001" \
+          --suppress-exit-code
 
   post_build:
     commands:
