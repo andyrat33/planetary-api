@@ -235,7 +235,8 @@ class PipelineStack(Stack):
                         cpactions.CodeBuildAction(
                             action_name="Postman_Security",
                             project=postman_security_project,
-                            input=build_artifact,
+                            input=source_artifact,
+                            extra_inputs=[build_artifact],
                             outputs=[postman_security_artifact],
                             run_order=1,
                         ),
