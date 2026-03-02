@@ -102,6 +102,9 @@ class EcsStack(Stack):
 
         self.service = alb_service.service
         self.alb_dns_name = alb_service.load_balancer.load_balancer_dns_name
+        self.alb_sg_id = alb_service.load_balancer.connections.security_groups[
+            0
+        ].security_group_id
 
         CfnOutput(self, "ServiceArn", value=self.service.service_arn)
         CfnOutput(self, "ClusterArn", value=self.cluster.cluster_arn)

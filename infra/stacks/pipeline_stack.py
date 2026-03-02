@@ -40,6 +40,7 @@ class PipelineStack(Stack):
         ecs_service: ecs.FargateService,
         ecs_cluster: ecs.Cluster,
         alb_dns_name: str,
+        alb_sg_id: str,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -112,6 +113,10 @@ class PipelineStack(Stack):
                     # ECS
                     "ecs:UpdateService",
                     "ecs:DescribeServices",
+                    # EC2 — ALB security group lockdown
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:AuthorizeSecurityGroupIngress",
+                    "ec2:RevokeSecurityGroupIngress",
                     # CloudWatch Logs
                     "logs:CreateLogGroup",
                     "logs:CreateLogStream",
@@ -141,7 +146,18 @@ class PipelineStack(Stack):
                 "AWS_ACCOUNT_ID": codebuild.BuildEnvironmentVariable(value=ACCOUNT),
                 "AWS_DEFAULT_REGION": codebuild.BuildEnvironmentVariable(value=REGION),
                 "ALB_DNS": codebuild.BuildEnvironmentVariable(value=alb_dns_name),
+                "ALB_SG_ID": codebuild.BuildEnvironmentVariable(value=alb_sg_id),
             },
+        )
+
+        # ── Pipeline variable — optional IP lockdown ──────────────────────────
+        allowed_ip_var = codepipeline.Variable(
+            variable_name="AllowedIp",
+            default_value="none",
+            description=(
+                "Optional CIDR to restrict ALB inbound access (e.g. 1.2.3.4/32). "
+                "Set to 'none' (default) to allow unrestricted access."
+            ),
         )
 
         # ── CodeBuild Projects ────────────────────────────────────────────────
@@ -174,6 +190,7 @@ class PipelineStack(Stack):
         )
         smoke_test_project = make_project("PlanetarySmokeTest", "smoke_test.yml")
         verify_project = make_project("PlanetaryVerify", "verify.yml")
+        lockdown_project = make_project("PlanetaryLockdown", "lockdown.yml")
 
         # ── Pipeline Artifacts ────────────────────────────────────────────────
         source_artifact = codepipeline.Artifact("SourceArtifact")
@@ -184,12 +201,15 @@ class PipelineStack(Stack):
         gate_artifact = codepipeline.Artifact("GateArtifact")
         smoke_artifact = codepipeline.Artifact("SmokeArtifact")
         verify_artifact = codepipeline.Artifact("VerifyArtifact")
+        lockdown_artifact = codepipeline.Artifact("LockdownArtifact")
 
         # ── Pipeline ──────────────────────────────────────────────────────────
         pipeline = codepipeline.Pipeline(
             self,
             "PlanetaryPipeline",
             pipeline_name="planetary-api-pipeline",
+            pipeline_type=codepipeline.PipelineType.V2,
+            variables=[allowed_ip_var],
             artifact_bucket=artifacts_bucket,
             stages=[
                 # [1] SOURCE
@@ -307,6 +327,23 @@ class PipelineStack(Stack):
                             project=verify_project,
                             input=source_artifact,
                             outputs=[verify_artifact],
+                        )
+                    ],
+                ),
+                # [9] LOCKDOWN
+                codepipeline.StageProps(
+                    stage_name="Lockdown",
+                    actions=[
+                        cpactions.CodeBuildAction(
+                            action_name="SecurityGroupLockdown",
+                            project=lockdown_project,
+                            input=source_artifact,
+                            outputs=[lockdown_artifact],
+                            environment_variables={
+                                "ALLOWED_IP": codebuild.BuildEnvironmentVariable(
+                                    value=allowed_ip_var.reference(),
+                                ),
+                            },
                         )
                     ],
                 ),

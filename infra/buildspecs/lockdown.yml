@@ -1,0 +1,65 @@
+version: 0.2
+
+# ALLOWED_IP is injected by CodePipeline from the AllowedIp pipeline variable.
+# If empty, access is left unrestricted (0.0.0.0/0).
+# If set (e.g. 1.2.3.4/32), all existing port-80 ingress rules on the ALB
+# security group are replaced with a rule allowing only that CIDR.
+
+phases:
+  build:
+    commands:
+      - pip install boto3 --quiet
+      - |
+        python3 - << 'PYEOF'
+        import boto3, os, sys
+
+        sg_id = os.environ["ALB_SG_ID"]
+        allowed_ip = os.environ.get("ALLOWED_IP", "none").strip().lower()
+        target_cidr = allowed_ip if (allowed_ip and allowed_ip != "none") else "0.0.0.0/0"
+
+        ec2 = boto3.client("ec2", region_name=os.environ["AWS_DEFAULT_REGION"])
+
+        # Get current port-80 ingress rules
+        sg = ec2.describe_security_groups(GroupIds=[sg_id])["SecurityGroups"][0]
+        port80_rules = [
+            p for p in sg["IpPermissions"]
+            if p.get("IpProtocol") == "tcp"
+            and p.get("FromPort") == 80
+            and p.get("ToPort") == 80
+        ]
+
+        # Revoke all existing port-80 rules
+        if port80_rules:
+            ec2.revoke_security_group_ingress(GroupId=sg_id, IpPermissions=port80_rules)
+            print(f"Revoked {len(port80_rules)} existing port-80 rule(s).")
+
+        # Add the desired rule
+        ec2.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpPermissions=[{
+                "IpProtocol": "tcp",
+                "FromPort": 80,
+                "ToPort": 80,
+                "IpRanges": [{
+                    "CidrIp": target_cidr,
+                    "Description": "Pipeline-managed access rule",
+                }],
+            }],
+        )
+
+        print("")
+        print("================================================================")
+        if allowed_ip and allowed_ip != "none":
+            print(f"  ACCESS RESTRICTED to {target_cidr} on port 80")
+        else:
+            print("  ACCESS UNRESTRICTED (0.0.0.0/0) — no AllowedIp set")
+        print(f"  Security group: {sg_id}")
+        print("================================================================")
+        PYEOF
+
+      - echo "Lockdown complete." > lockdown-result.txt
+
+artifacts:
+  files:
+    - lockdown-result.txt
+  discard-paths: yes
