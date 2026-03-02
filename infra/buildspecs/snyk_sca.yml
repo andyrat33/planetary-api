@@ -21,7 +21,7 @@ phases:
       - python infra/scripts/snyk_to_asff.py snyk-results.json $CODEBUILD_RESOLVED_SOURCE_VERSION snyk-findings.json
       - echo "Importing findings to AWS Security Hub..."
       - |
-        FINDING_COUNT=$(python -c "import json; d=json.load(open('snyk-findings.json')); print(len(d['Findings']))" 2>/dev/null || echo "0")
+        FINDING_COUNT=$(python -c "import json; d=json.load(open('snyk-findings.json')); print(len(d))" 2>/dev/null || echo "0")
         echo "Findings to import: $FINDING_COUNT"
         if [ "$FINDING_COUNT" -gt 0 ]; then
           aws securityhub batch-import-findings --findings file://snyk-findings.json

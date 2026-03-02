@@ -167,14 +167,15 @@ def snyk_to_asff(snyk_file: str, source_version: str, output_file: str) -> None:
             findings.append(finding)
 
     # Security Hub batch-import-findings accepts max 100 per call
-    output = {"Findings": findings[:100]}
+    # batch-import-findings --findings expects a JSON array, not an object
+    output = findings[:100]  # cap at 100 per API limit
 
     with open(output_file, "w") as f:
         json.dump(output, f, indent=2)
 
     print(
         f"Converted {len(findings)} Snyk findings to ASFF ({output_file}). "
-        f"Exported first {len(output['Findings'])}."
+        f"Exported first {len(output)}."
     )
 
 
