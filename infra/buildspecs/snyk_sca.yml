@@ -13,6 +13,8 @@ phases:
 
   build:
     commands:
+      - echo "Installing app dependencies for Snyk to resolve..."
+      - pip install -r requirements.txt --quiet
       - echo "Running Snyk SCA scan..."
       - snyk test --json > snyk-results.json || true   # capture output even when vulnerabilities found
       - echo "Generating SBOM (CycloneDX)..."
