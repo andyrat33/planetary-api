@@ -94,7 +94,7 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 **Three CDK stacks:**
 - `PlanetaryEcr` (`infra/stacks/ecr_stack.py`) — ECR repository `planetary-api`
 - `PlanetaryEcs` (`infra/stacks/ecs_stack.py`) — VPC, ECS Fargate cluster + ALB, references RDS MySQL 8.0 credentials from Secrets Manager
-- `PlanetaryPipeline` (`infra/stacks/pipeline_stack.py`) — full 7-stage CodePipeline
+- `PlanetaryPipeline` (`infra/stacks/pipeline_stack.py`) — full 10-stage CodePipeline
 
 **Pipeline stages:**
 1. **Source** — GitHub (`andyrat33/planetary-api`, branch `master`) via CodeStar connection
@@ -104,8 +104,9 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 5. **ManualApproval** — SNS email notification with Security Hub console link; reviewer approves/rejects
 6. **SmokeTest** — Docker-in-Docker: MySQL + app containers, Newman/Postman tests, results uploaded to S3
 7. **Deploy** — ECS Fargate rolling update via `imagedefinitions.json`
-8. **Lockdown** — optionally restricts ALB SG to a single CIDR via the `AllowedIp` pipeline variable; defaults to `none` (unrestricted)
-9. **Verify** — live health check against the ALB (skipped if `AllowedIp` is set, as CodeBuild can't reach a locked-down ALB); prints URL and commit SHA
+8. **DbMigrate** — runs `flask db_create` as a one-off ECS Fargate task against prod RDS; idempotent (SQLAlchemy `create_all`), safe on every deploy; fails pipeline on non-zero exit
+9. **Lockdown** — optionally restricts ALB SG to a single CIDR via the `AllowedIp` pipeline variable; defaults to `none` (unrestricted)
+10. **Verify** — live health check against the ALB (skipped if `AllowedIp` is set, as CodeBuild can't reach a locked-down ALB); prints URL and commit SHA
 
 **Buildspecs** (`infra/buildspecs/`):
 - `build.yml` — Docker build + ECR push, Docker Hub login via Secrets Manager
@@ -114,8 +115,9 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 - `postman_security.yml` — Docker-in-Docker, runs Postman `Security` folder with `--suppress-exit-code`
 - `security_gate.yml` — Security Hub query + SSM override check
 - `smoke_test.yml` — Docker-in-Docker Newman tests (Postman `Basic` + `Negative` folders)
-- `verify.yml` — curl health check against live ALB; prints deployment URL and commit SHA
+- `db_migrate.yml` — runs `flask db_create` as one-off ECS Fargate task; boto3 polls until STOPPED, fails on non-zero exit; `db_seed` intentionally excluded (would insert duplicates)
 - `lockdown.yml` — updates ALB SG port-80 rule to `AllowedIp` CIDR, or restores `0.0.0.0/0` if `none`
+- `verify.yml` — curl health check against live ALB; prints deployment URL and commit SHA
 
 **Converter scripts** (`infra/scripts/`):
 - `sarif_to_asff.py` — converts Semgrep SARIF output to ASFF (ERROR→HIGH, WARNING→MEDIUM, NOTE→LOW)
