@@ -99,7 +99,7 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 **Pipeline stages:**
 1. **Source** — GitHub (`andyrat33/planetary-api`, branch `master`) via CodeStar connection
 2. **Build** — Docker build + ECR push, produces `imagedefinitions.json`
-3. **SecurityScan** — Semgrep SAST + Snyk SCA run in parallel; findings imported to Security Hub in ASFF format
+3. **SecurityScan** — three parallel actions: Semgrep SAST, Snyk SCA, and Postman security tests; findings imported to Security Hub in ASFF format
 4. **SecurityGate** — queries Security Hub for HIGH/CRITICAL findings; blocks pipeline unless SSM override is `true`
 5. **ManualApproval** — SNS email notification with Security Hub console link; reviewer approves/rejects
 6. **SmokeTest** — Docker-in-Docker: MySQL + app containers, Newman/Postman tests, results uploaded to S3
@@ -109,8 +109,9 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 - `build.yml` — Docker build + ECR push, Docker Hub login via Secrets Manager
 - `semgrep.yml` — Semgrep SAST → SARIF → ASFF → Security Hub + S3
 - `snyk_sca.yml` — Snyk SCA + CycloneDX SBOM → ASFF → Security Hub + S3
+- `postman_security.yml` — Docker-in-Docker, runs Postman `Security` folder with `--suppress-exit-code`
 - `security_gate.yml` — Security Hub query + SSM override check
-- `smoke_test.yml` — Docker-in-Docker Newman tests
+- `smoke_test.yml` — Docker-in-Docker Newman tests (Postman `Basic` + `Negative` folders)
 
 **Converter scripts** (`infra/scripts/`):
 - `sarif_to_asff.py` — converts Semgrep SARIF output to ASFF (ERROR→HIGH, WARNING→MEDIUM, NOTE→LOW)
@@ -165,6 +166,7 @@ aws ssm put-parameter --name /planetary-api/pipeline/security-override \
 - `securityhub.CfnHub` was removed because Security Hub was enabled manually; re-adding it will cause a 409 conflict
 - ASFF `WorkflowState` field is deprecated and rejected by `batch-import-findings` — use nothing (RecordState only)
 - ASFF `Vulnerabilities[].Cwes` expects strings (`"CWE-79"`), not integers
+- SecurityGate: `get-findings --query 'length(Findings)'` emits one count per page when paginating — capture via `awk '{sum+=$1} END{print sum+0}'` to get a single integer, otherwise the `[ -gt ]` comparison fails silently and the gate passes
 
 ### GitHub Actions
 Semgrep SAST scanning on PRs and pushes to `main`/`master` (`.github/workflows/`).

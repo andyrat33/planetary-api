@@ -144,14 +144,16 @@ GitHub (master)
     ▼
 [1] Source         — CodeStar connection to andyrat33/planetary-api
 [2] Build          — Docker build + push to ECR
-[3] SecurityScan   — Semgrep SAST + Snyk SCA (parallel)
-                     → findings imported to AWS Security Hub (ASFF)
-                     → CycloneDX SBOM uploaded to S3
+[3] SecurityScan   — three parallel actions:
+                     • Semgrep SAST → ASFF → Security Hub
+                     • Snyk SCA → ASFF → Security Hub + CycloneDX SBOM → S3
+                     • Postman security tests (SQLi, cmdi, XSS) with --suppress-exit-code
 [4] SecurityGate   — blocks on HIGH/CRITICAL Security Hub findings
                      (SSM parameter /planetary-api/pipeline/security-override
                       can be set to "true" to bypass for intentional vulns)
 [5] ManualApproval — SNS email with Security Hub console link
-[6] SmokeTest      — Newman/Postman tests in Docker-in-Docker; results to S3
+[6] SmokeTest      — Newman/Postman functional tests (Basic + Negative folders)
+                     in Docker-in-Docker; results uploaded to S3
 [7] Deploy         — ECS Fargate rolling update
 ```
 
