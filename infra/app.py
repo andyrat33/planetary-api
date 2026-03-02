@@ -32,6 +32,7 @@ pipeline_stack = PipelineStack(
     ecr_repo=ecr_stack.repo,
     ecs_service=ecs_stack.service,
     ecs_cluster=ecs_stack.cluster,
+    alb_dns_name=ecs_stack.alb_dns_name,
     env=cdk.Environment(
         account="450372565572",
         region="us-east-1",

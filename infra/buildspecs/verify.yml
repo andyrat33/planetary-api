@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo "Waiting 15s for ECS task to stabilise..."
+      - sleep 15
+      - |
+        echo ""
+        echo "================================================================"
+        echo "  DEPLOYMENT COMPLETE"
+        echo "  API / Web UI: http://$ALB_DNS"
+        echo "================================================================"
+        echo ""
+      - echo "Running live health check..."
+      - curl -f --retry 5 --retry-delay 10 http://$ALB_DNS/ || (echo "Health check failed" && exit 1)
+      - echo "Health check passed."
+      - |
+        cat > deploy-info.txt << EOF
+        Deployed at: $(date -u)
+        Build:       $CODEBUILD_BUILD_ID
+        Commit:      $CODEBUILD_RESOLVED_SOURCE_VERSION
+        URL:         http://$ALB_DNS
+        EOF
+      - cat deploy-info.txt
+
+artifacts:
+  files:
+    - deploy-info.txt
+  discard-paths: yes

@@ -39,6 +39,7 @@ class PipelineStack(Stack):
         ecr_repo: ecr.Repository,
         ecs_service: ecs.FargateService,
         ecs_cluster: ecs.Cluster,
+        alb_dns_name: str,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -139,6 +140,7 @@ class PipelineStack(Stack):
                 ),
                 "AWS_ACCOUNT_ID": codebuild.BuildEnvironmentVariable(value=ACCOUNT),
                 "AWS_DEFAULT_REGION": codebuild.BuildEnvironmentVariable(value=REGION),
+                "ALB_DNS": codebuild.BuildEnvironmentVariable(value=alb_dns_name),
             },
         )
 
@@ -171,6 +173,7 @@ class PipelineStack(Stack):
             "PlanetarySecurityGate", "security_gate.yml"
         )
         smoke_test_project = make_project("PlanetarySmokeTest", "smoke_test.yml")
+        verify_project = make_project("PlanetaryVerify", "verify.yml")
 
         # ── Pipeline Artifacts ────────────────────────────────────────────────
         source_artifact = codepipeline.Artifact("SourceArtifact")
@@ -180,6 +183,7 @@ class PipelineStack(Stack):
         postman_security_artifact = codepipeline.Artifact("PostmanSecurityArtifact")
         gate_artifact = codepipeline.Artifact("GateArtifact")
         smoke_artifact = codepipeline.Artifact("SmokeArtifact")
+        verify_artifact = codepipeline.Artifact("VerifyArtifact")
 
         # ── Pipeline ──────────────────────────────────────────────────────────
         pipeline = codepipeline.Pipeline(
@@ -291,6 +295,18 @@ class PipelineStack(Stack):
                             action_name="EcsDeploy",
                             service=ecs_service,
                             image_file=build_artifact.at_path("imagedefinitions.json"),
+                        )
+                    ],
+                ),
+                # [8] VERIFY
+                codepipeline.StageProps(
+                    stage_name="Verify",
+                    actions=[
+                        cpactions.CodeBuildAction(
+                            action_name="HealthCheck",
+                            project=verify_project,
+                            input=source_artifact,
+                            outputs=[verify_artifact],
                         )
                     ],
                 ),
