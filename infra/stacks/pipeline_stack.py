@@ -318,19 +318,7 @@ class PipelineStack(Stack):
                         )
                     ],
                 ),
-                # [8] VERIFY
-                codepipeline.StageProps(
-                    stage_name="Verify",
-                    actions=[
-                        cpactions.CodeBuildAction(
-                            action_name="HealthCheck",
-                            project=verify_project,
-                            input=source_artifact,
-                            outputs=[verify_artifact],
-                        )
-                    ],
-                ),
-                # [9] LOCKDOWN
+                # [8] LOCKDOWN
                 codepipeline.StageProps(
                     stage_name="Lockdown",
                     actions=[
@@ -339,6 +327,23 @@ class PipelineStack(Stack):
                             project=lockdown_project,
                             input=source_artifact,
                             outputs=[lockdown_artifact],
+                            environment_variables={
+                                "ALLOWED_IP": codebuild.BuildEnvironmentVariable(
+                                    value=allowed_ip_var.reference(),
+                                ),
+                            },
+                        )
+                    ],
+                ),
+                # [9] VERIFY
+                codepipeline.StageProps(
+                    stage_name="Verify",
+                    actions=[
+                        cpactions.CodeBuildAction(
+                            action_name="HealthCheck",
+                            project=verify_project,
+                            input=source_artifact,
+                            outputs=[verify_artifact],
                             environment_variables={
                                 "ALLOWED_IP": codebuild.BuildEnvironmentVariable(
                                     value=allowed_ip_var.reference(),

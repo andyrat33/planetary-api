@@ -12,9 +12,15 @@ phases:
         echo "  API / Web UI: http://$ALB_DNS"
         echo "================================================================"
         echo ""
-      - echo "Running live health check..."
-      - curl -f --retry 5 --retry-delay 10 http://$ALB_DNS/ || (echo "Health check failed" && exit 1)
-      - echo "Health check passed."
+      - |
+        if [ "$ALLOWED_IP" = "none" ] || [ -z "$ALLOWED_IP" ]; then
+          echo "Running live health check..."
+          curl -f --retry 5 --retry-delay 10 --max-time 15 http://$ALB_DNS/ || (echo "Health check failed" && exit 1)
+          echo "Health check passed."
+        else
+          echo "ALB locked to $ALLOWED_IP — health check skipped (CodeBuild runs from a different IP)."
+          echo "Verify deployment manually at http://$ALB_DNS from $ALLOWED_IP"
+        fi
       - |
         cat > deploy-info.txt << EOF
         Deployed at: $(date -u)

@@ -104,8 +104,8 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 5. **ManualApproval** — SNS email notification with Security Hub console link; reviewer approves/rejects
 6. **SmokeTest** — Docker-in-Docker: MySQL + app containers, Newman/Postman tests, results uploaded to S3
 7. **Deploy** — ECS Fargate rolling update via `imagedefinitions.json`
-8. **Verify** — live health check against the ALB; prints URL and commit SHA in build logs
-9. **Lockdown** — optionally restricts ALB SG to a single CIDR via the `AllowedIp` pipeline variable; defaults to `none` (unrestricted)
+8. **Lockdown** — optionally restricts ALB SG to a single CIDR via the `AllowedIp` pipeline variable; defaults to `none` (unrestricted)
+9. **Verify** — live health check against the ALB (skipped if `AllowedIp` is set, as CodeBuild can't reach a locked-down ALB); prints URL and commit SHA
 
 **Buildspecs** (`infra/buildspecs/`):
 - `build.yml` — Docker build + ECR push, Docker Hub login via Secrets Manager
