@@ -155,9 +155,11 @@ GitHub (master)
 [6] SmokeTest      — Newman/Postman functional tests (Basic + Negative folders)
                      in Docker-in-Docker; results uploaded to S3
 [7] Deploy         — ECS Fargate rolling update
-[8] Lockdown       — restricts ALB SG to AllowedIp CIDR (optional pipeline
+[8] DbMigrate      — runs `flask db_create` as one-off ECS task against prod RDS
+                     (idempotent — safe on every deploy; creates missing tables only)
+[9] Lockdown       — restricts ALB SG to AllowedIp CIDR (optional pipeline
                      variable, default 'none' = unrestricted 0.0.0.0/0)
-[9] Verify         — live health check + URL output (skipped if ALB is locked)
+[10] Verify        — live health check + URL output (skipped if ALB is locked)
 ```
 
 ### Infrastructure (CDK Stacks)
