@@ -1,0 +1,71 @@
+version: 0.2
+
+# Runs `flask db_create` as a one-off ECS task against the production RDS.
+# db_create is idempotent (SQLAlchemy create_all) — safe to run on every deploy.
+# Waits for the task to stop and fails the pipeline if the container exits non-zero.
+
+phases:
+  build:
+    commands:
+      - pip install boto3 --quiet
+      - |
+        python3 - << 'PYEOF'
+        import boto3, os, sys, time
+
+        region = os.environ["AWS_DEFAULT_REGION"]
+        cluster = "planetary-api-cluster"
+
+        # Resolve latest active revision of the task definition family
+        ecs = boto3.client("ecs", region_name=region)
+        family = "PlanetaryEcsPlanetaryTaskDef38BF7A91"
+        latest_td = ecs.describe_task_definition(taskDefinition=family)["taskDefinition"]["taskDefinitionArn"]
+        print(f"Task definition: {latest_td}")
+
+        # Launch one-off task
+        resp = ecs.run_task(
+            cluster=cluster,
+            taskDefinition=latest_td,
+            launchType="FARGATE",
+            networkConfiguration={
+                "awsvpcConfiguration": {
+                    "subnets": ["subnet-0c66537c0861cbf09", "subnet-0b547401946f1b085"],
+                    "securityGroups": ["sg-088cbb9df3be86516"],
+                    "assignPublicIp": "DISABLED",
+                }
+            },
+            overrides={
+                "containerOverrides": [{
+                    "name": "planetary-api",
+                    "command": ["sh", "-c", "flask db_create"],
+                }]
+            },
+        )
+
+        task_arn = resp["tasks"][0]["taskArn"]
+        print(f"Started task: {task_arn}")
+
+        # Poll until stopped (max 5 min)
+        for _ in range(30):
+            time.sleep(10)
+            desc = ecs.describe_tasks(cluster=cluster, tasks=[task_arn])["tasks"][0]
+            status = desc["lastStatus"]
+            print(f"  Status: {status}")
+            if status == "STOPPED":
+                exit_code = desc["containers"][0].get("exitCode")
+                reason = desc.get("stoppedReason", "")
+                print(f"Task stopped — exit code: {exit_code}, reason: {reason}")
+                if exit_code != 0:
+                    print("ERROR: db_create failed — pipeline blocked.", file=sys.stderr)
+                    sys.exit(1)
+                print("db_create completed successfully.")
+                sys.exit(0)
+
+        print("ERROR: Timed out waiting for db_create task.", file=sys.stderr)
+        sys.exit(1)
+        PYEOF
+      - echo "DB migration complete." > db-migrate-result.txt
+
+artifacts:
+  files:
+    - db-migrate-result.txt
+  discard-paths: yes

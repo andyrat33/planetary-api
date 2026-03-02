@@ -113,6 +113,10 @@ class PipelineStack(Stack):
                     # ECS
                     "ecs:UpdateService",
                     "ecs:DescribeServices",
+                    "ecs:RunTask",
+                    "ecs:DescribeTasks",
+                    "ecs:DescribeTaskDefinition",
+                    "iam:PassRole",
                     # EC2 — ALB security group lockdown
                     "ec2:DescribeSecurityGroups",
                     "ec2:AuthorizeSecurityGroupIngress",
@@ -189,6 +193,7 @@ class PipelineStack(Stack):
             "PlanetarySecurityGate", "security_gate.yml"
         )
         smoke_test_project = make_project("PlanetarySmokeTest", "smoke_test.yml")
+        db_migrate_project = make_project("PlanetaryDbMigrate", "db_migrate.yml")
         verify_project = make_project("PlanetaryVerify", "verify.yml")
         lockdown_project = make_project("PlanetaryLockdown", "lockdown.yml")
 
@@ -200,6 +205,7 @@ class PipelineStack(Stack):
         postman_security_artifact = codepipeline.Artifact("PostmanSecurityArtifact")
         gate_artifact = codepipeline.Artifact("GateArtifact")
         smoke_artifact = codepipeline.Artifact("SmokeArtifact")
+        db_migrate_artifact = codepipeline.Artifact("DbMigrateArtifact")
         verify_artifact = codepipeline.Artifact("VerifyArtifact")
         lockdown_artifact = codepipeline.Artifact("LockdownArtifact")
 
@@ -318,7 +324,19 @@ class PipelineStack(Stack):
                         )
                     ],
                 ),
-                # [8] LOCKDOWN
+                # [8] DB MIGRATE
+                codepipeline.StageProps(
+                    stage_name="DbMigrate",
+                    actions=[
+                        cpactions.CodeBuildAction(
+                            action_name="FlaskDbCreate",
+                            project=db_migrate_project,
+                            input=source_artifact,
+                            outputs=[db_migrate_artifact],
+                        )
+                    ],
+                ),
+                # [10] LOCKDOWN
                 codepipeline.StageProps(
                     stage_name="Lockdown",
                     actions=[
@@ -335,7 +353,7 @@ class PipelineStack(Stack):
                         )
                     ],
                 ),
-                # [9] VERIFY
+                # [11] VERIFY
                 codepipeline.StageProps(
                     stage_name="Verify",
                     actions=[
