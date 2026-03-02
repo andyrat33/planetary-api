@@ -105,6 +105,7 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 6. **SmokeTest** — Docker-in-Docker: MySQL + app containers, Newman/Postman tests, results uploaded to S3
 7. **Deploy** — ECS Fargate rolling update via `imagedefinitions.json`
 8. **Verify** — live health check against the ALB; prints URL and commit SHA in build logs
+9. **Lockdown** — optionally restricts ALB SG to a single CIDR via the `AllowedIp` pipeline variable; defaults to `none` (unrestricted)
 
 **Buildspecs** (`infra/buildspecs/`):
 - `build.yml` — Docker build + ECR push, Docker Hub login via Secrets Manager
@@ -114,6 +115,7 @@ The production pipeline is built with AWS CDK (Python) and deployed to account `
 - `security_gate.yml` — Security Hub query + SSM override check
 - `smoke_test.yml` — Docker-in-Docker Newman tests (Postman `Basic` + `Negative` folders)
 - `verify.yml` — curl health check against live ALB; prints deployment URL and commit SHA
+- `lockdown.yml` — updates ALB SG port-80 rule to `AllowedIp` CIDR, or restores `0.0.0.0/0` if `none`
 
 **Converter scripts** (`infra/scripts/`):
 - `sarif_to_asff.py` — converts Semgrep SARIF output to ASFF (ERROR→HIGH, WARNING→MEDIUM, NOTE→LOW)
@@ -133,6 +135,19 @@ AWS_PROFILE=andy_admin cdk deploy --all
 
 # Deploy a single stack
 AWS_PROFILE=andy_admin cdk deploy PlanetaryPipeline
+```
+
+**IP lockdown** (to restrict ALB access to a specific IP after deploy):
+```bash
+# Trigger via boto3 — AWS CLI version installed doesn't support --variables
+cd infra && pyenv activate aws_cdk_python_3.14.3
+AWS_PROFILE=andy_admin python3 -c "
+import boto3
+boto3.client('codepipeline', region_name='us-east-1').start_pipeline_execution(
+    name='planetary-api-pipeline',
+    variables=[{'name': 'AllowedIp', 'value': '1.2.3.4/32'}]
+)"
+# To restore unrestricted access, trigger without AllowedIp (uses default 'none')
 ```
 
 **Security override** (to deploy despite Security Hub findings):
@@ -166,6 +181,8 @@ aws ssm put-parameter --name /planetary-api/pipeline/security-override \
 - Do NOT use `codebuild.Cache.no_cache()` — no cache is the default in CDK v2, that method does not exist
 - `EcsDeployAction` takes either `input` or `image_file`, not both
 - `securityhub.CfnHub` was removed because Security Hub was enabled manually; re-adding it will cause a 409 conflict
+- `codepipeline.Variable` default value must be 1–1000 chars — use `"none"` as the sentinel for "not set", not `""`
+- `aws codepipeline start-pipeline-execution --variables` is not supported by the installed AWS CLI version; use boto3 instead (see IP lockdown command above)
 - ASFF `WorkflowState` field is deprecated and rejected by `batch-import-findings` — use nothing (RecordState only)
 - ASFF `Vulnerabilities[].Cwes` expects strings (`"CWE-79"`), not integers
 - SecurityGate: `get-findings --query 'length(Findings)'` emits one count per page when paginating — capture via `awk '{sum+=$1} END{print sum+0}'` to get a single integer, otherwise the `[ -gt ]` comparison fails silently and the gate passes

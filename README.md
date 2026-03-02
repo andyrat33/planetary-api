@@ -156,6 +156,8 @@ GitHub (master)
                      in Docker-in-Docker; results uploaded to S3
 [7] Deploy         — ECS Fargate rolling update
 [8] Verify         — live health check against ALB; prints URL + commit SHA
+[9] Lockdown       — restricts ALB SG to AllowedIp CIDR (optional pipeline
+                     variable, default 'none' = unrestricted 0.0.0.0/0)
 ```
 
 ### Infrastructure (CDK Stacks)
