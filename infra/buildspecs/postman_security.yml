@@ -54,22 +54,22 @@ phases:
 
   build:
     commands:
-      - echo "Running Newman functional smoke tests..."
+      - echo "Running Postman security tests..."
       - |
         newman run planetary-api.postman_collection.json \
           -e Planetary-API-Environment.postman_environment.json \
-          --folder Basic \
-          --folder Negative \
+          --folder Security \
           --reporters cli,junit,htmlextra \
-          --reporter-junit-export report.xml \
-          --reporter-htmlextra-export newman-report.html \
-          --env-var "baseUrl=http://localhost:5001"
+          --reporter-junit-export security-report.xml \
+          --reporter-htmlextra-export security-report.html \
+          --env-var "baseUrl=http://localhost:5001" \
+          --suppress-exit-code
 
   post_build:
     commands:
-      - echo "Uploading test reports to S3..."
-      - aws s3 cp report.xml s3://$ARTIFACTS_BUCKET/newman/$CODEBUILD_BUILD_ID/report.xml || true
-      - aws s3 cp newman-report.html s3://$ARTIFACTS_BUCKET/newman/$CODEBUILD_BUILD_ID/report.html || true
+      - echo "Uploading security test reports to S3..."
+      - aws s3 cp security-report.xml s3://$ARTIFACTS_BUCKET/postman-security/$CODEBUILD_BUILD_ID/security-report.xml || true
+      - aws s3 cp security-report.html s3://$ARTIFACTS_BUCKET/postman-security/$CODEBUILD_BUILD_ID/security-report.html || true
       - echo "Stopping test containers..."
       - docker stop mysql-test app-test || true
       - docker rm mysql-test app-test || true
@@ -77,12 +77,12 @@ phases:
 
 artifacts:
   files:
-    - report.xml
-    - newman-report.html
+    - security-report.xml
+    - security-report.html
   discard-paths: yes
 
 reports:
-  NewmanTestReport:
+  PostmanSecurityReport:
     files:
-      - report.xml
+      - security-report.xml
     file-format: JUNITXML

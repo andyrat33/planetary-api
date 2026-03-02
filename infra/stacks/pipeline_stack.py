@@ -164,6 +164,9 @@ class PipelineStack(Stack):
         build_project = make_project("PlanetaryBuild", "build.yml")
         semgrep_project = make_project("PlanetarySemgrep", "semgrep.yml")
         snyk_project = make_project("PlanetarySnyk", "snyk_sca.yml")
+        postman_security_project = make_project(
+            "PlanetaryPostmanSecurity", "postman_security.yml"
+        )
         security_gate_project = make_project(
             "PlanetarySecurityGate", "security_gate.yml"
         )
@@ -174,6 +177,7 @@ class PipelineStack(Stack):
         build_artifact = codepipeline.Artifact("BuildArtifact")
         semgrep_artifact = codepipeline.Artifact("SemgrepArtifact")
         snyk_artifact = codepipeline.Artifact("SnykArtifact")
+        postman_security_artifact = codepipeline.Artifact("PostmanSecurityArtifact")
         gate_artifact = codepipeline.Artifact("GateArtifact")
         smoke_artifact = codepipeline.Artifact("SmokeArtifact")
 
@@ -226,6 +230,13 @@ class PipelineStack(Stack):
                             project=snyk_project,
                             input=source_artifact,
                             outputs=[snyk_artifact],
+                            run_order=1,
+                        ),
+                        cpactions.CodeBuildAction(
+                            action_name="Postman_Security",
+                            project=postman_security_project,
+                            input=build_artifact,
+                            outputs=[postman_security_artifact],
                             run_order=1,
                         ),
                     ],

