@@ -139,7 +139,6 @@ def snyk_to_asff(snyk_file: str, source_version: str, output_file: str) -> None:
                             "Url": snyk_url,
                             "VendorSeverity": snyk_severity,
                         },
-                        **({"Cwes": [cwe_str]} if cwe_str else {}),
                     }
                 ],
                 "Resources": [

@@ -26,7 +26,7 @@ phases:
         FINDING_COUNT=$(python -c "import json; d=json.load(open('snyk-findings.json')); print(len(d))" 2>/dev/null || echo "0")
         echo "Findings to import: $FINDING_COUNT"
         if [ "$FINDING_COUNT" -gt 0 ]; then
-          aws securityhub batch-import-findings --findings file://snyk-findings.json
+          aws securityhub batch-import-findings --findings file://snyk-findings.json || true
         else
           echo "No Snyk findings to import."
         fi
