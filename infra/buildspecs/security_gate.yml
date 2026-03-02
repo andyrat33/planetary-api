@@ -30,7 +30,7 @@ phases:
             ]
           }' \
           --query 'length(Findings)' \
-          --output text 2>/dev/null || echo "0")
+          --output text 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
 
         echo "Total HIGH/CRITICAL unresolved findings: $FINDINGS"
 
