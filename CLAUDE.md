@@ -161,6 +161,17 @@ aws ssm put-parameter --name /planetary-api/pipeline/security-override \
   --value "false" --overwrite --type String --profile andy_admin
 ```
 
+**Typical workflow:**
+
+| Scenario | Override | AllowedIp |
+|---|---|---|
+| Normal push — verify gate blocks | `false` | `none` |
+| Deploy for testing, open access | `true` | `none` |
+| Deploy for testing, restrict to your IP | `true` | `1.2.3.4/32` |
+| Re-open after a locked deploy | `true` | `none` |
+
+ManualApproval always fires regardless of the override — a human must approve before anything deploys.
+
 **AWS resource references:**
 - ALB: `Planet-Plane-SNDR7vxPgVHV-1816646008.us-east-1.elb.amazonaws.com`
 - ECR: `450372565572.dkr.ecr.us-east-1.amazonaws.com/planetary-api`
