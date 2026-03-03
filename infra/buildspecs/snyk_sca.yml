@@ -8,7 +8,7 @@ phases:
   install:
     commands:
       - npm install -g snyk --quiet
-      - pip install boto3 --quiet
+      - pip install boto3 cyclonedx-bom --quiet
       - snyk auth $SNYK_TOKEN
 
   build:
@@ -18,7 +18,7 @@ phases:
       - echo "Running Snyk SCA scan..."
       - snyk test --json-file-output=snyk-results.json || true   # capture output even when vulnerabilities found
       - echo "Generating SBOM (CycloneDX)..."
-      - snyk sbom --format=cyclonedx1.4+json --file=requirements.txt > sbom.json || true
+      - cyclonedx-py requirements requirements.txt --of JSON -o sbom.json
       - echo "Converting Snyk results to ASFF..."
       - python infra/scripts/snyk_to_asff.py snyk-results.json $CODEBUILD_RESOLVED_SOURCE_VERSION snyk-findings.json
       - echo "Importing findings to AWS Security Hub..."
