@@ -135,35 +135,37 @@ fi
 
 # ── Step 3 — Empty versioned S3 bucket ────────────────────────────────────
 step "3/8 — Emptying versioned S3 bucket..."
-if [[ -n "$BUCKET" ]]; then
-    # Ensure boto3 is available
-    python3 -c "import boto3" 2>/dev/null || pip3 install boto3 --quiet --user 2>/dev/null || true
 
-    if AWS_PROFILE="$PROFILE" python3 -c "
-import boto3, sys
-from botocore.exceptions import ClientError
-s3 = boto3.resource('s3', region_name='$REGION')
-bucket = s3.Bucket('$BUCKET')
-try:
-    resp = bucket.object_versions.delete()
-    deleted = sum(len(r.get('Deleted', [])) for r in resp) if resp else 0
-    errors  = sum(len(r.get('Errors',  [])) for r in resp) if resp else 0
-    print(f'  {deleted} object version(s) deleted.')
-    if errors > 0:
-        print(f'  {errors} deletion error(s).', file=sys.stderr)
-        sys.exit(1)
-except ClientError as e:
-    code = e.response['Error']['Code']
-    if code in ('NoSuchBucket', '404'):
-        print('  Bucket not found — may already be deleted.')
-    else:
-        print(f'  Error: {e}', file=sys.stderr)
-        sys.exit(1)
-" 2>&1; then
-        success "S3 bucket $BUCKET emptied."
-    else
-        warn "Failed to empty S3 bucket. Empty it manually before the bucket can be deleted."
-    fi
+# Deletes one object type ("Versions" or "DeleteMarkers") in 1000-item batches
+# using only AWS CLI + stdlib python3 — no boto3 required.
+_delete_s3_object_type() {
+    local object_type="$1"
+    local tmpfile
+    tmpfile=$(mktemp /tmp/s3-delete-XXXXXX.json)
+    while true; do
+        aws s3api list-object-versions \
+            --bucket "$BUCKET" --profile "$PROFILE" --region "$REGION" \
+            --query "${object_type}[].{Key:Key,VersionId:VersionId}" \
+            --max-items 1000 --output json 2>/dev/null \
+        | python3 -c "
+import sys, json
+items = json.load(sys.stdin)
+if not items:
+    sys.exit(0)
+print(json.dumps({'Objects': items, 'Quiet': True}))
+" > "$tmpfile" 2>/dev/null || break
+        [[ ! -s "$tmpfile" ]] && break
+        aws s3api delete-objects \
+            --bucket "$BUCKET" --profile "$PROFILE" --region "$REGION" \
+            --delete "file://$tmpfile" > /dev/null
+    done
+    rm -f "$tmpfile"
+}
+
+if [[ -n "$BUCKET" ]]; then
+    _delete_s3_object_type "Versions"
+    _delete_s3_object_type "DeleteMarkers"
+    success "S3 bucket $BUCKET emptied."
 else
     warn "No bucket to empty — skipping."
 fi
