@@ -309,6 +309,28 @@ The ALB DNS name is printed as a CDK output and again by the Verify stage at the
 
 ---
 
+## Teardown
+
+To remove all AWS resources and stop all ongoing costs, run the interactive teardown script:
+
+```bash
+./teardown.sh
+```
+
+It will, in order:
+1. **Stop the ECS service** — immediately halts Fargate billing
+2. **Empty the S3 artifacts bucket** (versioned — `aws s3 rm` only adds delete markers; the script uses boto3 to remove all versions)
+3. **Empty the ECR repository** — required before CDK can delete it
+4. **`cdk destroy --all`** — removes the three CDK stacks (VPC, NAT Gateway, ALB, ECS, CodePipeline, etc.)
+5. **Delete RETAIN resources** — S3 bucket and ECR repo after they are empty
+6. **Delete Secrets Manager secrets** — all four `planetary-api/*` secrets, immediately (no 30-day recovery window)
+7. **Prompt to delete the RDS instance** — lists all instances in the region; requires you to type the identifier before deleting
+8. **Print manual steps** — Security Hub, CodeStar connection, CDK bootstrap stack
+
+> The RDS instance is not managed by CDK. The script lists all RDS instances in the region and prompts before deleting — it will not delete without explicit confirmation.
+
+---
+
 ## Disclaimer
 
 This application contains **intentional security vulnerabilities** for educational purposes. Do not deploy it in a production environment without the appropriate controls.
