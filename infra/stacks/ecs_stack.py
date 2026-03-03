@@ -61,11 +61,8 @@ class EcsStack(Stack):
             multi_az=False,
         )
 
-        # DeletionPolicy=Delete requires SkipFinalSnapshot=true (CloudFormation requirement)
-        db.node.default_child.add_property_override("SkipFinalSnapshot", True)
-
         # Destroy the credentials secret when the stack is deleted
-        db.secret.node.apply_removal_policy(RemovalPolicy.DESTROY)
+        db.secret.apply_removal_policy(RemovalPolicy.DESTROY)
 
         # ECS Cluster
         self.cluster = ecs.Cluster(

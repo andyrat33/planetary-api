@@ -1,7 +1,8 @@
 version: 0.2
 
-# Runs `flask db_create` as a one-off ECS task against the production RDS.
+# Runs `flask db_create && flask db_seed` as a one-off ECS task against the production RDS.
 # db_create is idempotent (SQLAlchemy create_all) — safe to run on every deploy.
+# db_seed is idempotent (skips if planets table already has rows) — safe to run on every deploy.
 # Waits for the task to stop and fails the pipeline if the container exits non-zero.
 
 phases:
@@ -38,7 +39,7 @@ phases:
             overrides={
                 "containerOverrides": [{
                     "name": "planetary-api",
-                    "command": ["sh", "-c", "flask db_create"],
+                    "command": ["sh", "-c", "flask db_create && flask db_seed"],
                 }]
             },
         )
@@ -57,9 +58,9 @@ phases:
                 reason = desc.get("stoppedReason", "")
                 print(f"Task stopped — exit code: {exit_code}, reason: {reason}")
                 if exit_code != 0:
-                    print("ERROR: db_create failed — pipeline blocked.", file=sys.stderr)
+                    print("ERROR: db_create/db_seed failed — pipeline blocked.", file=sys.stderr)
                     sys.exit(1)
-                print("db_create completed successfully.")
+                print("db_create and db_seed completed successfully.")
                 sys.exit(0)
 
         print("ERROR: Timed out waiting for db_create task.", file=sys.stderr)

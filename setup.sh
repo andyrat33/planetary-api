@@ -210,16 +210,27 @@ echo
 echo "  c) Bootstrap CDK (first time only, per account/region):"
 echo "     cdk bootstrap aws://${ACCOUNT_ID}/${AWS_REGION} --profile ${AWS_PROFILE}"
 echo
-echo "  d) Also create the RDS MySQL database and populate planetary-api/db-credentials"
-echo "     in Secrets Manager with DB_USER, DB_PASSWORD, DB_HOST, DB_NAME."
-echo
-echo "  e) Deploy all stacks:"
+echo "  d) Deploy all stacks:"
 echo "     cdk deploy --all --profile ${AWS_PROFILE}"
 echo
-echo "  f) After deploy, subscribe your email to the SNS approval topic:"
+echo "     RDS MySQL 8.0 is provisioned automatically by CDK (PlanetaryEcs stack)."
+echo "     The DB credentials secret is generated and injected into ECS at runtime."
+echo
+echo "  e) After deploy, subscribe your email to the SNS approval topic:"
 echo "     The ApprovalTopicArn is printed in the CDK outputs."
 echo "     aws sns subscribe --topic-arn <ApprovalTopicArn> \\"
 echo "         --protocol email --notification-endpoint ${APPROVAL_EMAIL} \\"
 echo "         --profile ${AWS_PROFILE}"
+echo
+echo "  f) Push a commit to trigger the pipeline. The first run will block at"
+echo "     SecurityGate — the app has intentional vulnerabilities. To allow it:"
+echo "     aws ssm put-parameter --name /planetary-api/pipeline/security-override \\"
+echo "         --value \"true\" --overwrite --type String --profile ${AWS_PROFILE}"
+echo "     Reset after the pipeline completes:"
+echo "     aws ssm put-parameter --name /planetary-api/pipeline/security-override \\"
+echo "         --value \"false\" --overwrite --type String --profile ${AWS_PROFILE}"
+echo
+echo "     The DbMigrate stage runs flask db_create (idempotent) and flask db_seed"
+echo "     (skips if already seeded) automatically on every deploy."
 echo
 success "All done!"

@@ -57,6 +57,11 @@ def db_drop():
 @app.cli.command("db_seed")
 def db_seed():
     try:
+        # Skip if already seeded — makes this safe to run on every deploy
+        if Planet.query.count() > 0:
+            print("Database already seeded — skipping.")
+            return
+
         # Load planets
         with open("star_trek_planets.json", "r") as f:
             planets_data = json.load(f)

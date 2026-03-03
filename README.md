@@ -168,7 +168,7 @@ flowchart LR
         S5["⑤ ManualApproval\n(SNS email)"]
         S6["⑥ SmokeTest\n(Newman)"]
         S7["⑦ Deploy\n(ECS rolling update)"]
-        S8["⑧ DbMigrate\n(flask db_create)"]
+        S8["⑧ DbMigrate\n(db_create + db_seed)"]
         S9["⑨ Lockdown\n(ALB SG)"]
         S10["⑩ Verify\n(health check + URL)"]
 
@@ -244,8 +244,8 @@ GitHub (master)
 [6] SmokeTest      — Newman/Postman functional tests (Basic + Negative folders)
                      in Docker-in-Docker; results uploaded to S3
 [7] Deploy         — ECS Fargate rolling update
-[8] DbMigrate      — runs `flask db_create` as one-off ECS task against prod RDS
-                     (idempotent — safe on every deploy; creates missing tables only)
+[8] DbMigrate      — runs `flask db_create && flask db_seed` as one-off ECS task against
+                     prod RDS; both are idempotent (db_seed skips if data already exists)
 [9] Lockdown       — restricts ALB SG to AllowedIp CIDR (optional pipeline
                      variable, default 'none' = unrestricted 0.0.0.0/0)
 [10] Verify        — live health check + URL output (skipped if ALB is locked)

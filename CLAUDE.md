@@ -104,7 +104,7 @@ The production pipeline is built with AWS CDK (Python). Account ID, region, GitH
 5. **ManualApproval** — SNS email notification with Security Hub console link; reviewer approves/rejects
 6. **SmokeTest** — Docker-in-Docker: MySQL + app containers, Newman/Postman tests, results uploaded to S3
 7. **Deploy** — ECS Fargate rolling update via `imagedefinitions.json`
-8. **DbMigrate** — runs `flask db_create` as a one-off ECS Fargate task against prod RDS; idempotent (SQLAlchemy `create_all`), safe on every deploy; fails pipeline on non-zero exit
+8. **DbMigrate** — runs `flask db_create && flask db_seed` as a one-off ECS Fargate task against prod RDS; both idempotent (`db_seed` skips if planets table already has rows), safe on every deploy; fails pipeline on non-zero exit
 9. **Lockdown** — optionally restricts ALB SG to a single CIDR via the `AllowedIp` pipeline variable; defaults to `none` (unrestricted)
 10. **Verify** — live health check against the ALB (skipped if `AllowedIp` is set, as CodeBuild can't reach a locked-down ALB); prints URL and commit SHA
 
@@ -115,7 +115,7 @@ The production pipeline is built with AWS CDK (Python). Account ID, region, GitH
 - `postman_security.yml` — Docker-in-Docker, runs Postman `Security` folder with `--suppress-exit-code`
 - `security_gate.yml` — Security Hub query + SSM override check
 - `smoke_test.yml` — Docker-in-Docker Newman tests (Postman `Basic` + `Negative` folders)
-- `db_migrate.yml` — runs `flask db_create` as one-off ECS Fargate task; boto3 polls until STOPPED, fails on non-zero exit; `db_seed` intentionally excluded (would insert duplicates)
+- `db_migrate.yml` — runs `flask db_create && flask db_seed` as one-off ECS Fargate task; boto3 polls until STOPPED, fails on non-zero exit; both commands are idempotent
 - `lockdown.yml` — updates ALB SG port-80 rule to `AllowedIp` CIDR, or restores `0.0.0.0/0` if `none`
 - `verify.yml` — curl health check against live ALB; prints deployment URL and commit SHA
 
