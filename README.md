@@ -146,6 +146,81 @@ pre-commit run --all-files      # Black + flake8 + file fixers
 | `MAIL_USERNAME` | SMTP username |
 | `MAIL_PASSWORD` | SMTP password |
 
+## AWS Architecture
+
+### CI/CD Pipeline
+
+```mermaid
+flowchart LR
+    GH(["GitHub\n(master)"])
+
+    subgraph CP ["CodePipeline — planetary-api-pipeline"]
+        S1["① Source\nCodeStar connection"]
+        S2["② Build\nDocker → ECR"]
+
+        subgraph Scan ["③ SecurityScan  (parallel)"]
+            sg["Semgrep SAST\n→ Security Hub"]
+            sn["Snyk SCA + SBOM\n→ Security Hub + S3"]
+            ps["Postman\nSecurity Tests"]
+        end
+
+        S4["④ SecurityGate\n(SSM override)"]
+        S5["⑤ ManualApproval\n(SNS email)"]
+        S6["⑥ SmokeTest\n(Newman)"]
+        S7["⑦ Deploy\n(ECS rolling update)"]
+        S8["⑧ DbMigrate\n(flask db_create)"]
+        S9["⑨ Lockdown\n(ALB SG)"]
+        S10["⑩ Verify\n(health check + URL)"]
+
+        S1 --> S2
+        S2 --> sg
+        S2 --> sn
+        S2 --> ps
+        sg --> S4
+        sn --> S4
+        ps --> S4
+        S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> S10
+    end
+
+    GH -->|push| S1
+```
+
+### Runtime Infrastructure
+
+```mermaid
+flowchart TB
+    Internet(("Internet"))
+
+    subgraph AWS ["AWS — us-east-1"]
+        subgraph VPC ["VPC"]
+            subgraph pub ["Public Subnets"]
+                ALB["Application\nLoad Balancer"]
+                NGW["NAT Gateway"]
+            end
+            subgraph priv ["Private Subnets"]
+                ECS["ECS Fargate\nplanetary-api"]
+                RDS[("RDS MySQL 8.0\nplanetary-api-db")]
+            end
+        end
+
+        ECR[("ECR\nplanetary-api")]
+        SM["Secrets Manager"]
+        CW["CloudWatch Logs"]
+        SH["Security Hub"]
+    end
+
+    Internet -->|"port 80"| ALB
+    ALB --> ECS
+    ECS <-->|"MySQL :3306"| RDS
+    ECS -->|outbound| NGW
+    NGW --> Internet
+    ECS -.->|"pull image"| ECR
+    ECS -.->|"credentials"| SM
+    ECS -.->|"logs"| CW
+```
+
+---
+
 ## CI/CD — AWS Security Pipeline
 
 The production pipeline is built with AWS CDK (Python) in the `infra/` directory and deployed to AWS (`us-east-1`).
