@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_ecs as ecs,
     aws_ecs_patterns as ecs_patterns,
     aws_ecr as ecr,
+    aws_elasticloadbalancingv2 as elbv2,
     aws_secretsmanager as secretsmanager,
     CfnOutput,
 )
@@ -82,6 +83,18 @@ class EcsStack(Stack):
 
         container.add_port_mappings(ecs.PortMapping(container_port=5000))
 
+        # Mailpit sidecar — captures emails sent by the app to localhost:1025
+        mailpit = task_definition.add_container(
+            "mailpit",
+            image=ecs.ContainerImage.from_registry("axllent/mailpit"),
+            logging=ecs.LogDrivers.aws_logs(stream_prefix="mailpit"),
+            essential=False,
+        )
+        mailpit.add_port_mappings(
+            ecs.PortMapping(container_port=1025),  # SMTP
+            ecs.PortMapping(container_port=8025),  # HTTP UI
+        )
+
         # ALB + Fargate Service
         alb_service = ecs_patterns.ApplicationLoadBalancedFargateService(
             self,
@@ -112,8 +125,30 @@ class EcsStack(Stack):
         ].security_group_id
         self.private_subnet_ids = [s.subnet_id for s in vpc.private_subnets]
 
+        # Mailpit UI accessible on port 8025 of the ALB
+        mailpit_listener = alb_service.load_balancer.add_listener(
+            "MailpitListener",
+            port=8025,
+            open=True,
+        )
+        mailpit_listener.add_targets(
+            "MailpitTargets",
+            port=8025,
+            targets=[alb_service.service],
+            health_check=elbv2.HealthCheck(
+                path="/",
+                healthy_http_codes="200",
+                interval=Duration.seconds(30),
+            ),
+        )
+
         CfnOutput(self, "ServiceArn", value=self.service.service_arn)
         CfnOutput(self, "ClusterArn", value=self.cluster.cluster_arn)
         CfnOutput(
             self, "AlbDnsName", value=alb_service.load_balancer.load_balancer_dns_name
+        )
+        CfnOutput(
+            self,
+            "MailpitUrl",
+            value=f"http://{alb_service.load_balancer.load_balancer_dns_name}:8025",
         )
