@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::450372565572:role/cdk-hnb659fds-deploy-role-450372565572-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::450372565572:role/cdk-hnb659fds-cfn-exec-role-450372565572-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-450372565572-us-east-1/8f561c933ffb15610dbadc16c666664600c0a0d1d1e10eadc059560385112bd6.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-450372565572-us-east-1/c1a0edde90023082213395c4b12e6d8ce9bf94611f68d9a1e6b878035d2f9c17.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -102,7 +102,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::450372565572:role/cdk-hnb659fds-deploy-role-450372565572-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::450372565572:role/cdk-hnb659fds-cfn-exec-role-450372565572-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-450372565572-us-east-1/a681f2b4b9561338accdbff8ca4eb05b8a94eec3199de1666eedd2815fda2d6d.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-450372565572-us-east-1/c7b4aa4a934f40b7e72ae877f5a454523bd0198f2363dafd8717c141f0cf4142.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -388,18 +388,18 @@
             "type": "aws:cdk:warning",
             "data": "minHealthyPercent has not been configured so the default value of 50% is used. The number of running tasks will decrease below the desired count during deployments etc. See https://github.com/aws/aws-cdk/issues/31705 [ack: @aws-cdk/aws-ecs:minHealthyPercent]",
             "trace": [
-              "Annotations.addMessage (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-OShPHW/node_modules/aws-cdk-lib/core/lib/annotations.js:1:2066)",
-              "Annotations.addWarningV2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-OShPHW/node_modules/aws-cdk-lib/core/lib/annotations.js:1:984)",
-              "new BaseService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-OShPHW/node_modules/aws-cdk-lib/aws-ecs/lib/base/base-service.js:1:12364)",
-              "new FargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-OShPHW/node_modules/aws-cdk-lib/aws-ecs/lib/fargate/fargate-service.js:1:6371)",
-              "new FargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-OShPHW/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:681)",
-              "new ApplicationLoadBalancedFargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-OShPHW/node_modules/aws-cdk-lib/aws-ecs-patterns/lib/fargate/application-load-balanced-fargate-service.js:1:6099)",
-              "new ApplicationLoadBalancedFargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-OShPHW/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:681)",
-              "Kernel._Kernel_create (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpwfff_ru8/lib/program.js:4012:25)",
-              "Kernel.create (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpwfff_ru8/lib/program.js:3682:93)",
-              "KernelHost.processRequest (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpwfff_ru8/lib/program.js:17342:36)",
-              "KernelHost.run (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpwfff_ru8/lib/program.js:17302:22)",
-              "Immediate._onImmediate (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpwfff_ru8/lib/program.js:17303:45)",
+              "Annotations.addMessage (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-lu7fUg/node_modules/aws-cdk-lib/core/lib/annotations.js:1:2066)",
+              "Annotations.addWarningV2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-lu7fUg/node_modules/aws-cdk-lib/core/lib/annotations.js:1:984)",
+              "new BaseService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-lu7fUg/node_modules/aws-cdk-lib/aws-ecs/lib/base/base-service.js:1:12364)",
+              "new FargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-lu7fUg/node_modules/aws-cdk-lib/aws-ecs/lib/fargate/fargate-service.js:1:6371)",
+              "new FargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-lu7fUg/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:681)",
+              "new ApplicationLoadBalancedFargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-lu7fUg/node_modules/aws-cdk-lib/aws-ecs-patterns/lib/fargate/application-load-balanced-fargate-service.js:1:6099)",
+              "new ApplicationLoadBalancedFargateService2 (/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/jsii-kernel-lu7fUg/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:681)",
+              "Kernel._Kernel_create (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpq7sburxg/lib/program.js:549:25)",
+              "Kernel.create (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpq7sburxg/lib/program.js:219:93)",
+              "KernelHost.processRequest (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpq7sburxg/lib/program.js:15484:36)",
+              "KernelHost.run (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpq7sburxg/lib/program.js:15444:22)",
+              "Immediate._onImmediate (/private/var/folders/sm/41n0twtn2jdb19vkfyzb8wl40000gn/T/tmpq7sburxg/lib/program.js:15445:45)",
               "process.processImmediate (node:internal/timers:504:21)"
             ]
           }
@@ -532,7 +532,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::450372565572:role/cdk-hnb659fds-deploy-role-450372565572-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::450372565572:role/cdk-hnb659fds-cfn-exec-role-450372565572-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-450372565572-us-east-1/c5fd754fe7053b8a1d1722a6ac23cdb13611e76ac4c4e7624eb3027ac391b6cd.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-450372565572-us-east-1/8511b2e21337a344d8ff656816d68475350d4cb80b630a9df644e0bbdf569aa9.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
