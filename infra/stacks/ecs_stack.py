@@ -129,11 +129,13 @@ class EcsStack(Stack):
         mailpit_listener = alb_service.load_balancer.add_listener(
             "MailpitListener",
             port=8025,
+            protocol=elbv2.ApplicationProtocol.HTTP,
             open=True,
         )
         mailpit_listener.add_targets(
             "MailpitTargets",
             port=8025,
+            protocol=elbv2.ApplicationProtocol.HTTP,
             targets=[alb_service.service],
             health_check=elbv2.HealthCheck(
                 path="/",
