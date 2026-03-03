@@ -93,7 +93,7 @@ The production pipeline is built with AWS CDK (Python). Account ID, region, GitH
 
 **Three CDK stacks:**
 - `PlanetaryEcr` (`infra/stacks/ecr_stack.py`) — ECR repository `planetary-api`
-- `PlanetaryEcs` (`infra/stacks/ecs_stack.py`) — VPC, ECS Fargate cluster + ALB, references RDS MySQL 8.0 credentials from Secrets Manager
+- `PlanetaryEcs` (`infra/stacks/ecs_stack.py`) — VPC, ECS Fargate cluster + ALB, references RDS MySQL 8.0 credentials from Secrets Manager; ECS task runs two containers: `planetary-api` (port 5000) and `mailpit` sidecar (SMTP :1025, UI :8025); Mailpit UI exposed via second ALB listener on port 8025
 - `PlanetaryPipeline` (`infra/stacks/pipeline_stack.py`) — full 10-stage CodePipeline
 
 **Pipeline stages:**
@@ -181,7 +181,9 @@ ManualApproval always fires regardless of the override — a human must approve 
 - Pipeline: `planetary-api-pipeline`
 - ECR repo: `planetary-api`
 
-ALB DNS, artifacts bucket, and SNS topic ARN are printed as CDK outputs after `cdk deploy`.
+ALB DNS, Mailpit URL, artifacts bucket, and SNS topic ARN are printed as CDK outputs after `cdk deploy`.
+
+**Important:** The pipeline's Deploy stage only does an ECS image rolling update (`imagedefinitions.json`) — it does NOT run `cdk deploy`. Infrastructure changes (new containers, new ALB listeners, security group rules, etc.) require a manual `cdk deploy PlanetaryEcs` to take effect.
 
 **AWS Secrets Manager secrets (created by `./setup.sh`):**
 - `planetary-api/docker-credentials` — Docker Hub credentials (`DOCKER_HUB_USERNAME`, `DOCKER_HUB_PASSWORD`)
@@ -199,6 +201,12 @@ ALB DNS, artifacts bucket, and SNS topic ARN are printed as CDK outputs after `c
 - ASFF `WorkflowState` field is deprecated and rejected by `batch-import-findings` — use nothing (RecordState only)
 - ASFF `Vulnerabilities[].Cwes` field has been removed from the Security Hub schema — `batch-import-findings` rejects it; remove from `snyk_to_asff.py` entirely
 - SecurityGate: `get-findings --query 'length(Findings)'` emits one count per page when paginating — capture via `awk '{sum+=$1} END{print sum+0}'` to get a single integer, otherwise the `[ -gt ]` comparison fails silently and the gate passes
+- ALB `add_listener` and `add_targets` require `protocol=elbv2.ApplicationProtocol.HTTP` explicitly for non-standard ports (CDK only infers HTTP for 80, HTTPS for 443)
+- `targets=[service]` in `add_targets` always routes to the default container; use `service.load_balancer_target(container_name=..., container_port=...)` to target a specific sidecar container
+
+**Teardown:**
+
+Run `./teardown.sh` to remove all AWS resources interactively. It stops ECS, empties the versioned S3 bucket (via boto3) and ECR repo, runs `cdk destroy --all`, deletes Secrets Manager secrets, prompts before deleting RDS, and prints manual steps for Security Hub and CDK bootstrap cleanup.
 
 ### GitHub Actions
 Semgrep SAST scanning on PRs and pushes to `main`/`master` (`.github/workflows/`).
