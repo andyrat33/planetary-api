@@ -111,7 +111,7 @@ The production pipeline is built with AWS CDK (Python). Account ID, region, GitH
 **Buildspecs** (`infra/buildspecs/`):
 - `build.yml` — Docker build + ECR push, Docker Hub login via Secrets Manager
 - `semgrep.yml` — Semgrep SAST → SARIF → ASFF → Security Hub + S3
-- `snyk_sca.yml` — Snyk SCA + CycloneDX SBOM → ASFF → Security Hub + S3
+- `snyk_sca.yml` — Snyk SCA → ASFF → Security Hub + S3; CycloneDX SBOM generated via `cyclonedx-py` (not `snyk sbom` — requires paid Snyk plan)
 - `postman_security.yml` — Docker-in-Docker, runs Postman `Security` folder with `--suppress-exit-code`
 - `security_gate.yml` — Security Hub query + SSM override check
 - `smoke_test.yml` — Docker-in-Docker Newman tests (Postman `Basic` + `Negative` folders)
@@ -197,7 +197,7 @@ ALB DNS, artifacts bucket, and SNS topic ARN are printed as CDK outputs after `c
 - `codepipeline.Variable` default value must be 1–1000 chars — use `"none"` as the sentinel for "not set", not `""`
 - `aws codepipeline start-pipeline-execution --variables` is not supported by the installed AWS CLI version; use boto3 instead (see IP lockdown command above)
 - ASFF `WorkflowState` field is deprecated and rejected by `batch-import-findings` — use nothing (RecordState only)
-- ASFF `Vulnerabilities[].Cwes` expects strings (`"CWE-79"`), not integers
+- ASFF `Vulnerabilities[].Cwes` field has been removed from the Security Hub schema — `batch-import-findings` rejects it; remove from `snyk_to_asff.py` entirely
 - SecurityGate: `get-findings --query 'length(Findings)'` emits one count per page when paginating — capture via `awk '{sum+=$1} END{print sum+0}'` to get a single integer, otherwise the `[ -gt ]` comparison fails silently and the gate passes
 
 ### GitHub Actions

@@ -193,6 +193,22 @@ All findings from Semgrep and Snyk are converted to ASFF format and imported to 
 - `sarif_to_asff.py` — Semgrep SARIF → ASFF
 - `snyk_to_asff.py` — Snyk JSON → ASFF with CVE/CWE metadata
 
+### Pipeline Artifacts
+
+The artifacts bucket name is printed as the `ArtifactsBucketName` CDK output. All paths use the CodeBuild build ID as a unique prefix.
+
+| Artifact | S3 path | Stage |
+|----------|---------|-------|
+| `semgrep.sarif` | `semgrep/<build-id>/semgrep.sarif` | SecurityScan |
+| `findings.json` (Semgrep ASFF) | `semgrep/<build-id>/findings.json` | SecurityScan |
+| `snyk-results.json` | `snyk/<build-id>/snyk-results.json` | SecurityScan |
+| `snyk-findings.json` (Snyk ASFF) | `snyk/<build-id>/snyk-findings.json` | SecurityScan |
+| `sbom.json` (CycloneDX JSON) | `sbom/<build-id>/sbom.json` | SecurityScan |
+| `newman-report.html` | `newman/<build-id>/report.html` | SmokeTest |
+| `report.xml` (JUnit) | `newman/<build-id>/report.xml` | SmokeTest |
+
+Security Hub findings (Semgrep + Snyk) are also visible in the AWS Security Hub console (`GeneratorId` prefix: `planetary-api`). The Docker image is pushed to ECR tagged with the commit SHA. Newman JUnit results are published to the CodeBuild Reports console.
+
 ### CDK Deployment
 
 Run `./setup.sh` first to generate `infra/config.py`, then:
@@ -221,6 +237,77 @@ aws ssm put-parameter --name /planetary-api/pipeline/security-override \
 ### GitHub Actions
 
 Semgrep SAST scanning runs on all PRs and pushes to `main`/`master`.
+
+## Deploying to AWS
+
+### Prerequisites
+
+- AWS CLI configured with a profile that has permission to create CDK resources
+- Node.js — install the CDK CLI: `npm install -g aws-cdk`
+- Python 3.9+
+- Accounts: [Docker Hub](https://hub.docker.com), [Snyk](https://app.snyk.io), [Semgrep](https://semgrep.dev)
+
+### Steps
+
+**1. Fork and clone**
+```bash
+git clone https://github.com/<you>/planetary-api.git
+cd planetary-api
+```
+
+**2. Enable Security Hub** (one-time per account/region)
+```bash
+aws securityhub enable-security-hub --region us-east-1 --profile <your-profile>
+```
+
+**3. Run the setup script**
+```bash
+./setup.sh
+```
+Follow the prompts — it collects your AWS profile, GitHub details, Docker Hub credentials, Snyk token, and Semgrep token; creates the required Secrets Manager secrets; pauses for you to create a GitHub CodeStar connection in the AWS Console (requires a browser OAuth flow); then generates `infra/config.py`.
+
+**4. Create the RDS credentials secret** (manual step — not covered by setup.sh)
+```bash
+aws secretsmanager create-secret \
+  --name planetary-api/db-credentials \
+  --secret-string '{"DB_USER":"admin","DB_PASSWORD":"...","DB_HOST":"...","DB_NAME":"planetary"}' \
+  --profile <your-profile> --region us-east-1
+```
+
+**5. Deploy CDK stacks**
+```bash
+cd infra
+pip install -r requirements.txt
+cdk bootstrap aws://$(aws sts get-caller-identity --query Account --output text)/us-east-1 \
+  --profile <your-profile>
+cdk deploy --all --profile <your-profile>
+```
+
+**6. Subscribe to the approval SNS topic**
+
+CDK prints an `ApprovalTopicArn` output. Subscribe your email:
+```bash
+aws sns subscribe --topic-arn <ApprovalTopicArn> --protocol email \
+  --notification-endpoint <your-email> --profile <your-profile> --region us-east-1
+```
+Confirm the subscription email that arrives.
+
+**7. Push a commit to trigger the pipeline**
+
+Any push to `master` triggers the pipeline automatically. The first run will block at SecurityGate — the app contains intentional vulnerabilities. To proceed:
+```bash
+# Allow the pipeline to pass SecurityGate
+aws ssm put-parameter --name /planetary-api/pipeline/security-override \
+  --value "true" --overwrite --type String --profile <your-profile> --region us-east-1
+
+# Re-trigger, then reset the override after the pipeline completes
+aws ssm put-parameter --name /planetary-api/pipeline/security-override \
+  --value "false" --overwrite --type String --profile <your-profile> --region us-east-1
+```
+
+The ALB DNS name is printed as a CDK output and again by the Verify stage at the end of every pipeline run.
+
+---
 
 ## Disclaimer
 
