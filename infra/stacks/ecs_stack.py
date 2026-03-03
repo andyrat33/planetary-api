@@ -136,7 +136,12 @@ class EcsStack(Stack):
             "MailpitTargets",
             port=8025,
             protocol=elbv2.ApplicationProtocol.HTTP,
-            targets=[alb_service.service],
+            targets=[
+                alb_service.service.load_balancer_target(
+                    container_name="mailpit",
+                    container_port=8025,
+                )
+            ],
             health_check=elbv2.HealthCheck(
                 path="/",
                 healthy_http_codes="200",
