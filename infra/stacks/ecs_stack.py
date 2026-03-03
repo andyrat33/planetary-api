@@ -1,12 +1,13 @@
 from aws_cdk import (
     Stack,
     Duration,
+    RemovalPolicy,
     aws_ec2 as ec2,
     aws_ecs as ecs,
     aws_ecs_patterns as ecs_patterns,
     aws_ecr as ecr,
     aws_elasticloadbalancingv2 as elbv2,
-    aws_secretsmanager as secretsmanager,
+    aws_rds as rds,
     CfnOutput,
 )
 from constructs import Construct
@@ -25,6 +26,46 @@ class EcsStack(Stack):
             max_azs=2,
             nat_gateways=1,
         )
+
+        # RDS security group — ingress from ECS tasks added after service creation
+        rds_sg = ec2.SecurityGroup(
+            self,
+            "RdsSg",
+            vpc=vpc,
+            description="MySQL access from ECS tasks",
+        )
+
+        # RDS MySQL 8.0 — RemovalPolicy.DESTROY for easy teardown (educational tool)
+        db = rds.DatabaseInstance(
+            self,
+            "PlanetaryDb",
+            engine=rds.DatabaseInstanceEngine.mysql(
+                version=rds.MysqlEngineVersion.VER_8_0
+            ),
+            instance_type=ec2.InstanceType.of(
+                ec2.InstanceClass.T3, ec2.InstanceSize.MICRO
+            ),
+            vpc=vpc,
+            vpc_subnets=ec2.SubnetSelection(
+                subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS
+            ),
+            security_groups=[rds_sg],
+            database_name="planetary",
+            credentials=rds.Credentials.from_generated_secret(
+                "admin",
+                secret_name="planetary-api/db-credentials",
+            ),
+            removal_policy=RemovalPolicy.DESTROY,
+            deletion_protection=False,
+            backup_retention=Duration.days(0),
+            multi_az=False,
+        )
+
+        # DeletionPolicy=Delete requires SkipFinalSnapshot=true (CloudFormation requirement)
+        db.node.default_child.add_property_override("SkipFinalSnapshot", True)
+
+        # Destroy the credentials secret when the stack is deleted
+        db.secret.node.apply_removal_policy(RemovalPolicy.DESTROY)
 
         # ECS Cluster
         self.cluster = ecs.Cluster(
@@ -46,15 +87,7 @@ class EcsStack(Stack):
         # Note: ECR pull permissions are granted automatically by CDK
         # when using ContainerImage.from_ecr_repository()
 
-        # Reference existing DB credentials from Secrets Manager
-        # (created separately or by RDS — pass endpoint via env var)
-        db_secret = secretsmanager.Secret.from_secret_name_v2(
-            self,
-            "DbSecret",
-            secret_name="planetary-api/db-credentials",
-        )
-
-        # Container definition
+        # Container definition — db.secret fields: username, password, host, dbname
         container = task_definition.add_container(
             "planetary-api",
             image=ecs.ContainerImage.from_ecr_repository(ecr_repo, tag="latest"),
@@ -65,12 +98,10 @@ class EcsStack(Stack):
                 "MAIL_USE_TLS": "false",
             },
             secrets={
-                "DB_USER": ecs.Secret.from_secrets_manager(db_secret, "DB_USER"),
-                "DB_PASSWORD": ecs.Secret.from_secrets_manager(
-                    db_secret, "DB_PASSWORD"
-                ),
-                "DB_HOST": ecs.Secret.from_secrets_manager(db_secret, "DB_HOST"),
-                "DB_NAME": ecs.Secret.from_secrets_manager(db_secret, "DB_NAME"),
+                "DB_USER": ecs.Secret.from_secrets_manager(db.secret, "username"),
+                "DB_PASSWORD": ecs.Secret.from_secrets_manager(db.secret, "password"),
+                "DB_HOST": ecs.Secret.from_secrets_manager(db.secret, "host"),
+                "DB_NAME": ecs.Secret.from_secrets_manager(db.secret, "dbname"),
             },
             health_check=ecs.HealthCheck(
                 command=["CMD-SHELL", "curl -f http://localhost:5000/ || exit 1"],
@@ -105,6 +136,13 @@ class EcsStack(Stack):
             public_load_balancer=True,
             listener_port=80,
             assign_public_ip=False,
+        )
+
+        # Allow ECS tasks to connect to RDS on port 3306
+        rds_sg.add_ingress_rule(
+            peer=alb_service.service.connections.security_groups[0],
+            connection=ec2.Port.tcp(3306),
+            description="MySQL access from ECS tasks",
         )
 
         # Health check path

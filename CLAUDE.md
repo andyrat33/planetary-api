@@ -65,7 +65,7 @@ No unit test suite. API testing is done via Postman collection (`planetary-api.p
 ### Database
 - **Docker Compose:** MySQL 5.7 (`mysql+pymysql://`)
 - **Local dev:** SQLite (`planets.db`)
-- **AWS (prod):** RDS MySQL 8.0 (`planetary-api-db.co5qauskgubh.us-east-1.rds.amazonaws.com`)
+- **AWS (prod):** RDS MySQL 8.0 (provisioned by CDK in `PlanetaryEcs` stack, endpoint injected via Secrets Manager)
 - Connection string is built from env vars: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`
 
 ### Route Categories
@@ -93,7 +93,7 @@ The production pipeline is built with AWS CDK (Python). Account ID, region, GitH
 
 **Three CDK stacks:**
 - `PlanetaryEcr` (`infra/stacks/ecr_stack.py`) — ECR repository `planetary-api`
-- `PlanetaryEcs` (`infra/stacks/ecs_stack.py`) — VPC, ECS Fargate cluster + ALB, references RDS MySQL 8.0 credentials from Secrets Manager; ECS task runs two containers: `planetary-api` (port 5000) and `mailpit` sidecar (SMTP :1025, UI :8025); Mailpit UI exposed via second ALB listener on port 8025
+- `PlanetaryEcs` (`infra/stacks/ecs_stack.py`) — VPC, ECS Fargate cluster + ALB, RDS MySQL 8.0 (`db.t3.micro`, `RemovalPolicy.DESTROY`), CDK-generated credentials secret (`planetary-api/db-credentials`); ECS task runs two containers: `planetary-api` (port 5000) and `mailpit` sidecar (SMTP :1025, UI :8025); Mailpit UI exposed via second ALB listener on port 8025
 - `PlanetaryPipeline` (`infra/stacks/pipeline_stack.py`) — full 10-stage CodePipeline
 
 **Pipeline stages:**
@@ -189,7 +189,7 @@ ALB DNS, Mailpit URL, artifacts bucket, and SNS topic ARN are printed as CDK out
 - `planetary-api/docker-credentials` — Docker Hub credentials (`DOCKER_HUB_USERNAME`, `DOCKER_HUB_PASSWORD`)
 - `planetary-api/snyk-token` — Snyk auth token (`SNYK_TOKEN`)
 - `planetary-api/semgrep-token` — Semgrep app token (`SEMGREP_APP_TOKEN`)
-- `planetary-api/db-credentials` — RDS credentials (`DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`) — create manually
+- `planetary-api/db-credentials` — RDS credentials (`username`, `password`, `host`, `dbname`) — auto-created by CDK (`from_generated_secret`); fields mapped to `DB_USER`/`DB_PASSWORD`/`DB_HOST`/`DB_NAME` in ECS task
 
 **Known CDK quirks:**
 - Do NOT call `ecr_repo.grant_pull(task_definition.execution_role)` — `execution_role` is null at synth time; CDK handles ECR permissions automatically via `ContainerImage.from_ecr_repository()`
@@ -206,7 +206,7 @@ ALB DNS, Mailpit URL, artifacts bucket, and SNS topic ARN are printed as CDK out
 
 **Teardown:**
 
-Run `./teardown.sh` to remove all AWS resources interactively. It stops ECS, empties the versioned S3 bucket (via boto3) and ECR repo, runs `cdk destroy --all`, deletes Secrets Manager secrets, prompts before deleting RDS, and prints manual steps for Security Hub and CDK bootstrap cleanup.
+Run `./teardown.sh` to remove all AWS resources interactively. **Irreversible — all data including the RDS database is permanently deleted.** It stops ECS, empties the versioned S3 bucket (pure AWS CLI, no boto3) and ECR repo, runs `cdk destroy --all` (which handles RDS deletion and ordering automatically), deletes any remaining Secrets Manager secrets, and prints manual steps for Security Hub and CDK bootstrap cleanup.
 
 ### GitHub Actions
 Semgrep SAST scanning on PRs and pushes to `main`/`master` (`.github/workflows/`).

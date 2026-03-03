@@ -256,10 +256,8 @@ GitHub (master)
 | Stack | Resources |
 |-------|-----------|
 | `PlanetaryEcr` | ECR repository |
-| `PlanetaryEcs` | VPC, ECS Fargate cluster, ALB, task definition |
+| `PlanetaryEcs` | VPC, ECS Fargate cluster, ALB, RDS MySQL 8.0, task definition |
 | `PlanetaryPipeline` | CodePipeline, CodeBuild projects, S3, SNS, SSM, IAM |
-
-RDS MySQL 8.0 (`db.t3.micro`) is provisioned separately in the same VPC.
 
 ### Security Hub Integration
 
@@ -341,15 +339,7 @@ aws securityhub enable-security-hub --region us-east-1 --profile <your-profile>
 ```
 Follow the prompts — it collects your AWS profile, GitHub details, Docker Hub credentials, Snyk token, and Semgrep token; creates the required Secrets Manager secrets; pauses for you to create a GitHub CodeStar connection in the AWS Console (requires a browser OAuth flow); then generates `infra/config.py`.
 
-**4. Create the RDS credentials secret** (manual step — not covered by setup.sh)
-```bash
-aws secretsmanager create-secret \
-  --name planetary-api/db-credentials \
-  --secret-string '{"DB_USER":"admin","DB_PASSWORD":"...","DB_HOST":"...","DB_NAME":"planetary"}' \
-  --profile <your-profile> --region us-east-1
-```
-
-**5. Deploy CDK stacks**
+**4. Deploy CDK stacks**
 ```bash
 cd infra
 pip install -r requirements.txt
@@ -358,7 +348,9 @@ cdk bootstrap aws://$(aws sts get-caller-identity --query Account --output text)
 cdk deploy --all --profile <your-profile>
 ```
 
-**6. Subscribe to the approval SNS topic**
+RDS MySQL 8.0 (`db.t3.micro`) is provisioned automatically as part of the `PlanetaryEcs` stack. The CDK-generated credentials secret (`planetary-api/db-credentials`) is injected into the ECS task at runtime.
+
+**5. Subscribe to the approval SNS topic**
 
 CDK prints an `ApprovalTopicArn` output. Subscribe your email:
 ```bash
@@ -367,7 +359,7 @@ aws sns subscribe --topic-arn <ApprovalTopicArn> --protocol email \
 ```
 Confirm the subscription email that arrives.
 
-**7. Push a commit to trigger the pipeline**
+**6. Push a commit to trigger the pipeline**
 
 Any push to `master` triggers the pipeline automatically. The first run will block at SecurityGate — the app contains intentional vulnerabilities. To proceed:
 ```bash
@@ -386,6 +378,8 @@ The ALB DNS name is printed as a CDK output and again by the Verify stage at the
 
 ## Teardown
 
+> **Warning: teardown is completely and irreversibly destructive. All pipeline history, container images, scan artifacts, and all database data will be permanently deleted with no recovery option.**
+
 To remove all AWS resources and stop all ongoing costs, run the interactive teardown script:
 
 ```bash
@@ -394,15 +388,14 @@ To remove all AWS resources and stop all ongoing costs, run the interactive tear
 
 It will, in order:
 1. **Stop the ECS service** — immediately halts Fargate billing
-2. **Empty the S3 artifacts bucket** (versioned — `aws s3 rm` only adds delete markers; the script uses boto3 to remove all versions)
+2. **Empty the S3 artifacts bucket** (versioned — uses AWS CLI to remove all versions and delete markers)
 3. **Empty the ECR repository** — required before CDK can delete it
-4. **`cdk destroy --all`** — removes the three CDK stacks (VPC, NAT Gateway, ALB, ECS, CodePipeline, etc.)
+4. **`cdk destroy --all`** — removes all three CDK stacks including RDS, VPC, NAT Gateway, ALB, ECS, and CodePipeline
 5. **Delete RETAIN resources** — S3 bucket and ECR repo after they are empty
-6. **Delete Secrets Manager secrets** — all four `planetary-api/*` secrets, immediately (no 30-day recovery window)
-7. **Prompt to delete the RDS instance** — lists all instances in the region; requires you to type the identifier before deleting
-8. **Print manual steps** — Security Hub, CodeStar connection, CDK bootstrap stack
+6. **Delete Secrets Manager secrets** — all `planetary-api/*` secrets, immediately (no 30-day recovery window)
+7. **Print manual steps** — Security Hub, CodeStar connection, CDK bootstrap stack
 
-> The RDS instance is not managed by CDK. The script lists all RDS instances in the region and prompts before deleting — it will not delete without explicit confirmation.
+RDS MySQL is managed by CDK with `RemovalPolicy=DESTROY`. CloudFormation deletes it automatically during `cdk destroy` and handles all subnet/security group ordering.
 
 ---
 

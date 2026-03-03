@@ -42,15 +42,13 @@ echo "This script will:"
 echo "  1. Stop the ECS service (immediate Fargate billing stop)"
 echo "  2. Empty the S3 artifacts bucket (versioned — AWS CLI only, no boto3)"
 echo "  3. Empty the ECR repository"
-echo "  4. Prompt to delete the RDS instance and wait for completion"
-echo "  5. Clean up external security groups referencing the ECS task SG"
-echo "  6. Run cdk destroy --all (VPC, NAT Gateway, ALB, ECS, Pipeline, etc.)"
-echo "  7. Delete RETAIN resources (S3 bucket + ECR repo)"
-echo "  8. Delete Secrets Manager secrets"
-echo "  9. Print remaining optional manual cleanup steps"
+echo "  4. Run cdk destroy --all (deletes VPC, NAT Gateway, ALB, ECS, RDS, Pipeline, etc.)"
+echo "  5. Delete RETAIN resources (S3 bucket + ECR repo)"
+echo "  6. Delete any remaining Secrets Manager secrets"
+echo "  7. Print remaining optional manual cleanup steps"
 echo
-echo "Note: RDS is deleted BEFORE cdk destroy so the VPC subnet dependency"
-echo "  is released and the RDS security group can be cleaned up first."
+echo "Note: RDS is managed by CDK (RemovalPolicy=DESTROY). CloudFormation deletes"
+echo "  it automatically during cdk destroy and handles subnet ordering."
 echo
 echo "Note: ensure your CDK Python environment is active before continuing."
 echo "  If using pyenv: pyenv activate <your-cdk-env>"
@@ -86,17 +84,17 @@ printf "  %-52s %s\n" "Resource" "Cost stopped"
 printf "  %-52s %s\n" "----------------------------------------------------" "---------------"
 printf "  %-52s %s\n" "NAT Gateway" "~\$32/month"
 printf "  %-52s %s\n" "ALB (Application Load Balancer)" "~\$18/month"
+printf "  %-52s %s\n" "RDS MySQL 8.0 (db.t3.micro)" "~\$15-20/month"
 printf "  %-52s %s\n" "ECS Fargate service + cluster" "per-task billing"
 printf "  %-52s %s\n" "CodePipeline + 9 CodeBuild projects" "per-build billing"
 printf "  %-52s %s\n" "S3 artifacts bucket (versioned)" "storage costs"
 printf "  %-52s %s\n" "ECR repository  planetary-api" "storage costs"
-printf "  %-52s %s\n" "4x Secrets Manager secrets" "~\$0.40/secret/month"
+printf "  %-52s %s\n" "Secrets Manager secrets" "~\$0.40/secret/month"
 printf "  %-52s %s\n" "VPC, SNS, SSM, IAM, CloudWatch logs" "negligible"
 echo
-echo "  RDS instance: prompted separately — will not delete without confirmation."
-echo
-echo -e "${RED}This is irreversible. All pipeline history, container images,"
-echo -e "and scan artifacts will be permanently deleted.${NC}"
+echo -e "${RED}WARNING: This is completely irreversible."
+echo -e "All pipeline history, container images, scan artifacts,"
+echo -e "and ALL DATABASE DATA will be permanently deleted.${NC}"
 echo
 
 read -rp "Type 'yes' to proceed with teardown: " CONFIRM
@@ -106,7 +104,7 @@ if [[ "$CONFIRM" != "yes" ]]; then
 fi
 
 # ── Step 1 — Stop ECS service ──────────────────────────────────────────────
-step "1/9 — Stopping ECS service (immediate Fargate billing stop)..."
+step "1/7 — Stopping ECS service (immediate Fargate billing stop)..."
 SERVICE_ARN=$(aws ecs list-services --cluster planetary-api-cluster \
     --profile "$PROFILE" --region "$REGION" \
     --query 'serviceArns[0]' --output text 2>/dev/null || echo "None")
@@ -123,7 +121,7 @@ else
 fi
 
 # ── Step 2 — Look up S3 artifacts bucket ──────────────────────────────────
-step "2/9 — Looking up S3 artifacts bucket from CloudFormation..."
+step "2/7 — Looking up S3 artifacts bucket from CloudFormation..."
 BUCKET=$(aws cloudformation describe-stacks \
     --stack-name PlanetaryPipeline \
     --profile "$PROFILE" --region "$REGION" \
@@ -138,7 +136,7 @@ else
 fi
 
 # ── Step 3 — Empty versioned S3 bucket ────────────────────────────────────
-step "3/9 — Emptying versioned S3 bucket..."
+step "3/7 — Emptying versioned S3 bucket..."
 
 # Deletes one object type ("Versions" or "DeleteMarkers") in 1000-item batches
 # using only AWS CLI + stdlib python3 — no boto3 required.
@@ -175,7 +173,7 @@ else
 fi
 
 # ── Step 4 — Empty ECR repository ─────────────────────────────────────────
-step "4/9 — Emptying ECR repository planetary-api..."
+step "4/7 — Emptying ECR repository planetary-api..."
 IMAGES=$(aws ecr list-images --repository-name planetary-api \
     --profile "$PROFILE" --region "$REGION" \
     --query 'imageIds' --output json 2>/dev/null || echo "null")
@@ -192,113 +190,15 @@ else
     warn "ECR repository is empty or not found — skipping."
 fi
 
-# ── Step 5 — RDS instance ──────────────────────────────────────────────────
-# RDS must be deleted BEFORE cdk destroy: it lives in the CDK VPC and its
-# ENI blocks subnet deletion. Its security group also references the ECS
-# task SG and must be cleaned up before CloudFormation can delete it.
-step "5/9 — RDS instance..."
-echo "RDS instances in $REGION:"
-aws rds describe-db-instances \
-    --profile "$PROFILE" --region "$REGION" \
-    --query 'DBInstances[*].[DBInstanceIdentifier,DBInstanceClass,DBInstanceStatus]' \
-    --output table 2>/dev/null || echo "  (none found or no access)"
-echo
-
-read -rp "RDS instance identifier to delete (Enter to skip): " RDS_ID
-if [[ -n "$RDS_ID" ]]; then
-    aws rds delete-db-instance \
-        --db-instance-identifier "$RDS_ID" \
-        --skip-final-snapshot \
-        --delete-automated-backups \
-        --profile "$PROFILE" --region "$REGION" > /dev/null
-    success "RDS instance '$RDS_ID' deletion initiated — waiting for completion..."
-    echo -n "  "
-    while aws rds describe-db-instances \
-            --db-instance-identifier "$RDS_ID" \
-            --profile "$PROFILE" --region "$REGION" &>/dev/null; do
-        echo -n "."
-        sleep 15
-    done
-    echo
-    success "RDS instance '$RDS_ID' deleted."
-else
-    warn "Skipping RDS deletion. cdk destroy may fail if RDS is still in the VPC."
-fi
-
-# ── Step 6 — Clean up external SG references to the ECS task SG ──────────
-# The manually-created RDS SG has inbound rules referencing the ECS task SG.
-# CloudFormation cannot delete the task SG or VPC subnet until these are gone.
-step "6/9 — Cleaning up external security group references..."
-TASK_SG=$(aws cloudformation describe-stacks \
-    --stack-name PlanetaryEcs --profile "$PROFILE" --region "$REGION" \
-    --query 'Stacks[0].Outputs' --output json 2>/dev/null \
-    | python3 -c "
-import sys, json
-outputs = json.load(sys.stdin) or []
-for o in outputs:
-    key = o.get('OutputKey', '')
-    if 'PlanetaryServiceSecurityGroup' in key and 'GroupId' in key:
-        print(o['OutputValue'])
-        break
-" 2>/dev/null || true)
-
-if [[ -n "$TASK_SG" && "$TASK_SG" != "None" ]]; then
-    REFERENCING=$(aws ec2 describe-security-groups \
-        --filters "Name=ip-permission.group-id,Values=$TASK_SG" \
-        --profile "$PROFILE" --region "$REGION" \
-        --query 'SecurityGroups[*].GroupId' --output text 2>/dev/null || true)
-
-    if [[ -n "$REFERENCING" ]]; then
-        for REF_SG in $REFERENCING; do
-            TMPPERMS=$(mktemp /tmp/sg-perms-XXXXXX.json)
-            TMPREVOKE=$(mktemp /tmp/sg-revoke-XXXXXX.json)
-
-            aws ec2 describe-security-groups \
-                --group-ids "$REF_SG" --profile "$PROFILE" --region "$REGION" \
-                --query "SecurityGroups[0].IpPermissions" \
-                --output json > "$TMPPERMS" 2>/dev/null
-
-            python3 - "$TMPPERMS" "$TMPREVOKE" "$TASK_SG" <<'PYEOF'
-import sys, json
-task_sg = sys.argv[3]
-perms = json.load(open(sys.argv[1])) or []
-to_revoke = []
-for rule in perms:
-    pairs = [p for p in rule.get('UserIdGroupPairs', []) if p.get('GroupId') == task_sg]
-    if pairs:
-        to_revoke.append({**rule, 'UserIdGroupPairs': pairs})
-json.dump(to_revoke, open(sys.argv[2], 'w'))
-PYEOF
-
-            REVOKE_COUNT=$(python3 -c "import json; print(len(json.load(open('$TMPREVOKE'))))")
-            if [[ "$REVOKE_COUNT" -gt 0 ]]; then
-                aws ec2 revoke-security-group-ingress \
-                    --group-id "$REF_SG" \
-                    --ip-permissions "file://$TMPREVOKE" \
-                    --profile "$PROFILE" --region "$REGION" > /dev/null
-            fi
-            rm -f "$TMPPERMS" "$TMPREVOKE"
-
-            aws ec2 delete-security-group --group-id "$REF_SG" \
-                --profile "$PROFILE" --region "$REGION" > /dev/null 2>/dev/null \
-                && success "Deleted external SG $REF_SG." \
-                || warn "Could not delete $REF_SG — may still be in use, cdk destroy will retry."
-        done
-    else
-        success "No external SG references to ECS task SG found."
-    fi
-else
-    warn "PlanetaryEcs stack not found or task SG not in outputs — skipping."
-fi
-
-# ── Step 7 — cdk destroy --all ────────────────────────────────────────────
-step "7/9 — Running cdk destroy --all --force..."
-echo "  This may take 10-20 minutes while CloudFormation deletes the stacks."
+# ── Step 5 — cdk destroy --all ────────────────────────────────────────────
+step "5/7 — Running cdk destroy --all --force..."
+echo "  This deletes the VPC, NAT Gateway, ALB, ECS, RDS, CodePipeline, etc."
+echo "  RDS deletion alone can take 5-10 minutes — CloudFormation will wait."
 (cd infra && cdk destroy --all --force --profile "$PROFILE")
 success "CDK stacks destroyed."
 
-# ── Step 8 — Delete RETAIN resources ──────────────────────────────────────
-step "8/9 — Deleting RETAIN resources (S3 bucket + ECR repo)..."
+# ── Step 6 — Delete RETAIN resources ──────────────────────────────────────
+step "6/7 — Deleting RETAIN resources (S3 bucket + ECR repo)..."
 if [[ -n "$BUCKET" ]]; then
     aws s3 rb "s3://$BUCKET" --profile "$PROFILE" --region "$REGION" 2>/dev/null \
         && success "S3 bucket $BUCKET deleted." \
@@ -310,8 +210,8 @@ aws ecr delete-repository --repository-name planetary-api --force \
     && success "ECR repository planetary-api deleted." \
     || warn "ECR repository planetary-api not found or already deleted."
 
-# ── Step 9 — Delete Secrets Manager secrets ───────────────────────────────
-step "9/9 — Deleting Secrets Manager secrets..."
+# ── Step 7 — Delete any remaining Secrets Manager secrets ─────────────────
+step "7/7 — Deleting any remaining Secrets Manager secrets..."
 for SECRET in planetary-api/docker-credentials planetary-api/snyk-token \
               planetary-api/semgrep-token planetary-api/db-credentials; do
     aws secretsmanager delete-secret --secret-id "$SECRET" \
