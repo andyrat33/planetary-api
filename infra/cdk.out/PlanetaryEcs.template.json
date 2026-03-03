@@ -527,6 +527,31 @@
         "ValueFrom": "arn:aws:secretsmanager:us-east-1:450372565572:secret:planetary-api/db-credentials:DB_NAME::"
        }
       ]
+     },
+     {
+      "Essential": false,
+      "Image": "axllent/mailpit",
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "PlanetaryTaskDefmailpitLogGroupA0768C1A"
+        },
+        "awslogs-stream-prefix": "mailpit",
+        "awslogs-region": "us-east-1"
+       }
+      },
+      "Name": "mailpit",
+      "PortMappings": [
+       {
+        "ContainerPort": 1025,
+        "Protocol": "tcp"
+       },
+       {
+        "ContainerPort": 8025,
+        "Protocol": "tcp"
+       }
+      ]
      }
     ],
     "Cpu": "512",
@@ -536,7 +561,7 @@
       "Arn"
      ]
     },
-    "Family": "PlanetaryEcsPlanetaryTaskDef38BF7A91",
+    "Family": "planetary-api-task",
     "Memory": "1024",
     "NetworkMode": "awsvpc",
     "RequiresCompatibilities": [
@@ -608,12 +633,20 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": {
-        "Fn::GetAtt": [
-         "PlanetaryTaskDefplanetaryapiLogGroupD8F39288",
-         "Arn"
-        ]
-       }
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "PlanetaryTaskDefmailpitLogGroupA0768C1A",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "PlanetaryTaskDefplanetaryapiLogGroupD8F39288",
+          "Arn"
+         ]
+        }
+       ]
       },
       {
        "Action": [
@@ -635,6 +668,14 @@
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryEcs/PlanetaryTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlanetaryTaskDefmailpitLogGroupA0768C1A": {
+   "Type": "AWS::Logs::LogGroup",
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryTaskDef/mailpit/LogGroup/Resource"
    }
   },
   "PlanetaryServiceLB849C6FE4": {
@@ -686,6 +727,13 @@
       "FromPort": 80,
       "IpProtocol": "tcp",
       "ToPort": 80
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 8025",
+      "FromPort": 8025,
+      "IpProtocol": "tcp",
+      "ToPort": 8025
      }
     ],
     "VpcId": {
@@ -718,6 +766,30 @@
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/SecurityGroup/to PlanetaryEcsPlanetaryServiceSecurityGroup752509AA:5000"
+   }
+  },
+  "PlanetaryServiceLBSecurityGrouptoPlanetaryEcsPlanetaryServiceSecurityGroup752509AA8025D221F585": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceSecurityGroup6082DF2A",
+      "GroupId"
+     ]
+    },
+    "FromPort": 8025,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceLBSecurityGroupA338020E",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 8025
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/SecurityGroup/to PlanetaryEcsPlanetaryServiceSecurityGroup752509AA:8025"
    }
   },
   "PlanetaryServiceLBPublicListener00060808": {
@@ -766,6 +838,52 @@
     "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/PublicListener/ECSGroup/Resource"
    }
   },
+  "PlanetaryServiceLBMailpitListener6811B86D": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "PlanetaryServiceLBMailpitListenerMailpitTargetsGroup2953BC01"
+      },
+      "Type": "forward"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "PlanetaryServiceLB849C6FE4"
+    },
+    "Port": 8025,
+    "Protocol": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/MailpitListener/Resource"
+   }
+  },
+  "PlanetaryServiceLBMailpitListenerMailpitTargetsGroup2953BC01": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "HealthCheckIntervalSeconds": 30,
+    "HealthCheckPath": "/",
+    "Matcher": {
+     "HttpCode": "200"
+    },
+    "Port": 8025,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "VpcId": {
+     "Ref": "PlanetaryVpc2814F774"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/LB/MailpitListener/MailpitTargetsGroup/Resource"
+   }
+  },
   "PlanetaryService256D60FB": {
    "Type": "AWS::ECS::Service",
    "Properties": {
@@ -791,6 +909,13 @@
       "ContainerPort": 5000,
       "TargetGroupArn": {
        "Ref": "PlanetaryServiceLBPublicListenerECSGroupBFCDD617"
+      }
+     },
+     {
+      "ContainerName": "mailpit",
+      "ContainerPort": 8025,
+      "TargetGroupArn": {
+       "Ref": "PlanetaryServiceLBMailpitListenerMailpitTargetsGroup2953BC01"
       }
      }
     ],
@@ -820,6 +945,8 @@
     }
    },
    "DependsOn": [
+    "PlanetaryServiceLBMailpitListenerMailpitTargetsGroup2953BC01",
+    "PlanetaryServiceLBMailpitListener6811B86D",
     "PlanetaryServiceLBPublicListenerECSGroupBFCDD617",
     "PlanetaryServiceLBPublicListener00060808",
     "PlanetaryTaskDefTaskRole478DB264"
@@ -877,10 +1004,37 @@
     "aws:cdk:path": "PlanetaryEcs/PlanetaryService/Service/SecurityGroup/from PlanetaryEcsPlanetaryServiceLBSecurityGroup7B437B5E:5000"
    }
   },
+  "PlanetaryServiceSecurityGroupfromPlanetaryEcsPlanetaryServiceLBSecurityGroup7B437B5E802550C6C86D": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "FromPort": 8025,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceSecurityGroup6082DF2A",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "PlanetaryServiceLBSecurityGroupA338020E",
+      "GroupId"
+     ]
+    },
+    "ToPort": 8025
+   },
+   "DependsOn": [
+    "PlanetaryTaskDefTaskRole478DB264"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PlanetaryEcs/PlanetaryService/Service/SecurityGroup/from PlanetaryEcsPlanetaryServiceLBSecurityGroup7B437B5E:8025"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31RwW7CMAz9lt1DtsEuOzLGEBLaqhZxRWkwxSMkVeKAUNV/X9pQqNi0k59fn+vnlyEfjl7504M4uYHc7AcKc15lJOSeBWpdgRzyalVKNtnqVTJhic8VysznGqjhbig1nmApcgU3/saNnTMSBaHRV3EDpvOkKZ+CZoLgJM4ssXgM8PbjuSawAXeC6OTSjSl43R1AE8tAeot0nlnjy9bDv8S0sODcL3quW75mIB2vJsq7sL1RdfBD2EI0V7n9O2xRY3fTPWM0CdRge9xlNgN7RBlzirBmKA68Sk1Mr62JCUm350ZUM2WK4GlhiutFHW7trktBTVSOj8syTLRpL4zYvAkltITN3XpQwhFKFRR5q0BdHMNz/z1t475e39dhyEZfNB3ufV+GzeEFO9u9tq5ZCs54G/P48lR6qllypp3RjyP+/MJHD98OcWC9JjwAT2P9Ab5qYRK6AgAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31R0W7CMAz8Ft5Dxrr9AGMMIaGtahGvKA2meISkShwQqvrvS1tKKzbtyefruT5fIh69TvhkJC5uLHfHscKMlykJeWSB2pYgI15uCslme72JZyz2mUKZ+kwD1VyPEuMJ1iJT0PM9N3XOSBSERt/FNZgv47p8CloIgou4stjiOcD+x0tNYAPuBK2TWzel4PVwAk0sBekt0nVhjS8aD/8S89yCc7/opW74ioF0vJwp78L2WtXBD2FzUV/lju+wR43dTY+M0SRQgx1wt9kU7Bllm1MLK4bixMvEtOk1NTYh6ebcFlVMmTx4Wpn8flGHG7vbQlAdlePToggTTdorI3ZvQgktYfewHpRwhFIFRdYoUOfn8Nx/T9t236Af6jBko2+aDg++r8Pm8IKd7UFbVSwBZ7xt8/jyVHiqWHylg9FPL/w54tHo2yGOrdeEJ+BJW38AKL+4z7oCAAA="
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryEcs/CDKMetadata/Default"
@@ -933,6 +1087,23 @@
     ]
    }
   },
+  "MailpitUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "PlanetaryServiceLB849C6FE4",
+        "DNSName"
+       ]
+      },
+      ":8025"
+     ]
+    ]
+   }
+  },
   "ExportsOutputFnGetAttPlanetaryServiceLB849C6FE4DNSNameF8EDD621": {
    "Value": {
     "Fn::GetAtt": [
@@ -961,6 +1132,33 @@
    },
    "Export": {
     "Name": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+   }
+  },
+  "ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlanetaryServiceSecurityGroup6082DF2A",
+     "GroupId"
+    ]
+   },
+   "Export": {
+    "Name": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+   }
+  },
+  "ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40": {
+   "Value": {
+    "Ref": "PlanetaryVpcPrivateSubnet1SubnetE2514B64"
+   },
+   "Export": {
+    "Name": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+   }
+  },
+  "ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C": {
+   "Value": {
+    "Ref": "PlanetaryVpcPrivateSubnet2SubnetB02B119C"
+   },
+   "Export": {
+    "Name": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
    }
   },
   "ExportsOutputFnGetAttPlanetaryService256D60FBName4E24F9E2": {

@@ -588,6 +588,43 @@
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
        }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -699,6 +736,43 @@
        "Type": "PLAINTEXT",
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
        }
       }
      ],
@@ -812,6 +886,43 @@
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
        }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -923,6 +1034,43 @@
        "Type": "PLAINTEXT",
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
        }
       }
      ],
@@ -1036,6 +1184,43 @@
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
        }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -1147,6 +1332,43 @@
        "Type": "PLAINTEXT",
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
        }
       }
      ],
@@ -1260,6 +1482,43 @@
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
        }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -1372,6 +1631,43 @@
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
        }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
+       }
       }
      ],
      "Image": "aws/codebuild/standard:7.0",
@@ -1483,6 +1779,43 @@
        "Type": "PLAINTEXT",
        "Value": {
         "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceLBSecurityGroupA338020EGroupIdDA89B28C"
+       }
+      },
+      {
+       "Name": "ECS_CLUSTER",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryCluster4F250F965F1C3032"
+       }
+      },
+      {
+       "Name": "ECS_TASK_FAMILY",
+       "Type": "PLAINTEXT",
+       "Value": "planetary-api-task"
+      },
+      {
+       "Name": "ECS_TASK_SG_ID",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::ImportValue": "PlanetaryEcs:ExportsOutputFnGetAttPlanetaryServiceSecurityGroup6082DF2AGroupId43A2C3DB"
+       }
+      },
+      {
+       "Name": "ECS_SUBNET_IDS",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet1SubnetE2514B64CEAB5A40"
+          },
+          ",",
+          {
+           "Fn::ImportValue": "PlanetaryEcs:ExportsOutputRefPlanetaryVpcPrivateSubnet2SubnetB02B119CA389EE6C"
+          }
+         ]
+        ]
        }
       }
      ],
@@ -2901,7 +3234,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/0WMyQ7CIBRFv8U9fQ5141Y/QKLuDaVPfZZCwxDTEP7dQhtd3XOH3B3s6gNsVuLjKtl2laIG4tUL2bEpukfn+uwt6ScXVvTo0bLTQ/9MYq6GeAyyQ5+LmaZUO4g3M5DMaYHESExvF6MwZ0W5USTH8lgoMWlabAKpFiKnARVp5Na8UZb7BefZsPT/ZZksnFJ25+CHMO356F9Gr2vY7qFevR1RZYP21CNcZv0CtK85JgsBAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/0WMWw6CMBBF18J/GRFcgS7ARv03tYw6UlrSR4xpundpIfp1z33kttDuGmgq8Xa17Ida0Q3i2Qs5sDm6RufG7C3pBxdWjOjRssNd/0xiroO4D3JAn4uF5lQ7iBczkcxpgcRIzG8nozBnRblRJD/lsVBi0vR4C6R6iJwmVKSRW/NCWe5XXGbT2v+XZbJyStkdg5/CvOcf/zR608G2hbZ6OaLaBu1pRDgt+gU3zKojCwEAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "PlanetaryPipeline/CDKMetadata/Default"
