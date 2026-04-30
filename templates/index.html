@@ -1,101 +1,1005 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Planetary API</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planetary API Command</title>
+    <style>
+        :root {
+            --space: #060912;
+            --panel: rgba(10, 18, 32, 0.86);
+            --panel-strong: rgba(14, 28, 48, 0.96);
+            --line: rgba(137, 217, 255, 0.28);
+            --text: #edf7ff;
+            --muted: #92abc0;
+            --gold: #f6c65b;
+            --amber: #f58c4b;
+            --blue: #5ed7ff;
+            --green: #74e2a6;
+            --red: #ff6f7d;
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.44);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(94, 215, 255, 0.16), transparent 22rem),
+                radial-gradient(circle at 86% 24%, rgba(246, 198, 91, 0.13), transparent 18rem),
+                linear-gradient(135deg, rgba(6, 9, 18, 0.96), rgba(10, 16, 30, 0.98)),
+                var(--space);
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            position: fixed;
+            inset: 0;
+            content: "";
+            pointer-events: none;
+        }
+
+        body::before {
+            background-image:
+                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.5px),
+                radial-gradient(circle, rgba(94, 215, 255, 0.8) 0 1px, transparent 1.6px);
+            background-position: 0 0, 38px 54px;
+            background-size: 96px 96px, 142px 142px;
+            opacity: 0.42;
+        }
+
+        body::after {
+            background:
+                linear-gradient(90deg, transparent 0 48%, rgba(94, 215, 255, 0.08) 50%, transparent 52%),
+                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 7px);
+            mix-blend-mode: screen;
+            opacity: 0.38;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            width: min(1180px, calc(100% - 32px));
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 32px 0;
+            display: grid;
+            align-items: center;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .delta {
+            width: 46px;
+            height: 52px;
+            flex: 0 0 auto;
+            filter: drop-shadow(0 0 18px rgba(94, 215, 255, 0.38));
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: clamp(1.35rem, 2.2vw, 2.15rem);
+            line-height: 1.04;
+            letter-spacing: 0;
+        }
+
+        .brand p,
+        .eyebrow,
+        .status-copy,
+        .field span,
+        .endpoint {
+            color: var(--muted);
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            font-size: 0.92rem;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 38px;
+            padding: 0 14px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--muted);
+            background: rgba(8, 16, 30, 0.68);
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: var(--red);
+            box-shadow: 0 0 18px var(--red);
+        }
+
+        .status-pill.online .status-dot {
+            background: var(--green);
+            box-shadow: 0 0 18px var(--green);
+        }
+
+        .login-screen {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.72fr);
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .hero-panel,
+        .login-panel,
+        .control-panel,
+        .output-panel,
+        .planet-strip {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .hero-panel {
+            position: relative;
+            min-height: 560px;
+            padding: clamp(28px, 4vw, 54px);
+            overflow: hidden;
+            border-radius: 8px 46px 8px 8px;
+        }
+
+        .hero-panel::before {
+            position: absolute;
+            inset: 28px 28px auto auto;
+            width: 38%;
+            height: 78px;
+            content: "";
+            border-top: 16px solid var(--gold);
+            border-right: 16px solid var(--amber);
+            border-radius: 0 34px 0 0;
+            opacity: 0.92;
+        }
+
+        .orbit {
+            position: absolute;
+            right: -130px;
+            bottom: -150px;
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            border: 1px solid rgba(94, 215, 255, 0.34);
+            background:
+                radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.8), transparent 2px),
+                radial-gradient(circle at 52% 48%, rgba(94, 215, 255, 0.44), transparent 12px),
+                radial-gradient(circle at 50% 50%, rgba(7, 23, 42, 0.12) 0 46%, transparent 47%);
+        }
+
+        .orbit::before,
+        .orbit::after {
+            position: absolute;
+            inset: 72px;
+            content: "";
+            border-radius: inherit;
+            border: 1px solid rgba(246, 198, 91, 0.32);
+        }
+
+        .orbit::after {
+            inset: 138px;
+            border-color: rgba(116, 226, 166, 0.26);
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 620px;
+        }
+
+        .eyebrow {
+            margin: 0 0 12px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+        }
+
+        .hero-panel h2 {
+            margin: 0;
+            font-size: clamp(2.4rem, 6vw, 5.8rem);
+            line-height: 0.92;
+            letter-spacing: 0;
+        }
+
+        .hero-panel .lead {
+            max-width: 560px;
+            margin: 22px 0 0;
+            color: #c7d8e7;
+            font-size: clamp(1rem, 1.8vw, 1.18rem);
+            line-height: 1.65;
+        }
+
+        .mission-grid {
+            position: absolute;
+            left: clamp(28px, 4vw, 54px);
+            right: clamp(28px, 4vw, 54px);
+            bottom: clamp(28px, 4vw, 54px);
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .mission-chip {
+            min-height: 78px;
+            padding: 14px;
+            border: 1px solid rgba(94, 215, 255, 0.24);
+            border-radius: 8px;
+            background: rgba(4, 10, 20, 0.54);
+        }
+
+        .mission-chip strong {
+            display: block;
+            font-size: 1.24rem;
+            color: var(--gold);
+        }
+
+        .mission-chip span {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .login-panel {
+            border-radius: 46px 8px 8px 8px;
+            padding: 28px;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .panel-heading {
+            margin-bottom: 22px;
+        }
+
+        .panel-heading h2,
+        .control-panel h2,
+        .output-panel h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .panel-heading p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .field span {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        input {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid rgba(137, 217, 255, 0.32);
+            border-radius: 8px;
+            padding: 0 13px;
+            color: var(--text);
+            background: rgba(4, 10, 20, 0.76);
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(94, 215, 255, 0.16);
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button {
+            min-height: 44px;
+            border: 0;
+            border-radius: 8px;
+            padding: 0 16px;
+            color: #08111e;
+            font-weight: 800;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--gold), var(--amber));
+            box-shadow: 0 12px 28px rgba(245, 140, 75, 0.22);
+        }
+
+        button.secondary {
+            color: var(--text);
+            border: 1px solid rgba(137, 217, 255, 0.28);
+            background: rgba(11, 27, 48, 0.84);
+            box-shadow: none;
+        }
+
+        button.danger {
+            color: #230408;
+            background: linear-gradient(135deg, #ff9ca6, var(--red));
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.52;
+        }
+
+        .form-message {
+            min-height: 22px;
+            margin: 14px 0 0;
+            color: var(--muted);
+        }
+
+        .form-message.error {
+            color: #ffb4bd;
+        }
+
+        .app-screen {
+            display: none;
+        }
+
+        .app-screen.active {
+            display: block;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .controls {
+            display: grid;
+            gap: 14px;
+        }
+
+        .control-panel,
+        .output-panel,
+        .planet-strip {
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .control-panel header,
+        .output-panel header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: start;
+            margin-bottom: 14px;
+        }
+
+        .endpoint {
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .form-grid .wide {
+            grid-column: 1 / -1;
+        }
+
+        .output-panel {
+            position: sticky;
+            top: 18px;
+            background: var(--panel-strong);
+        }
+
+        .response-meta {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .metric {
+            min-height: 66px;
+            border: 1px solid rgba(137, 217, 255, 0.22);
+            border-radius: 8px;
+            padding: 11px;
+            background: rgba(3, 9, 18, 0.52);
+        }
+
+        .metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .metric strong {
+            display: block;
+            margin-top: 6px;
+            color: var(--text);
+            font-size: 1.05rem;
+            overflow-wrap: anywhere;
+        }
+
+        pre {
+            min-height: 430px;
+            max-height: 62vh;
+            margin: 0;
+            overflow: auto;
+            border: 1px solid rgba(137, 217, 255, 0.22);
+            border-radius: 8px;
+            padding: 16px;
+            color: #d9f2ff;
+            background:
+                linear-gradient(rgba(94, 215, 255, 0.035) 50%, transparent 50%),
+                rgba(2, 7, 14, 0.92);
+            background-size: 100% 28px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+
+        .planet-strip {
+            margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .planet-card {
+            min-height: 86px;
+            border-radius: 8px;
+            padding: 13px;
+            background:
+                linear-gradient(135deg, rgba(246, 198, 91, 0.16), rgba(94, 215, 255, 0.08)),
+                rgba(3, 9, 18, 0.62);
+            border: 1px solid rgba(137, 217, 255, 0.22);
+        }
+
+        .planet-card strong,
+        .planet-card span {
+            display: block;
+            overflow-wrap: anywhere;
+        }
+
+        .planet-card span {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 0.83rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 920px) {
+            .login-screen,
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-panel {
+                min-height: 500px;
+            }
+
+            .mission-grid,
+            .planet-strip,
+            .response-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .output-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 20px, 1180px);
+                padding: 18px 0;
+            }
+
+            .topbar,
+            .control-panel header,
+            .output-panel header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .status-pill,
+            .endpoint {
+                white-space: normal;
+            }
+
+            .hero-panel,
+            .login-panel {
+                min-height: auto;
+                border-radius: 8px;
+                padding: 22px;
+            }
+
+            .hero-panel::before {
+                display: none;
+            }
+
+            .orbit {
+                opacity: 0.45;
+            }
+
+            .hero-content {
+                padding-bottom: 220px;
+            }
+
+            .mission-grid {
+                position: relative;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                margin-top: -170px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Login</h2>
-    <input type="text" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <h2>Get Planet</h2>
-    <input type="text" id="planet_name" placeholder="Planet Name">
-    <button onclick="getPlanet()">Fetch Planet</button>
+    <main class="shell">
+        <section id="loginScreen" class="login-screen">
+            <div class="hero-panel" aria-label="Starfleet planetary archive">
+                <div class="orbit" aria-hidden="true"></div>
+                <div class="hero-content">
+                    <p class="eyebrow">Federation Stellar Cartography</p>
+                    <h2>Planetary API Command</h2>
+                    <p class="lead">
+                        Authenticate to open a Star Trek inspired operations deck for browsing, creating,
+                        updating, and deleting planetary records.
+                    </p>
+                </div>
+                <div class="mission-grid" aria-label="API capabilities">
+                    <div class="mission-chip">
+                        <strong>JWT</strong>
+                        <span>Protected command channels</span>
+                    </div>
+                    <div class="mission-chip">
+                        <strong>CRUD</strong>
+                        <span>Planetary record operations</span>
+                    </div>
+                    <div class="mission-chip">
+                        <strong>LCARS</strong>
+                        <span>Modern tactical interface</span>
+                    </div>
+                </div>
+            </div>
 
-    <h2>Add Planet</h2>
-    <input type="text" id="new_planet_name" placeholder="Planet Name">
-    <input type="text" id="new_planet_type" placeholder="Planet Type">
-    <input type="text" id="new_home_star" placeholder="Home Star">
-    <input type="number" id="new_mass" placeholder="Mass">
-    <input type="number" id="new_radius" placeholder="Radius">
-    <input type="number" id="new_distance" placeholder="Distance">
-    <button onclick="addPlanet()">Add Planet</button>
+            <form id="loginForm" class="login-panel">
+                <div class="panel-heading">
+                    <svg class="delta" viewBox="0 0 80 96" role="img" aria-label="Starfleet delta">
+                        <path d="M40 4 72 90 40 72 8 90 40 4Z" fill="none" stroke="#5ed7ff" stroke-width="5"/>
+                        <path d="M40 18 54 72 40 62 26 72 40 18Z" fill="#f6c65b"/>
+                    </svg>
+                    <p class="eyebrow">Secure Channel</p>
+                    <h2>Crew Authentication</h2>
+                    <p>Use a seeded account such as test@test.com / P@ssw0rd after running the database seed command.</p>
+                </div>
 
-    <h2>Delete Planet</h2>
-    <input type="number" id="delete_planet_id" placeholder="Planet ID">
-    <button onclick="deletePlanet()">Delete Planet</button>
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" id="email" value="test@test.com" autocomplete="username" required>
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <input type="password" id="password" value="P@ssw0rd" autocomplete="current-password" required>
+                </label>
 
-    <pre id="output"></pre>
+                <div class="button-row">
+                    <button type="submit">Engage Login</button>
+                </div>
+                <p id="loginMessage" class="form-message" role="status"></p>
+            </form>
+        </section>
+
+        <section id="appScreen" class="app-screen" aria-label="Planetary API controls">
+            <div class="topbar">
+                <div class="brand">
+                    <svg class="delta" viewBox="0 0 80 96" aria-hidden="true">
+                        <path d="M40 4 72 90 40 72 8 90 40 4Z" fill="none" stroke="#5ed7ff" stroke-width="5"/>
+                        <path d="M40 18 54 72 40 62 26 72 40 18Z" fill="#f6c65b"/>
+                    </svg>
+                    <div>
+                        <h1>Planetary API Command</h1>
+                        <p id="sessionLabel">Authenticated session active</p>
+                    </div>
+                </div>
+                <div class="button-row">
+                    <span id="statusPill" class="status-pill online"><span class="status-dot"></span>Online</span>
+                    <button type="button" class="secondary" id="logoutButton">Logout</button>
+                </div>
+            </div>
+
+            <div id="planetStrip" class="planet-strip" aria-live="polite"></div>
+
+            <div class="dashboard">
+                <div class="controls">
+                    <section class="control-panel">
+                        <header>
+                            <div>
+                                <p class="eyebrow">Survey</p>
+                                <h2>Browse Planetary Archive</h2>
+                            </div>
+                            <span class="endpoint">GET /planets</span>
+                        </header>
+                        <div class="button-row">
+                            <button type="button" id="listPlanetsButton">List Planets</button>
+                            <button type="button" class="secondary" id="randomPlanetButton">Random Planet</button>
+                        </div>
+                    </section>
+
+                    <section class="control-panel">
+                        <header>
+                            <div>
+                                <p class="eyebrow">Search</p>
+                                <h2>Protected Planet Lookup</h2>
+                            </div>
+                            <span class="endpoint">GET /get_planet/&lt;name&gt;</span>
+                        </header>
+                        <form id="searchForm">
+                            <label class="field">
+                                <span>Planet Name</span>
+                                <input type="text" id="planet_name" value="Vulcan" required>
+                            </label>
+                            <button type="submit">Scan Planet</button>
+                        </form>
+                    </section>
+
+                    <section class="control-panel">
+                        <header>
+                            <div>
+                                <p class="eyebrow">Create</p>
+                                <h2>Add Planet</h2>
+                            </div>
+                            <span class="endpoint">POST /add_planet</span>
+                        </header>
+                        <form id="addForm" class="form-grid">
+                            <label class="field">
+                                <span>Name</span>
+                                <input type="text" id="new_planet_name" value="New Bajor" required>
+                            </label>
+                            <label class="field">
+                                <span>Class</span>
+                                <input type="text" id="new_planet_type" value="Class M" required>
+                            </label>
+                            <label class="field">
+                                <span>Home Star</span>
+                                <input type="text" id="new_home_star" value="Bajor" required>
+                            </label>
+                            <label class="field">
+                                <span>Mass</span>
+                                <input type="number" id="new_mass" value="5.258e23" step="any" required>
+                            </label>
+                            <label class="field">
+                                <span>Radius</span>
+                                <input type="number" id="new_radius" value="3516" step="any" required>
+                            </label>
+                            <label class="field">
+                                <span>Distance</span>
+                                <input type="number" id="new_distance" value="135980000" step="any" required>
+                            </label>
+                            <div class="wide">
+                                <button type="submit">Add Record</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="control-panel">
+                        <header>
+                            <div>
+                                <p class="eyebrow">Modify</p>
+                                <h2>Update Planet</h2>
+                            </div>
+                            <span class="endpoint">PUT /update_planet</span>
+                        </header>
+                        <form id="updateForm" class="form-grid">
+                            <label class="field">
+                                <span>Planet ID</span>
+                                <input type="number" id="update_planet_id" min="1" required>
+                            </label>
+                            <label class="field">
+                                <span>Name</span>
+                                <input type="text" id="update_planet_name" required>
+                            </label>
+                            <label class="field">
+                                <span>Class</span>
+                                <input type="text" id="update_planet_type" required>
+                            </label>
+                            <label class="field">
+                                <span>Home Star</span>
+                                <input type="text" id="update_home_star" required>
+                            </label>
+                            <label class="field">
+                                <span>Mass</span>
+                                <input type="number" id="update_mass" step="any" required>
+                            </label>
+                            <label class="field">
+                                <span>Radius</span>
+                                <input type="number" id="update_radius" step="any" required>
+                            </label>
+                            <label class="field wide">
+                                <span>Distance</span>
+                                <input type="number" id="update_distance" step="any" required>
+                            </label>
+                            <div class="wide">
+                                <button type="submit" class="secondary">Update Record</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="control-panel">
+                        <header>
+                            <div>
+                                <p class="eyebrow">Remove</p>
+                                <h2>Delete Planet</h2>
+                            </div>
+                            <span class="endpoint">DELETE /remove_planet/&lt;id&gt;</span>
+                        </header>
+                        <form id="deleteForm">
+                            <label class="field">
+                                <span>Planet ID</span>
+                                <input type="number" id="delete_planet_id" min="1" required>
+                            </label>
+                            <button type="submit" class="danger">Delete Record</button>
+                        </form>
+                    </section>
+                </div>
+
+                <section class="output-panel">
+                    <header>
+                        <div>
+                            <p class="eyebrow">Telemetry</p>
+                            <h2>API Response</h2>
+                        </div>
+                        <button type="button" class="secondary" id="clearOutputButton">Clear</button>
+                    </header>
+                    <div class="response-meta">
+                        <div class="metric">
+                            <span>Status</span>
+                            <strong id="responseStatus">Idle</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Method</span>
+                            <strong id="responseMethod">--</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Endpoint</span>
+                            <strong id="responseEndpoint">--</strong>
+                        </div>
+                    </div>
+                    <pre id="output">Awaiting command input...</pre>
+                </section>
+            </div>
+        </section>
+    </main>
+
     <script>
         let token = "";
-        function login() {
+        let currentUser = "";
+
+        const loginScreen = document.getElementById("loginScreen");
+        const appScreen = document.getElementById("appScreen");
+        const loginMessage = document.getElementById("loginMessage");
+        const output = document.getElementById("output");
+        const responseStatus = document.getElementById("responseStatus");
+        const responseMethod = document.getElementById("responseMethod");
+        const responseEndpoint = document.getElementById("responseEndpoint");
+        const sessionLabel = document.getElementById("sessionLabel");
+        const planetStrip = document.getElementById("planetStrip");
+
+        function setLoading(isLoading) {
+            document.querySelectorAll("button").forEach((button) => {
+                button.disabled = isLoading;
+            });
+        }
+
+        function showApp() {
+            loginScreen.classList.add("hidden");
+            appScreen.classList.add("active");
+            sessionLabel.textContent = `Authenticated as ${currentUser}`;
+        }
+
+        function showLogin() {
+            token = "";
+            currentUser = "";
+            appScreen.classList.remove("active");
+            loginScreen.classList.remove("hidden");
+            loginMessage.textContent = "";
+        }
+
+        function showResponse(method, endpoint, status, data) {
+            responseMethod.textContent = method;
+            responseEndpoint.textContent = endpoint;
+            responseStatus.textContent = status;
+            output.textContent = JSON.stringify(data, null, 2);
+        }
+
+        function planetPayload(prefix) {
+            return {
+                planet_name: document.getElementById(`${prefix}_planet_name`).value,
+                planet_type: document.getElementById(`${prefix}_planet_type`).value,
+                home_star: document.getElementById(`${prefix}_home_star`).value,
+                mass: document.getElementById(`${prefix}_mass`).value,
+                radius: document.getElementById(`${prefix}_radius`).value,
+                distance: document.getElementById(`${prefix}_distance`).value,
+            };
+        }
+
+        async function apiRequest(method, endpoint, options = {}) {
+            setLoading(true);
+            try {
+                const headers = options.headers || {};
+                if (options.protectedRoute) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+                if (options.body) {
+                    headers["Content-Type"] = "application/json";
+                }
+
+                const response = await fetch(endpoint, {
+                    method,
+                    headers,
+                    body: options.body ? JSON.stringify(options.body) : undefined,
+                });
+                const data = await response.json();
+                showResponse(method, endpoint, `${response.status} ${response.statusText}`, data);
+                return { response, data };
+            } catch (error) {
+                showResponse(method, endpoint, "Network Error", { message: error.message });
+                return { response: null, data: null };
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function refreshPlanets() {
+            const result = await apiRequest("GET", "/planets");
+            if (!Array.isArray(result.data)) {
+                return;
+            }
+            planetStrip.replaceChildren();
+            result.data.slice(0, 4).forEach((planet) => {
+                const card = document.createElement("article");
+                const name = document.createElement("strong");
+                const detail = document.createElement("span");
+
+                card.className = "planet-card";
+                name.textContent = planet.planet_name;
+                detail.textContent = `${planet.planet_type} | ${planet.home_star}`;
+
+                card.append(name, detail);
+                planetStrip.append(card);
+            });
+        }
+
+        document.getElementById("loginForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            loginMessage.textContent = "Opening channel...";
+            loginMessage.classList.remove("error");
+            setLoading(true);
+
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
-            fetch("/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ "email": email,
-                    "password": password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.access_token) {
-                    token = data.access_token;
-                    alert("Login successful");
-                } else {
-                    alert("Invalid credentials");
+
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await response.json();
+                if (!response.ok || !data.access_token) {
+                    throw new Error(data.message || "Invalid credentials");
                 }
-            });
-        }
-        function getPlanet() {
-            const planet_name = document.getElementById("planet_name")
-            .value;
-            fetch(`/get_planet/${planet_name}`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("output").textContent =
-                JSON.stringify(data, null, 2);
-            });
-        }
 
-        function addPlanet() {
-            const body = {
-                planet_name: document.getElementById("new_planet_name").value,
-                planet_type: document.getElementById("new_planet_type").value,
-                home_star: document.getElementById("new_home_star").value,
-                mass: document.getElementById("new_mass").value,
-                radius: document.getElementById("new_radius").value,
-                distance: document.getElementById("new_distance").value,
-            };
-            fetch("/add_planet", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(body)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("output").textContent =
-                JSON.stringify(data, null, 2);
-            });
-        }
+                token = data.access_token;
+                currentUser = email;
+                loginMessage.textContent = "Channel open.";
+                showApp();
+                await refreshPlanets();
+            } catch (error) {
+                loginMessage.textContent = error.message;
+                loginMessage.classList.add("error");
+            } finally {
+                setLoading(false);
+            }
+        });
 
-        function deletePlanet() {
-            const planet_id = document.getElementById("delete_planet_id").value;
-            fetch(`/remove_planet/${planet_id}`, {
-                method: "DELETE",
-                headers: { "Authorization": `Bearer ${token}` }
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("output").textContent =
-                JSON.stringify(data, null, 2);
+        document.getElementById("logoutButton").addEventListener("click", showLogin);
+        document.getElementById("clearOutputButton").addEventListener("click", () => {
+            responseStatus.textContent = "Idle";
+            responseMethod.textContent = "--";
+            responseEndpoint.textContent = "--";
+            output.textContent = "Awaiting command input...";
+        });
+
+        document.getElementById("listPlanetsButton").addEventListener("click", refreshPlanets);
+        document.getElementById("randomPlanetButton").addEventListener("click", () => {
+            apiRequest("GET", "/random_planet");
+        });
+
+        document.getElementById("searchForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const name = encodeURIComponent(document.getElementById("planet_name").value);
+            apiRequest("GET", `/get_planet/${name}`, { protectedRoute: true });
+        });
+
+        document.getElementById("addForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            await apiRequest("POST", "/add_planet", {
+                protectedRoute: true,
+                body: planetPayload("new"),
             });
-        }
+            await refreshPlanets();
+        });
+
+        document.getElementById("updateForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const body = planetPayload("update");
+            body.planet_id = document.getElementById("update_planet_id").value;
+            await apiRequest("PUT", "/update_planet", {
+                protectedRoute: true,
+                body,
+            });
+            await refreshPlanets();
+        });
+
+        document.getElementById("deleteForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const id = encodeURIComponent(document.getElementById("delete_planet_id").value);
+            await apiRequest("DELETE", `/remove_planet/${id}`, { protectedRoute: true });
+            await refreshPlanets();
+        });
     </script>
 </body>
 </html>
